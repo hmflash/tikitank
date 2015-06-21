@@ -216,7 +216,7 @@ function setEffectScreenSaver(api, arg) {
 function getSettings() {
     console.log("Getting settings");
     // Get panels effects
-    $.getJSON("/settings/", function (data, status) {
+    $.getJSON("/settings", function (data, status) {
         console.log(data);
         displaySettings(data);
     });
@@ -231,29 +231,29 @@ function displaySettings(data) {
 function setDmxBrightness(arg) {
     $.post("/settings",
      {
-         dmxbrightness: arg
+         dmxBrightness: arg
      },
      function (data, status) {
-         //displayActiveEffectData(data, api);
+         displaySettings(data);
      });
 }
 
 function setManualTick(arg) {
     $.post("/settings",
      {
-         manualtick: arg
+         manualTick: arg
      },
      function (data, status) {
-         //displayActiveEffectData(data, api);
+         displaySettings(data);
      });
 }
 
 function setScreenSaverInterval(arg) {
     $.post("/settings",
      {
-         idleinterval: arg
+         idleInterval: arg
      },
      function (data, status) {
-         //displayActiveEffectData(data, api);
+         displaySettings(data);
      });
 }
