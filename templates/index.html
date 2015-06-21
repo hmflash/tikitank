@@ -6,11 +6,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta content="user-scalable=0" name="viewport" />
     <title>TikiTank Console</title>
-	<link rel="stylesheet" type="text/css" href="@Path['~/content/tank.css']" />
-    <script src="@Path['~/content/jquery-2.1.1.min.js']"></script>
-    <script src="@Path['~/content/raphael-min.js']"></script>
-    <script src="@Path['~/content/colorwheel.js']"></script>
-    <script src="@Path['~/content/tank.js']"></script>
+    <link rel="stylesheet" type="text/css" href="/static/tank.css" />
+    <script src="/static/jquery-2.1.1.min.js"></script>
+    <script src="/static/raphael-min.js"></script>
+    <script src="/static/colorwheel.js"></script>
+    <script src="/static/tank.js"></script>
 </head>
 <body>
 <div id="headerBar">
@@ -28,7 +28,7 @@
                 <div id="panelsTab">
                     <div id="effectsWrapper">
                         <div id="effectsLeft_bodyMap">
-                            <img src="@Path['~/content/panels.png']" width="256" height="356" usemap="#panelsmap" />
+                            <img src="/static/panels.png" width="256" height="356" usemap="#panelsmap" />
 
                             <map name="panelsmap">
                                 <area shape="rect" alt="grill" href="javascript:setEffectParameters('panels', cw.color().hex, 0)" coords="18, 10, 239, 59" />
