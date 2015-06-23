@@ -44,15 +44,15 @@ class Settings:
 		for i in Settings.kinds:
 			avail = self._effects.get(i, [])
 			effects = all_effects.get(i, [])
-			for v in effects:
-				if not isinstance(v, dict):
-					continue
+			for cur in avail:
+				cls = cur.get('id', None)
 
-				cls = v.get('id', None)
-				cur = next((x for x in avail if x['id'] == cls), None)
-				if cur:
-					# Only apply if saved setting still applies
-					self._set_effect(cur, v, False)
+				new = next((x for x in effects if x['id'] == cls), None)
+				if not isinstance(new, dict):
+					new = {}
+
+				# Always initialize effect settings
+				self._set_effect(cur, new, False)
 
 		# Get saved active effects
 		active = saved.get('active', {})
@@ -68,10 +68,36 @@ class Settings:
 
 	def _set_effect(self, cur, data, save):
 		obj = Effect.effects[cur['id']]
-		cur['isSensorDriven'] = data.get('isSensorDriven', obj.isSensorDriven)
-		cur['isScreenSaver'] = data.get('isScreenSaver', obj.isScreenSaver)
-		cur['color'] = data.get('color', obj.color)
-		cur['argument'] = data.get('argument', obj.argument)
+		need_save = False
+
+		need_save |= self._apply_effect('isSensorDriven', cur, data, obj)
+		need_save |= self._apply_effect('isScreenSaver', cur, data, obj)
+		need_save |= self._apply_effect('color', cur, data, obj)
+
+		if obj.description:
+			need_save |= self._apply_effect('argument', cur, data, obj)
+
+		if save and need_save:
+			self._save_settings()
+
+	def _apply_effect(self, name, cur, data, obj):
+		val = cur.get(name, None)
+		new = data.get(name, None)
+
+		if str(new) == 'true':
+			new = True
+		elif str(new) == 'false':
+			new = False
+
+		if not new is None and new != val:
+			cur[name] = new
+			return True
+		elif not val is None:
+			cur[name] = val
+		else:
+			cur[name] = getattr(obj, name)
+
+		return False
 
 	def _save_settings(self):
 		obj = {
