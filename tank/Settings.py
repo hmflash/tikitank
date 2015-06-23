@@ -54,6 +54,8 @@ class Settings:
 			self._settings[name] = new;
 			if cur and cur != new:
 				self._save_settings()
+		elif not cur:
+			self._settings[name] = def_val
 
 
 	def post_settings(self, data):
