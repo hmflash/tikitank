@@ -13,6 +13,7 @@ urls = (
 	'/', 'index',
 	'/settings', 'settings',
 	'/api/(\w+)/effects', 'effects',
+	'/api/(\w+)/effect', 'effect',
 )
 
 class index:
@@ -32,6 +33,11 @@ class effects:
 	def GET(self, kind):
 		web.header('Content-Type', 'application/json')
 		return json.dumps(s.get_effects(kind))
+
+class effect:
+	def GET(self, kind):
+		web.header('Content-Type', 'application/json')
+		return json.dumps(s.get_effect(kind))
 
 if __name__ == "__main__":
 	app = web.application(urls, globals())
