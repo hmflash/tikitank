@@ -1,10 +1,10 @@
 from tank import Effect
 
 class RainbowTread(Effect.Effect):
-	"""Rainbow Tread"""
 
+	name = "Rainbow Tread"
 	kind = Effect.TREADS
-        isSensorDriven = True
+	isSensorDriven = True
 
 	def __init__(self, *k, **kw):
-		super(RainbowTread).__init__(*k, **kw)
+		super(RainbowTread, self).__init__(*k, **kw)

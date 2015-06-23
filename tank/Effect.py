@@ -16,8 +16,13 @@ evil = store_effect_type('evil', (object,), {})
 
 class Effect(evil):
 
-	kind = None
-	isSensorDriven = False
+	name = None            # Pretty name for effect
+	kind = None            # What kind of effect is it?
+	isSensorDriven = False # Drive the effect from the VSS?
+	isScreenSaver = False  # Include in screen saver by default?
+	description = None     # Description of argument
+	argument = None        # Default argument value
+	color = '#ffffff'      # Default color for the effect
 
 	def __init__(self, *k, **kw):
 		pass
