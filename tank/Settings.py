@@ -128,6 +128,10 @@ class Settings:
 		elif not cur:
 			self._settings[name] = def_val
 
+	def _get_effect(self, kind, id):
+		avail = self._effects.get(kind, {})
+		return next((x for x in avail if x['id'] == id), {})
+
 	def post_settings(self, data):
 		self._apply_setting('dmxBrightness', data, 100,   100)
 		self._apply_setting('manualTick',    data, 65536, 0)
@@ -141,8 +145,12 @@ class Settings:
 
 	def get_effect(self, kind):
 		active = self._active.get(kind, None)
-		avail = self._effects.get(kind, {})
-		return next((x for x in avail if x['id'] == active), None)
+		return self._get_effect(kind, active)
 
 	def set_effect(self, kind, data):
-		pass
+		cur = self._active.get(kind, None)
+		new = data.get('id', cur)
+		e = self._get_effect(kind, new)
+		if e:
+			self._set_effect(e, data, True)
+		return e
