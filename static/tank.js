@@ -149,17 +149,19 @@ function getActiveEffects()
 }
 
 function selectEffect(id, api) {
-    $.post("/api/" + api + "/effect/" + id,
-        function (data, status) {
-            displayActiveEffectData(data, api);
-            console.log(data);        
+    $.post("/api/" + api + "/effect",
+    {
+        id: id
+    },
+    function (data, status) {
+        displayActiveEffectData(data, api);
     });
 }
 
 function setEffectParameters(api, color, arg) {
     var clr = color.toString();
 
-    $.post("/api/" + api + "/effect/",
+    $.post("/api/" + api + "/effect",
      {
          color: clr,
          argument: arg
@@ -172,7 +174,7 @@ function setEffectParameters(api, color, arg) {
 function setEffectColor(api, color) {
     var clr = color.toString();
 
-    $.post("/api/" + api + "/effect/",
+    $.post("/api/" + api + "/effect",
      {
          color: clr,
      },
@@ -182,7 +184,7 @@ function setEffectColor(api, color) {
 }
 
 function setEffectArgument(api, arg) {
-    $.post("/api/" + api + "/effect/",
+    $.post("/api/" + api + "/effect",
      {
          argument: arg
      },
@@ -192,9 +194,9 @@ function setEffectArgument(api, arg) {
 }
 
 function setEffectSensorDrive(api, arg) {
-    $.post("/api/" + api + "/effect/",
+    $.post("/api/" + api + "/effect",
      {
-         sensordriven: arg
+         isSensorDriven: arg
      },
      function (data, status) {
          getActiveEffects();
@@ -202,9 +204,9 @@ function setEffectSensorDrive(api, arg) {
 }
 
 function setEffectScreenSaver(api, arg) {
-    $.post("/api/" + api + "/effect/",
+    $.post("/api/" + api + "/effect",
      {
-         screensaver: arg
+         isScreenSaver: arg
      },
      function (data, status) {
          getActiveEffects();
