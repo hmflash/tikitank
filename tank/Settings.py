@@ -52,7 +52,7 @@ class Settings:
 					new = {}
 
 				# Always initialize effect settings
-				self._set_effect(cur, new, False)
+				self._set_effect(cur, new, False, False)
 
 		# Get saved active effects
 		active = saved.get('active', {})
@@ -66,9 +66,8 @@ class Settings:
 			elif opts:
 				self._active[i] = opts[0]['id']
 
-	def _set_effect(self, cur, data, save):
+	def _set_effect(self, cur, data, save, need_save):
 		obj = Effect.effects[cur['id']]
-		need_save = False
 
 		need_save |= self._apply_effect('isSensorDriven', cur, data, obj)
 		need_save |= self._apply_effect('isScreenSaver', cur, data, obj)
@@ -152,5 +151,5 @@ class Settings:
 		new = data.get('id', cur)
 		e = self._get_effect(kind, new)
 		if e:
-			self._set_effect(e, data, True)
-		return e
+			self._active[kind] = new
+			self._set_effect(e, data, True, new != cur)
