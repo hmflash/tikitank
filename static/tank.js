@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     $('#panelsTab').show();
     $('#treadsTab').hide();
     $('#barrelTab').hide();
