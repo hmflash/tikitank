@@ -3,16 +3,11 @@
 import web
 import json
 
-from tank import Effect
-from tank.effects import *
-
-opts = {
-	'dmxBrightness' : 100,
-	'manualTick' : 0,
-	'idleInterval' : 120,
-}
+from tank.Settings import Settings
 
 render = web.template.render('templates')
+
+s = Settings()
 
 urls = (
 	'/', 'index',
@@ -27,28 +22,16 @@ class index:
 class settings:
 	def GET(self):
 		web.header('Content-Type', 'application/json')
-		return json.dumps(opts)
+		return json.dumps(s.get_settings())
 
 	def POST(self):
-		data = web.input()
-		for k in opts.keys():
-			opts[k] = getattr(data, k, opts[k])
+		s.post_settings(web.input())
 		return self.GET()
 
 class effects:
 	def GET(self, kind):
 		web.header('Content-Type', 'application/json')
-		ret = []
-		for k,v in Effect.effects.iteritems():
-			if kind != v.kind:
-				continue
-
-			ret.append({
-				'name' : v.__doc__,
-				'id' : k,
-				'isSensorDriven' : v.isSensorDriven,
-			})
-		return json.dumps(ret)
+		return json.dumps(s.get_effects(kind))
 
 if __name__ == "__main__":
 	app = web.application(urls, globals())
