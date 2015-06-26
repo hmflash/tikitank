@@ -83,7 +83,7 @@ function displayEffectsList(effects, api) {
 
         var name = effects[i].name;
         if (effects[i].isScreenSaver) name += "*";
-        html += "<li onClick=\"selectEffect(" + effects[i].id + ",'" + api + "')\">" + name + "</li>";
+        html += "<li onClick=\"selectEffect('" + effects[i].id + "','" + api + "')\">" + name + "</li>";
         console.log(effects[i]);
     }
 
