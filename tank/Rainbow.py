@@ -1,4 +1,18 @@
 
+# Reasonable color correction values from
+# https://github.com/FastLED/FastLED/blob/master/color.h
+
+TypicalSMD5050   = ( 255, 176, 240 )
+UncorrectedColor = ( 255, 255, 255 )
+
+# Perform color correction but ignore temperature adjustment
+def color_correct(pixel, scale):
+	return (
+		(pixel[0] * (scale[0] + 1)) >> 8,
+		(pixel[1] * (scale[1] + 1)) >> 8,
+		(pixel[2] * (scale[2] + 1)) >> 8,
+	)
+
 # Precomputed output from hsv2rainbow()
 # https://github.com/FastLED/FastLED/blob/master/hsv2rgb.cpp
 
