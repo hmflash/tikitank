@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Adafruit_I2C import Adafruit_I2C
+from tank import Rainbow
 import time
 
 class PwmLed:
@@ -120,15 +121,17 @@ def simple_colorwheel():
 if __name__ == "__main__":
 	p = PwmLed(0x40)
 
-	colors = simple_colorwheel()
-	
+	colors = Rainbow.fastled_rainbow()
+
+	cc = Rainbow.TypicalSMD5050
+
 	i = 0
 	try:
 		while True:
-			r,g,b = colors[i]
+			r,g,b = Rainbow.color_correct(colors[i], cc)
 			p.render([ r, g, b ])
 			i = (i + 1) % len(colors)
-			time.sleep(0.005)
+			time.sleep(0.050)
 	except KeyboardInterrupt:
 		p.close()
 
