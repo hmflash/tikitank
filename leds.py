@@ -79,49 +79,10 @@ class PwmLed:
 			self.i2c.write8(self.__LED0_OFF_L + n, v & 0xff)
 			self.i2c.write8(self.__LED0_OFF_H + n, v >> 8)
 
-def white_shades():
-	return [ (c, c, c) for x in range(0,256,1) + range(255,-1,-1) ]
-
-def simple_colorwheel():
-	ret = []
-
-	r = 255
-	g = 0
-	b = 0
-	dr = -1
-	dg = 1
-	db = 0
-
-	while True:
-		ret.append((r,g,b))
-
-		r += dr
-		g += dg
-		b += db
-
-		if g == 256:
-			r = 0
-			g = 255
-			b = 0
-			dr = 0
-			dg = -1
-			db = 1
-
-		if b == 256:
-			r = 0
-			g = 0
-			b = 255
-			dr = 1
-			dg = 0
-			db = -1
-
-		if r == 256:
-			return ret;
-
 if __name__ == "__main__":
 	p = PwmLed(0x40)
 
-	colors = Rainbow.fastled_rainbow()
+	colors = Rainbow.fastled_rainbow
 
 	cc = Rainbow.TypicalSMD5050
 
