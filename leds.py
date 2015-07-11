@@ -80,7 +80,8 @@ class PwmLed:
 			self.i2c.write8(self.__LED0_OFF_H + n, v >> 8)
 
 if __name__ == "__main__":
-	p = PwmLed(0x40)
+	p1 = PwmLed(0x40)
+	p2 = PwmLed(0x41)
 
 	colors = Rainbow.fastled_rainbow
 
@@ -90,9 +91,11 @@ if __name__ == "__main__":
 	try:
 		while True:
 			r,g,b = Rainbow.color_correct(colors[i], cc)
-			p.render([ r, g, b ])
+			p1.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
+			p2.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
 			i = (i + 1) % len(colors)
 			time.sleep(0.050)
 	except KeyboardInterrupt:
-		p.close()
+		p1.close()
+		p2.close()
 
