@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Adafruit_I2C import Adafruit_I2C
+from Adafruit_BBIO.SPI import SPI
 from tank import Rainbow
 import time
 
@@ -34,6 +35,10 @@ class PwmLed:
 	def __init__(self, address):
 		self.i2c = Adafruit_I2C(address)
 		self.brightness = 8
+
+		# Ensure board is connected
+		if -1 == self.i2c.readU8(self.__MODE1):
+			raise IOError("Error opening PCA9685, Addr: 0x%02X" % (address))
 
 		# Ensure everything is off
 		self.close()
@@ -79,23 +84,71 @@ class PwmLed:
 			self.i2c.write8(self.__LED0_OFF_L + n, v & 0xff)
 			self.i2c.write8(self.__LED0_OFF_H + n, v >> 8)
 
+class SpiLed:
+	__SPEED  = 16000000
+	__MODE   = 0
+        __DEVICE = 0
+
+	def __init__(self, bus):
+		# Use Adafruit_BBIO.SPI to initialize the cap
+		# and the spi bus configuration
+		s = SPI(bus, self.__DEVICE)
+		s.msh = self.__SPEED
+		s.mode = self.__MODE
+		s.close()
+
+		# Use normal file for writing bytes
+		dev = '/dev/spidev%s.%s' % (bus + 1, self.__DEVICE)
+		self.spi = open(dev, 'wb')
+		print 'Opened %s, Freq: %sHz' % (dev, self.__SPEED)
+
+	def render(self, pixels):
+		self.spi.write(pixels)
+		self.spi.flush()
+
+
+	def close(self):
+		self.spi.close()
+
 if __name__ == "__main__":
-	p1 = PwmLed(0x40)
-	p2 = PwmLed(0x41)
+	s1 = SpiLed(0)
+	s2 = SpiLed(1)
+	#p1 = PwmLed(0x40)
+	#p2 = PwmLed(0x41)
 
 	colors = Rainbow.fastled_rainbow
 
 	cc = Rainbow.TypicalSMD5050
 
 	i = 0
+	cnt = len(colors)
+
+	buf = bytearray((3*cnt) + 15)
+	for x in range(0, (3*cnt)):
+		buf[x] = 0x80
+
+
+	s2.render(buf)
+
 	try:
 		while True:
-			r,g,b = Rainbow.color_correct(colors[i], cc)
-			p1.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
-			p2.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
+			#r,g,b = Rainbow.color_correct(colors[i], cc)
+
+			for x in range(0, cnt):
+				r,g,b = colors[(i + x) % cnt]
+				buf[3*x+0] = (g >> 1) | 0x80
+				buf[3*x+1] = (r >> 1) | 0x80
+				buf[3*x+2] = (b >> 1) | 0x80
+
+			s2.render(buf)
+			#p1.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
+			#p2.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
 			i = (i + 1) % len(colors)
-			time.sleep(0.050)
+			#time.sleep(0.050)
+			#time.sleep(0.01)
 	except KeyboardInterrupt:
-		p1.close()
-		p2.close()
+		s1.close()
+		s2.close()
+		#p1.close()
+		#p2.close()
 
