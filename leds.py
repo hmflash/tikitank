@@ -140,6 +140,7 @@ if __name__ == "__main__":
 				buf[3*x+1] = (r >> 1) | 0x80
 				buf[3*x+2] = (b >> 1) | 0x80
 
+			s1.render(buf)
 			s2.render(buf)
 			#p1.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
 			#p2.render([ r, g, b, r, g, b, r, g, b, r, g, b, r, g, b ])
