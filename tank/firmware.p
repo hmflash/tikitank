@@ -1,4 +1,4 @@
-// (C) 2014 Mike Kroutikov
+#define ADC_PIN 0
 
 #define PRU0_ARM_INTERRUPT 19
 
@@ -15,22 +15,31 @@
 #define ADC_FIFO0DATA   (ADC_BASE + 0x0100)
 
 // Register allocations
-#define adc_  r6
-#define fifo0data r7
-#define out_buff  r8
-#define locals r9
+#define ticks     r5 // Number of times thru the capture loop
+#define adc_       r6 // Offset to ADC_
+#define fifo0data r7 // Offset to ADC_ FIFO
+#define locals    r8 // Offset to local shared memory
 
-#define value r10
-#define channel   r11
-#define ema   r12
-#define encoders  r13
-#define cap_delay r14
+// Constant configurations
+#define ema_pow   r9  // EMA Power
+#define enc_thrsh r10 // Encoder Threshold
+
+// Used to store encoder values
+#define enc_value r11
+#define enc_min   r12
+#define enc_max   r13
+#define enc_ticks r14
+#define enc_speed r15
+#define enc_acc   r16
+#define enc_delay r17
+#define enc_up    r18
+#define enc_down  r19
+
 
 #define tmp0  r1
 #define tmp1  r2
 #define tmp2  r3
 #define tmp3  r4
-#define tmp4  r5
 
 .origin 0
 .entrypoint START
@@ -43,38 +52,43 @@ START:
 	MOV adc_, ADC_BASE
 	MOV fifo0data, ADC_FIFO0DATA
 	MOV locals, 0
+	MOV ticks, 0
+	MOV enc_min, 0
+	MOV enc_max, 0
+	MOV enc_ticks, 0
+	MOV enc_speed, 0
+	MOV enc_acc, 0
+	MOV enc_delay, 0
+	MOV enc_up, 0
+	MOV enc_down, 0
 
 	LBBO tmp0, locals, 0, 4				// check eyecatcher
 	MOV tmp1, 0xbeef1965				//
 	QBNE QUIT, tmp0, tmp1				// bail out if does not match
 
-	LBBO out_buff, locals, 0x0c, 4
-	LBBO ema, locals, 0x1c, 4
-	LBBO encoders, locals, 0x40, 4
+	LBBO ema_pow, locals, 0x1c, 4
+	LBBO enc_thrsh, locals, 0x44, 4
 
-	// Read CAP_DELAY value into the register for convenience
-	LBBO cap_delay, locals, 0xc4, 4
-
-	// Disable ADC
+	// Disable ADC_
 	LBBO tmp0, adc_, CONTROL, 4
 	MOV  tmp1, 0x1
 	NOT  tmp1, tmp1
 	AND  tmp0, tmp0, tmp1
 	SBBO tmp0, adc_, CONTROL, 4
-	
-	// Put ADC capture to its full speed
+
+	// Put ADC_ capture to its full speed
 	MOV tmp0, 0
 	SBBO tmp0, adc_, SPEED, 4
 
 	// Configure STEP1 to read from configured pin
-	AND cap_delay, cap_delay, 0x7
-	LSL tmp0, cap_delay, 19
-	ADD tmp0, tmp0, 1           // Open pin in continuous mode
-	SBBO tmp0, adc_, STEP1, 4
-	MOV tmp0, 0                 // Open pin w/o delay
-	SBBO tmp0, adc_, DELAY1, 4
+	MOV tmp0, ADC_PIN
+	LSL tmp0, tmp0, 19
+	ADD tmp0, tmp0, 1
+	SBBO tmp0, adc_, STEP1, 4   // Open pin in continuous mode
+	MOV tmp0, 0
+	SBBO tmp0, adc_, DELAY1, 4  // Open pin w/o delay
 
-	// Enable ADC with the desired mode (make STEPCONFIG registers writable, use tags, enable)
+	// Enable ADC_ with the desired mode (make STEPCONFIG registers writable, use tags, enable)
 	LBBO tmp0, adc_, CONTROL, 4
 	OR   tmp0, tmp0, 0x7
 	SBBO tmp0, adc_, CONTROL, 4
@@ -83,7 +97,6 @@ START:
 	SBBO tmp0, adc_, STEPCONFIG, 4   // write STEPCONFIG register (this triggers capture)
 
 WAIT_FOR_FIFO0:
-	// Wait for the first sample
 	LBBO tmp0, adc_, FIFO0COUNT, 4
 	QBNE WAIT_FOR_FIFO0, tmp0, 1
 
@@ -93,30 +106,31 @@ CAPTURE:
 	QBNE QUIT, tmp0.b0, 0
 
 	// increment ticks
-	LBBO tmp0, locals, 0x04, 4
-	ADD  tmp0, tmp0, 1
-	SBBO tmp0, locals, 0x04, 4
+	ADD  ticks, ticks, 1
+	SBBO ticks, locals, 0x04, 4
 
 	// increment encoder ticks
-	LBBO tmp0, locals, 0x58, 8
-	ADD  tmp1, tmp1, 1
-	MAX  tmp0, tmp1, tmp0
-	SBBO tmp0, locals, 0x58, 8
+	ADD enc_acc, enc_acc, 1
+	MAX enc_speed, enc_speed, enc_acc
 
 READ_ALL_FIFO0:  // lets read all fifo content and dispatch depending on pin type
-	LBBO value, fifo0data, 0, 4
-	LSR  channel, value, 16
-	AND channel, channel, 0xf
-	MOV tmp1, 0xfff
-	AND value, value, tmp1
+	LBBO enc_value, fifo0data, 0, 4
 
-	LSL tmp1, channel, 2   // to byte offset
-	ADD tmp1, tmp1, 0x20   // base of the EMA values
-	LBBO tmp2, locals, tmp1, 4
-	LSR tmp3, tmp2, ema
-	SUB tmp3, value, tmp3
-	ADD tmp2, tmp2, tmp3
-	SBBO tmp2, locals, tmp1, 4
+	// Disabled for the moment to keep speed up
+	// Perform moving average and store in enc_value
+	// LBBO tmp0, fifo0data, 0, 4
+	// LBBO ema_pow, locals, 0x1c, 4
+	// LSR tmp1, enc_value, ema_pow
+	// SUB tmp1, tmp0, tmp1
+	// ADD enc_value, enc_value, tmp1
+
+	// Update min and max
+	MIN enc_min, enc_value, enc_min
+	MAX enc_max, enc_value, enc_max
+
+	CALL PROCESS
+
+	SBBO &enc_value, locals, 0x48, 16
 
 	JMP CAPTURE
 
@@ -124,73 +138,53 @@ QUIT:
 	MOV R31.b0, PRU0_ARM_INTERRUPT+16   // Send notification to Host for program completion
 	HALT
 
-PROCESS:                                // lets process wheel encoder value
-	LSL channel, channel, 6
-	ADD channel, channel, 0x44
-	LBBO &tmp1, locals, channel, 16     // load tmp1-tmp4 (threshold, raw, min, max)
-	MOV tmp2, value
-	MIN tmp3, tmp3, value
-	MAX tmp4, tmp4, value
-	SBBO &tmp1, locals, channel, 16     // store min/max etc
-	ADD tmp2, tmp3, tmp1                // tmp2 = min + threshold
-	QBLT MAYBE_TOHIGH, value, tmp2
-	ADD tmp2, value, tmp1               // tmp2 = value + threshold
-	QBLT MAYBE_TOLOW, tmp4, tmp2
+PROCESS:
+	LBBO enc_thrsh, locals, 0x44, 4
 
-	// zero out delays
-	ADD channel, channel, 32
-	MOV tmp1, 0
-	MOV tmp2, 0
-	SBBO &tmp1, locals, channel, 8
+	ADD tmp2, enc_min, enc_thrsh        // tmp2 = min + threshold
+	QBLT MAYBE_TOHIGH, enc_value, tmp2  // if ((min + thresh) < val)
+	ADD tmp2, enc_value, enc_thrsh      // tmp2 = value + threshold
+	QBLT MAYBE_TOLOW, enc_max, tmp2     // if ((value + thresh) < max)
+
+	MOV enc_up, 0
+	MOV enc_down, 0
 
 	RET
 
 MAYBE_TOHIGH:
-	ADD channel, channel, 28
-	LBBO &tmp1, locals, channel, 12 // load tmp1-tmp3 with (delay, up_count, down_count)
-	ADD tmp2, tmp2, 1               // up_count++
-	MOV tmp3, 0                     // down_count=0
-	SBBO &tmp1, locals, channel, 12
-	QBLT TOHIGH, tmp2, tmp1
-	
+	LBBO enc_delay, locals, 0x60, 4 // load enc_delay
+	ADD enc_up, enc_up, 1           // enc_up++
+	MOV enc_down, 0                 // enc_down == 0
+	QBLT TOHIGH, enc_up, enc_delay  // if (enc_delay < enc_up)
+
 	RET
 
 MAYBE_TOLOW:
-	ADD channel, channel, 28
-	LBBO &tmp1, locals, channel, 12 // load tmp1-tmp3 with (delay, up_count, down_count)
-	ADD tmp3, tmp3, 1               // down_count++
-	MOV tmp2, 0                     // up_count=0
-	SBBO &tmp1, locals, channel, 12
-	QBLT TOLOW, tmp3, tmp1
-	
+	LBBO enc_delay, locals, 0x60, 4 // load enc_delay
+	ADD enc_down, enc_down, 1       // enc_down++
+	MOV enc_up, 0                   // enc_up == 0
+	QBLT TOLOW, enc_down, enc_delay // if (enc_delay < enc_down)
+
 	RET
 
 TOLOW:
-	MOV tmp3, 0
-	MOV tmp2, 0
-	SBBO &tmp1, locals, channel, 12  // up_count = down_count = 0
-	
-	SUB channel, channel, 20
-	MOV tmp2, value                  // min = max = value
-	MOV tmp3, value
-	SBBO &tmp2, locals, channel, 8
-	
-	ADD channel, channel, 8
-	LBBO &tmp2, locals, channel, 12  // ticks, speed, acc
-	ADD tmp2, tmp2, 1                // ticks++
-	MOV tmp3, tmp4                   // speed = acc
-	MOV tmp4, 0                      // acc = 0
-	SBBO &tmp2, locals, channel, 12
+	MOV enc_up, 0
+	MOV enc_down, 0
+
+	MOV enc_min, enc_value
+	MOV enc_max, enc_value
+
+	ADD enc_ticks, enc_ticks, 1
+	MOV enc_speed, enc_acc
+	MOV enc_acc, 0
+
 	RET
 	
 TOHIGH:
-	MOV tmp3, 0
-	MOV tmp2, 0
-	SBBO &tmp1, locals, channel, 12  // up_count=0, down_count=0
+	MOV enc_up, 0
+	MOV enc_down, 0
 
-	SUB channel, channel, 20
-	MOV tmp2, value                  // min = max = value
-	MOV tmp3, value
-	SBBO &tmp2, locals, channel, 8
+	MOV enc_min, enc_value
+	MOV enc_max, enc_value
+
 	RET
-
