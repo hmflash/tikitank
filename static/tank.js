@@ -103,18 +103,18 @@ function displayActiveEffectData(data, api)
     $("#" + api + "ActiveEffect").text(data.name);
     
     if (data.isScreenSaver) {
-        $("#" + api + "ScreenSaverButton").text("OFF SSAVER");
+        $("#" + api + "ScreenSaverButton").text("[X] SSAVER");
     }
     else {
-        $("#" + api + "ScreenSaverButton").text("ON SSAVER");
+        $("#" + api + "ScreenSaverButton").text("[_] SSAVER");
     }
 
     if (api == "treads") {
         if (data.isSensorDriven) {            
-            $("#treadsAutoButton").text("SET MANUAL");
+            $("#treadsAutoButton").text("[X] AUTOMATIC");
         }
         else {            
-            $("#treadsAutoButton").text("SET AUTOMATIC");
+            $("#treadsAutoButton").text("[_] AUTOMATIC");
         }
         treadsSensorDriveValue = !data.isSensorDriven;
         treadsScreenSaverValue = !data.isScreenSaver;
