@@ -53,7 +53,7 @@ START:
 	MOV fifo0data, ADC_FIFO0DATA
 	MOV locals, 0
 	MOV ticks, 0
-	MOV enc_min, 0
+	MOV enc_min, 0xffff
 	MOV enc_max, 0
 	MOV enc_ticks, 0
 	MOV enc_speed, 0
