@@ -16,7 +16,7 @@
 
 // Register allocations
 #define ticks     r5 // Number of times thru the capture loop
-#define adc_       r6 // Offset to ADC_
+#define adc_      r6 // Offset to ADC_
 #define fifo0data r7 // Offset to ADC_ FIFO
 #define locals    r8 // Offset to local shared memory
 
