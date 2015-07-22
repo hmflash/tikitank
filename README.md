@@ -17,6 +17,40 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 optargs=text
 ```
 
+### Wiring Diagram
+
+Beaglebone:
+```
+P9_18 SPI0_DATA
+P9_22 SPI0_CLOCK
+P9_30 SPI1_DATA
+P9_31 SPI_CLOCK
+P9_19 I2C2_SCL
+P9_20 I2C2_SDA
+```
+
+49E Hall Sensor
+```
+P9_3  VDD_3V3
+P9_1  DGND
+P9_39 AIN0 (3.3k x2 voltage divider)
+```
+
+LPD8806 Connector
+
+| 5V | CLK | DATA | GND |
+|----|-----|------|-----|
+
+I2C Connector
+
+| 3.3V | SDA | SCL | GND |
+|------|-----|-----|-----|
+
+Hall Connector
+
+| OUT | GNG | 3.3V |
+|-----|-----|------|
+
 ### Useful Links
 
 1. [Beaglebone PRU connections and modes](http://elinux.org/Ti_AM33XX_PRUSSv2#PRU_to_external_peripherals)
