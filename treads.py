@@ -29,12 +29,10 @@ class SpeedSensor(adc.Capture):
 if __name__ == '__main__':
 	s = SpeedSensor()
 
-	s.start('tank/firmware.p')
-
-	s.encoder0_threshold = 750
-	s.encoder0_delay = 100
-
 	if len(sys.argv) > 1:
+		s.encoder0_threshold = 4096
+		s.start('tank/firmware.p')
+
 		time.sleep(10)
 		timer = s.timer
 		_, min0, max0, _, _ = s.encoder0_values
@@ -45,13 +43,21 @@ if __name__ == '__main__':
 		print 'Range for the encoder:', min0, '-', max0
 		print 'Recommended threshold value for encoder is:', int(0.9*(max0-min0))
 		sys.exit()
+	else:
+		s.encoder0_threshold = 750
+		s.encoder0_delay = 100
+		s.start('tank/firmware.p')
 
 	num = 0
 	last = s.encoder0_ticks
 
 	try:
 		while num < 10:
+			#print s.timer, s.encoder0_values
+			#continue
+
 			val = s.encoder0_ticks
+
 			if last != val:
 				delta = val - last
 				num += delta
