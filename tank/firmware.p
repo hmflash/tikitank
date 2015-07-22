@@ -66,8 +66,10 @@ START:
 	MOV tmp1, 0xbeef1965				//
 	QBNE QUIT, tmp0, tmp1				// bail out if does not match
 
+        // Load configuration variables
 	LBBO ema_pow, locals, 0x1c, 4
 	LBBO enc_thrsh, locals, 0x44, 4
+	LBBO enc_delay, locals, 0x60, 4
 
 	// Disable ADC_
 	LBBO tmp0, adc_, CONTROL, 4
@@ -139,8 +141,6 @@ QUIT:
 	HALT
 
 PROCESS:
-	LBBO enc_thrsh, locals, 0x44, 4
-
 	ADD tmp2, enc_min, enc_thrsh        // tmp2 = min + threshold
 	QBLT MAYBE_TOHIGH, enc_value, tmp2  // if ((min + thresh) < val)
 	ADD tmp2, enc_value, enc_thrsh      // tmp2 = value + threshold
@@ -152,7 +152,6 @@ PROCESS:
 	RET
 
 MAYBE_TOHIGH:
-	LBBO enc_delay, locals, 0x60, 4 // load enc_delay
 	ADD enc_up, enc_up, 1           // enc_up++
 	MOV enc_down, 0                 // enc_down == 0
 	QBLT TOHIGH, enc_up, enc_delay  // if (enc_delay < enc_up)
@@ -160,7 +159,6 @@ MAYBE_TOHIGH:
 	RET
 
 MAYBE_TOLOW:
-	LBBO enc_delay, locals, 0x60, 4 // load enc_delay
 	ADD enc_down, enc_down, 1       // enc_down++
 	MOV enc_up, 0                   // enc_up == 0
 	QBLT TOLOW, enc_down, enc_delay // if (enc_delay < enc_down)
