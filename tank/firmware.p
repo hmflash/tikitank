@@ -112,8 +112,8 @@ CAPTURE:
 	SBBO ticks, locals, 0x04, 4
 
 	// increment encoder ticks
-	ADD enc_acc, enc_acc, 1
-	MAX enc_speed, enc_speed, enc_acc
+	//ADD enc_acc, enc_acc, 1
+	//MAX enc_speed, enc_speed, enc_acc
 
 READ_ALL_FIFO0:  // lets read all fifo content and dispatch depending on pin type
 	LBBO enc_value, fifo0data, 0, 4
@@ -173,8 +173,8 @@ TOLOW:
 	MOV enc_max, enc_value
 
 	ADD enc_ticks, enc_ticks, 1
-	MOV enc_speed, enc_acc
-	MOV enc_acc, 0
+	//MOV enc_speed, enc_acc
+	//MOV enc_acc, 0
 
 	RET
 	
