@@ -33,7 +33,6 @@
 #define enc_up    r18
 #define enc_down  r19
 
-
 #define tmp0  r1
 #define tmp1  r2
 #define tmp2  r3
@@ -43,9 +42,9 @@
 .entrypoint START
 
 START:
-	LBCO r0, C4, 4, 4					// Load Bytes Constant Offset (?)
-	CLR  r0, r0, 4						// Clear bit 4 in reg 0
-	SBCO r0, C4, 4, 4					// Store Bytes Constant Offset
+	LBCO r0, C4, 4, 4  // Load Bytes Constant Offset (?)
+	CLR  r0, r0, 4     // Clear bit 4 in reg 0
+	SBCO r0, C4, 4, 4  // Store Bytes Constant Offset
 
 	MOV adc_, ADC_BASE
 	MOV fifo0data, ADC_FIFO0DATA
@@ -60,9 +59,9 @@ START:
 	MOV enc_up, 0
 	MOV enc_down, 0
 
-	LBBO tmp0, locals, 0, 4				// check eyecatcher
-	MOV tmp1, 0xbeef1965				//
-	QBNE QUIT, tmp0, tmp1				// bail out if does not match
+	LBBO tmp0, locals, 0, 4   // check eyecatcher
+	MOV tmp1, 0xbeef1965
+	QBNE QUIT, tmp0, tmp1     // bail out if does not match
 
         // Load configuration variables
 	LBBO ema_pow, locals, 0x1c, 4
@@ -109,11 +108,12 @@ CAPTURE:
 	ADD  ticks, ticks, 1
 	SBBO ticks, locals, 0x04, 4
 
+	// Disabled for the moment to keep speed up
 	// increment encoder ticks
-	//ADD enc_acc, enc_acc, 1
-	//MAX enc_speed, enc_speed, enc_acc
+	// ADD enc_acc, enc_acc, 1
+	// MAX enc_speed, enc_speed, enc_acc
 
-READ_ALL_FIFO0:  // lets read all fifo content and dispatch depending on pin type
+	// Read current ADC value from fifo
 	LBBO enc_value, fifo0data, 0, 4
 
 	// Disabled for the moment to keep speed up
@@ -171,8 +171,10 @@ TOLOW:
 	MOV enc_max, enc_value
 
 	ADD enc_ticks, enc_ticks, 1
-	//MOV enc_speed, enc_acc
-	//MOV enc_acc, 0
+
+	// Disabled for the moment to keep speed up
+	// MOV enc_speed, enc_acc
+	// MOV enc_acc, 0
 
 	RET
 	
