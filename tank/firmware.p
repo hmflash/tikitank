@@ -1,5 +1,3 @@
-#define ADC_PIN 0
-
 #define PRU0_ARM_INTERRUPT 19
 
 #define ADC_BASE 0x44e0d000
@@ -78,12 +76,12 @@ START:
 	AND  tmp0, tmp0, tmp1
 	SBBO tmp0, adc_, CONTROL, 4
 
-	// Put ADC_ capture to its full speed
+	// Put ADC capture to its full speed
 	MOV tmp0, 0
 	SBBO tmp0, adc_, SPEED, 4
 
 	// Configure STEP1 to read from configured pin
-	MOV tmp0, ADC_PIN
+	LBBO tmp0, locals, 0x40, 1
 	LSL tmp0, tmp0, 19
 	ADD tmp0, tmp0, 1
 	SBBO tmp0, adc_, STEP1, 4   // Open pin in continuous mode
