@@ -65,10 +65,10 @@ if __name__ == '__main__':
 
 		num = 0
 
-		while num < 10:
+		while True:
 			delta = s.encoder0_ticks - num
 			if delta:
-				print 'Tick: %s' % delta
+				print 'Tick: %s (%s)' % (delta, num)
 				num += delta
 
 	except KeyboardInterrupt:
