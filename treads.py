@@ -40,8 +40,8 @@ class SpeedSensor(adc.Capture):
 		print 'Recommended threshold value for encoder is:', int(0.9*(max0-min0))
 
 	def start(self):
-		s.encoder0_threshold = 750
-		s.encoder0_delay = 100
+		s.encoder0_threshold = 425
+		s.encoder0_delay = 1
 		adc._pru_adc.Capture.start(self, self._firmware)
 
 	def close(self):
