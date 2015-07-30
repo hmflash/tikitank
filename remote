@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$1" == "" ]; then
+	echo "Usage: $0 <host> [make options]"
+	exit 1
+fi
+
+HOST=$1
+LOCAL="`pwd`"
+DIRNAME="`basename "$LOCAL"`"
+REMOTE="${DIRNAME// /\\ }"
+
+shift
+
+ssh $HOST "mkdir -p ${REMOTE}"
+rsync -avz --delete --exclude=.git --exclude-from=.gitignore "${LOCAL}/" "${HOST}:${REMOTE}/"
+ssh $HOST "cd ${REMOTE} && make $* && ./bin/tikitank"
