@@ -10,7 +10,7 @@ SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
 
-LIBS=-lpthread
+LIBS=-lpthread -lrt
 
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h)
