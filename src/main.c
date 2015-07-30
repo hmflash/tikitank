@@ -3,6 +3,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <errno.h>
+#include <prussdrv.h>
 
 #include "common.h"
 
