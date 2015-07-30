@@ -3,6 +3,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <errno.h>
+#include <signal.h>
 #include <prussdrv.h>
 
 #include "common.h"
@@ -24,6 +25,7 @@ struct renderer {
 	pthread_mutex_t    mutex;
 	pthread_condattr_t condattr;
 	pthread_cond_t     cond;
+	int                exit;
 };
 
 int renderer_init(struct renderer* r) {
@@ -48,7 +50,7 @@ int renderer_run(struct renderer* r) {
 
 	clock_gettime(CLOCK_MONOTONIC, &tv);
 
-	while (1) {
+	while (!r->exit) {
 		ret = pthread_cond_timedwait(&r->cond, &r->mutex, &tv);
 
 		LOG(("Ret: %d, Errno: %d\n", ret, errno));
@@ -57,14 +59,29 @@ int renderer_run(struct renderer* r) {
 		tv.tv_sec += tv.tv_nsec / 1000000000;
 		tv.tv_nsec = tv.tv_nsec % 1000000000;
 	}
+
+	return 0;
+}
+
+static struct renderer r;
+
+static void signal_handler(int signum)
+{
+	r.exit = 1;
 }
 
 int main(int argc, char** argv) {
-	struct renderer r;
-
 	renderer_init(&r);
+
+	signal(SIGINT, signal_handler);
+	signal(SIGTERM, signal_handler);
+
+	LOG(("Running engine\n"));
+
 	renderer_run(&r);
 	renderer_destroy(&r);
+
+	LOG(("Exited gracefully\n"));
 
 	return 0;
 }
