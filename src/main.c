@@ -5,6 +5,11 @@
 #include <errno.h>
 #include <signal.h>
 #include <prussdrv.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include "common.h"
 
@@ -63,6 +68,88 @@ int renderer_run(struct renderer* r) {
 	return 0;
 }
 
+static int load_cape(const char* path, const char* name)
+{
+	FILE* fp;
+	char* pos = NULL;
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t read;
+
+	fp = fopen(path, "r");
+	if (!fp)
+		return -1;
+
+	while ((read = getline(&line, &len, fp)) != -1 && !pos) {
+		pos = strstr(line, name);
+	}
+
+	free(line);
+	fclose(fp);
+
+	if (pos) {
+		LOG(("Cape '%s' already loaded\n", name));
+		return 0;
+	}
+
+	fp = fopen(path, "w");
+	if (!fp)
+		return -1;
+
+	fprintf(fp, "%s", name);
+	fclose(fp);
+
+	// Give cape 200ms to load
+	usleep(200000);
+
+	LOG(("Cape '%s' loaded\n", name));
+	return 0;
+}
+
+static int load_capes(const char* names[])
+{
+	DIR* d;
+	char* path = NULL;
+	int ret = 0;
+
+	d = opendir("/sys/devices");
+	if (!d)
+		return -1;
+
+	while (!path) {
+		struct dirent* entry = readdir(d);
+
+		if (!entry)
+			break;
+
+		if (strncmp(entry->d_name, "bone_capemgr.", 13))
+			continue;
+
+		path = malloc(20 + strlen(entry->d_name));
+		sprintf(path, "/sys/devices/%s/slots", entry->d_name);
+	}
+
+	closedir(d);
+
+	if (!path) {
+		errno = ENOENT;
+		return -1;
+	}
+
+	for (; *names && !ret; ++names) {
+		ret = load_cape(path, *names);
+	}
+
+	free(path);
+	return ret;
+}
+
+static const char* capes[] = {
+	"BB-BONE-PRU-01",
+	"BB-ADC",
+	NULL
+};
+
 static struct renderer r;
 
 static void signal_handler(int signum)
@@ -71,6 +158,11 @@ static void signal_handler(int signum)
 }
 
 int main(int argc, char** argv) {
+	if (load_capes(capes)) {
+		perror("Failed to initialize capes");
+		return -1;
+	}
+
 	renderer_init(&r);
 
 	signal(SIGINT, signal_handler);
