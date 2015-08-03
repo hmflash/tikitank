@@ -115,10 +115,10 @@ int main(int argc, char** argv) {
 	struct engine* eng;
 	int rc;
 
-	// if (load_capes(capes)) {
-	// 	perror("Failed to initialize capes");
-	// 	return -1;
-	// }
+	if (load_capes(capes)) {
+		perror("Failed to initialize capes");
+		return -1;
+	}
 
 	eng = engine_init();
 	rc = web_init(eng);

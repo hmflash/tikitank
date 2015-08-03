@@ -90,10 +90,10 @@
               <div class="effectControlButton" onclick="setEffectColor('treads', cw.color().hex)">
                 SET COLOR
               </div>
-              <div id="treadsAutoButton" class="effectControlButton" onclick="setEffectSensorDrive('treads', treadsSensorDriveValue)">									
+              <div id="treadsAutoButton" class="effectControlButton" onclick="setEffectSensorDrive('treads', treadsSensorDriveValue)">
                 AUTOMATIC
               </div>
-              <div id="treadsScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('treads', treadsScreenSaverValue)">									
+              <div id="treadsScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('treads', treadsScreenSaverValue)">
                 SCREEN SAVER
               </div>
             </div>
@@ -128,7 +128,7 @@
               <div class="effectControlButton" onclick="setEffectColor('barrel', cw.color().hex)">
                 SET COLOR
               </div>
-              <div id="barrelScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('barrel', barrelScreenSaverValue)">									
+              <div id="barrelScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('barrel', barrelScreenSaverValue)">
                 SCREEN SAVER
               </div>
             </div>
@@ -198,26 +198,22 @@
 
   <div id="rightContainer">
     <div id="colorGrid">
-      <div class="colorOption" style="background-color:#7F0A7F;" onclick="cw.color('#7F0A7F')"></div>
-      <div class="colorOption" style="background-color:red;" onclick="cw.color('#FF0000')"></div>
-      <div class="colorOption" style="background-color:orange;" onclick="cw.color('#FFA500')"></div>
-      <div class="colorOption" style="background-color:yellow;" onclick="cw.color('#FFFF00')"></div>
-      <div class="colorOption" style="background-color:green;" onclick="cw.color('#00FF00')"></div>
-      <div class="colorOption" style="background-color:blue;" onclick="cw.color('#0000FF')"></div>
+      <div class="colorOption magenta" onclick="cw.color('#7F0A7F')"></div>
+      <div class="colorOption red" onclick="cw.color('#FF0000')"></div>
+      <div class="colorOption orange" onclick="cw.color('#FFA500')"></div>
+      <div class="colorOption yellow" onclick="cw.color('#FFFF00')"></div>
+      <div class="colorOption green" onclick="cw.color('#00FF00')"></div>
+      <div class="colorOption blue" onclick="cw.color('#0000FF')"></div>
     </div>
 
-    <div class="colorwheel" style="float:left; margin-right:20px; width:300px; text-align:left;"></div>
+    <div class="colorwheel"></div>
     <p align="center">
-      <input style="width: 50%; font-family: sans-serif; font-size: 2em; margin-top: 20px;"
-        name="input_example" 
-        value="#FFAA37" 
-        type="text" 
-        size="10" />
+      <input class="colorInput" name="input_example" value="#FFAA37" type="text" size="10" />
     </p>
 
     <script>
-     var cw = Raphael.colorwheel($$("#rightContainer .colorwheel")[0], 300);
-     cw.input($$("#rightContainer input")[0]);
+     var cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
+     cw.input($("#rightContainer input")[0]);
      cw.color("#FF0000");
      window.scrollTo(0, 1);
    </script>

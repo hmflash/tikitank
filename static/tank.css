@@ -1,15 +1,14 @@
 body {
 	background-color: rgb(0,0,0);
-    width: auto;    
-    position: fixed;
-    top: 0px;
-    left: 0px;
+	width: auto;    
+	position: fixed;
+	top: 0px;
+	left: 0px;
 }
-
 
 #headerBar {
 	background-color: rgb(220,201,177);
-	width:100%;
+	width: 100%;
 	max-width: 1205px;
 	text-align: center;
 	font-family: Arial;
@@ -18,23 +17,23 @@ body {
 	margin-bottom: 5px;
 }
 
-#leftContainer{
+#leftContainer {
 	background-color: rgb(192,192,192);
 	float:left;
-	width:605px;
-	height:520px;
+	width: 605px;
+	height: 520px;
 	margin-right:5px;
 }
 
-#tabHeader{
-	width:100%;
-	height:50px;
+#tabHeader {
+	width: 100%;
+	height: 50px;
 	background-color: rgb(227,227,227);
 }
 
 .tabOption {
-	width:25%;
-	height:35px;
+	width: 25%;
+	height: 35px;
 	float: left;
 	display: inline;
 	text-align: center;
@@ -44,38 +43,54 @@ body {
 	padding-top: 15px;
 }
 
-.selectTab {background-color: rgb(192,192,192);}
+.selectTab {
+	background-color: rgb(192,192,192);
+}
 
 .tabOption a {
 	text-decoration: none;
-	color:#000000;
+	color: #000000;
 }
 
-#rightContainer{
+#rightContainer {
 	background-color: rgb(192,192,192);
-	float:left;
-	width:300px;
-	height:520px;
-	padding:25px 25px 0px 25px;
+	float: left;
+	width: 300px;
+	height: 520px;
+	padding: 25px 25px 0px 25px;
 }
 
-#wheelWrapper {margin-top:50px;}
+#wheelWrapper {
+	margin-top: 50px;
+}
 
-#colorwheel {position:relative;top:0px !important;}
+.colorwheel {
+	float:left; 
+	margin-right: 20px; 
+	width: 300px; 
+	text-align: left;
+}
+
+.colorInput {
+	width: 50%; 
+	font-family: sans-serif; 
+	font-size: 2em; 
+	margin-top: 20px;
+}
 
 #colorGrid {
-	float:left;
+	float: left;
 	position: relative;
-	top:-15px;
-	left:-17px;
-	width:370px;
-	height:50px;
+	top: -15px;
+	left: -17px;
+	width: 370px;
+	height: 50px;
 }
 
 .colorOption {
 	background-color: rgb(0,0,0);
-	width:50px;
-	height:50px;
+	width: 50px;
+	height: 50px;
 	float: left;
 	display: inline;
 	text-align: center;
@@ -87,188 +102,298 @@ body {
 }
 
 #effectsWrapper {
-	position:relative;
-	width:605px;
+	position: relative;
+	width: 605px;
 	z-index: 100;
 }
 
 #effectsLeft {
-	width:355px;
-	height:625px;
-	float:left;
+	width: 355px;
+	height: 625px;
+	float: left;
 }
 #effectDisplay > .displayName {
-	width:305px;
-	height:auto;
+	width: 305px;
+	height: auto;
 	background-color: #efefef;
-	padding:10px;
+	padding: 10px;
 	font-size: 1.6em;
 }
 #effectDisplay {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
-	padding:10px;
+	padding: 10px;
 }
 
 .effectsList {
 	position: relative;
-	top:10px;
-	left:10px;
-	width:325px;
-	height:340px;
-	border:2px solid #666666;
+	top: 10px;
+	left: 10px;
+	width: 325px;
+	height: 340px;
+	border: 2px solid #666666;
 	overflow: scroll;
 }
 
 .effectsList ul {
-    list-style-type: none;
-    padding: 0px;
-    margin: 0px;
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
 }
 
 .effectsList ul li {
 	font-family: Helvetica, Arial;
 	font-size: 2em;
-	padding:10px;
+	padding: 10px;
 }
 
 .effectsList ul li:nth-child(odd) {
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 .effectsList ul li:nth-child(even) {
-    background-color: #efefef;
+	background-color: #efefef;
 }
 
 #effectsRight{
-	width:250px;
-	height:625px;
-	float:left;
+	width: 250px;
+	height: 625px;
+	float: left;
 }
 #effectControlWrapper {
 	position: relative;
-	top:10px;
-	left:10px;
-	width:230px;
-	height:605px;
+	top: 10px;
+	left: 10px;
+	width: 230px;
+	height: 605px;
 }
 #effectsRight > #effectDisplay input {
-	width:210px;
-	height:35px;
+	width: 210px;
+	height: 35px;
 	font-size: 2em;
 }
 
 .effectControlButton {
-	width:200px;
-	height:30px;
+	width: 200px;
+	height: 30px;
 	font-size: 1.5em;
 	background-color: #333333;
 	font-family: arial;
-	color:#efefef;
+	color: #efefef;
 	text-align: center;
-	padding:10px;
+	padding: 10px;
 	margin-bottom: 10px;
 }
 
 #effectsLeft_bodyMap {
-	width:300px;
-	height:370px;
-	float:left;
+	width: 300px;
+	height: 370px;
+	float: left;
 }
 #effectsRight_bodyMap{
-	width:305px;
-	height:625px;
-	float:left;
+	width: 305px;
+	height: 625px;
+	float: left;
 }
 #effectDisplay_bodyMap > .displayName_bodyMap {
-	width:265px;
-	height:auto;
+	width: 265px;
+	height: auto;
 	background-color: #efefef;
-	padding:10px;
+	padding: 10px;
 	font-size: 1.2em;
 }
 #effectDisplay_bodyMap {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
-	padding:10px;
+	padding: 10px;
 }
 
 .effectsList_bodyMap {
 	position: relative;
-	top:10px;
-	left:10px;
-	width:280px;
-	height:340px;
-	border:2px solid #666666;
+	top: 10px;
+	left: 10px;
+	width: 280px;
+	height: 340px;
+	border: 2px solid #666666;
 	overflow: scroll;
 }
 
 .effectsList_bodyMap ul {
-    list-style-type: none;
-    padding: 0px;
-    margin: 0px;
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
 }
 
 .effectsList_bodyMap ul li {
 	font-family: Helvetica, Arial;
 	font-size: 2em;
-	padding:10px;
+	padding: 10px;
 }
 
 .effectsList_bodyMap ul li:nth-child(odd) {
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 .effectsList_bodyMap ul li:nth-child(even) {
-    background-color: #efefef;
+	background-color: #efefef;
 }
 
 .tankMap {float:left;}
 
-.turretFront {position: absolute;top:130px;left:100px;}
-.turretLeft {position: absolute;top:130px;left:90px;}
-.turretRight {position: absolute;top:130px;left:160px;}
-.rearDeck {position: absolute;top:300px;left:90px;}
-.sideLeft {position: absolute;top:255px;left:30px;}
-.sideRight {position: absolute;top:255px;left:220px;}
-.cabFront {position: absolute;top:70px;left:40px;}
-.cabLeft {position: absolute;top:130px;left:30px;}
-.cabRight {position: absolute;top:130px;left:220px;}
-.frontGrill {position: absolute;top:15px;left:55px;}
+.turretFront {
+	position: absolute;
+	top: 130px;
+	left: 100px;
+}
 
-#triangle-down { width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-top: 75px solid red; }
-#triangle-left { width: 0; height: 0; border-top: 75px solid transparent; border-right: 50px solid red; border-bottom: 50px solid transparent; }
-#triangle-right { width: 0; height: 0; border-top: 75px solid transparent; border-left: 50px solid red; border-bottom: 50px solid transparent; }
-#rectangle_side { width: 50px; height: 95px; background: red; }
-#rectangle_G { width: 190px; height: 50px; background: red; }
-#rectangle_F { width: 220px; height: 50px; background: red; }
-#rectangle_R { width: 120px; height: 50px; background: red; }
-#trapezoid { width: 220px; height: 50px; background: red; }
-#trapezoid_L { width: 50px; height: 110px; background: red; }
-#trapezoid_R { width: 50px; height: 110px; background: red;  }
+.turretLeft {
+	position: absolute;
+	top: 130px;
+	left: 90px;
+}
+
+.turretRight {
+	position: absolute;
+	top: 130px;
+	left: 160px;
+}
+
+.rearDeck {
+	position: absolute;
+	top: 300px;
+	left: 90px;
+}
+
+.sideLeft {
+	position: absolute;
+	top: 255px;
+	left: 30px;
+}
+
+.sideRight {
+	position: absolute;
+	top: 255px;
+	left: 220px;
+}
+
+.cabFront {
+	position: absolute;
+	top: 70px;
+	left: 40px;
+}
+
+.cabLeft {
+	position: absolute;
+	top: 130px;
+	left: 30px;
+}
+
+.cabRight {
+	position: absolute;
+	top: 130px;
+	left: 220px;
+}
+
+.frontGrill {
+	position: absolute;
+	top: 15px;
+	left: 55px;
+}
+
+#triangle-down { 
+	width: 0; 
+	height: 0; 
+	border-left: 50px solid transparent; 
+	border-right: 50px solid transparent; 
+	border-top: 75px solid red; 
+}
+
+#triangle-left { 
+	width: 0;
+	height: 0; 
+	border-top: 75px solid transparent; 
+	border-right: 50px solid red; 
+	border-bottom: 50px solid transparent; 
+}
+
+#triangle-right { 
+	width: 0; 
+	height: 0; 
+	border-top: 75px solid transparent; 
+	border-left: 50px solid red; 
+	border-bottom: 50px solid transparent; 
+}
+
+#rectangle_side { 
+	width: 50px; 
+	height: 95px; 
+	background: red; 
+}
+
+#rectangle_G { 
+	width: 190px; 
+	height: 50px; 
+	background: red; 
+}
+
+#rectangle_F { 
+	width: 220px; 
+	height: 50px; 
+	background: red; 
+}
+
+#rectangle_R { 
+	width: 120px; 
+	height: 50px; 
+	background: red; 
+}
+
+#trapezoid { 
+	width: 220px; 
+	height: 50px; 
+	background: red; 
+}
+
+#trapezoid_L { 
+	width: 50px; 
+	height: 110px; 
+	background: red; 
+}
+
+#trapezoid_R { 
+	width: 50px; 
+	height: 110px; 
+	background: red;
+}
 
 #settingsWrapper {
-	position:relative;
-	width:605px;
+	position: relative;
+	width: 605px;
 }
 
 .setRowContainer {
-	width:605px;
-	height:120px;
-	margin:10px 0px 20px 10px;
+	width: 605px;
+	height: 120px;
+	margin: 10px 0px 20px 10px;
 }
+
 #brightInputWrap {
 	width: 235px;
 	height: 100px;
 	float: left;
-	margin-top:-5px;
+	margin-top: -5px;
 }
+
 .settingControlWrapper {
 	position: relative;
-	top:0px;
-	left:10px;
-	width:200px;
-	height:50px;
+	top: 0px;
+	left: 10px;
+	width: 200px;
+	height: 50px;
 }
-.settingDisplay {height: 60px;}
+
+.settingDisplay {
+	height: 60px;
+}
+
 .settingDisplay input {
 	font-family: Helvetica, Arial;
 	width: 210px;
@@ -276,22 +401,25 @@ body {
 	font-size: 2em;
 	margin:10px;
 }
+
 .settingLabel {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
-	padding-left:10px;
+	padding-left: 10px;
 }
+
 .settingControlButton {
-	width:195px;
-	height:25px;
+	width: 195px;
+	height: 25px;
 	font-size: 1.5em;
 	background-color: #333333;
 	font-family: arial;
-	color:#efefef;
+	color: #efefef;
 	text-align: center;
-	padding:10px;
+	padding: 10px;
 	margin-bottom: 10px;
 }
+
 .brightButton {
 	float: left;
 	width: 75px;
@@ -304,3 +432,11 @@ body {
 	text-align: center;
 	padding-top: 20px;
 }
+
+.magenta { background-color: #7F0A7F; }
+.red { background-color: red; }
+.orange { background-color: orange;}
+.yellow { background-color: yellow;}
+.green { background-color: green;}
+.blue { background-color: blue;}
+
