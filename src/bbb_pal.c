@@ -14,8 +14,8 @@
 
 #include "common.h"
 
-static int load_cape(const char* path, const char* name)
-{
+static 
+int load_cape(const char* path, const char* name) {
 	FILE* fp;
 	char* pos = NULL;
 	char* line = NULL;
@@ -52,8 +52,8 @@ static int load_cape(const char* path, const char* name)
 	return 0;
 }
 
-static int load_capes(const char* names[])
-{
+static 
+int load_capes(const char* names[]) {
 	DIR* d;
 	char* path = NULL;
 	int ret = 0;
@@ -90,7 +90,8 @@ static int load_capes(const char* names[])
 	return ret;
 }
 
-static const char* capes[] = {
+static 
+const char* capes[] = {
 	"BB-SPIDEV0",
 	"BB-SPIDEV1",
 	"BB-BONE-PRU-01",
@@ -131,8 +132,8 @@ static int open_spi(const char* dev) {
 	return fd;
 }
 
-static void safe_close(int* fd)
-{
+static 
+void safe_close(int* fd) {
 	if (*fd != -1) {
 		close(*fd);
 		*fd = -1;

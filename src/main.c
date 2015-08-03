@@ -42,7 +42,7 @@ int renderer_init(struct renderer* r) {
 	pthread_cond_init(&r->cond, &r->condattr);
 	pthread_mutex_lock(&r->mutex);
 
-	memset(&r->framebuf, 0, sizeof(&r->framebuf));
+	memset(r->framebuf, 0, sizeof(r->framebuf));
 
 	return 0;
 }
@@ -53,7 +53,6 @@ int renderer_destroy(struct renderer* r) {
 	pthread_condattr_destroy(&r->condattr);
 	return 0;
 }
-
 
 int renderer_run(struct renderer* r) {
 	int ret;
@@ -84,10 +83,16 @@ int renderer_run(struct renderer* r) {
 		tv.tv_nsec = tv.tv_nsec % 1000000000;
 	}
 
+	LOG(("Turning off LEDs\n"));
+
+	memset(r->framebuf, 1, sizeof(r->framebuf));
+	pal_write_treads(&p, r->framebuf, sizeof(r->framebuf));
+
 	return 0;
 }
-static void signal_handler(int signum)
-{
+
+static 
+void signal_handler(int signum) {
 	r.exit = 1;
 }
 
@@ -103,6 +108,7 @@ int main(int argc, char** argv) {
 	LOG(("Running engine\n"));
 
 	renderer_run(&r);
+
 	renderer_destroy(&r);
 	pal_destroy(&p);
 
