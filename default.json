@@ -6,7 +6,7 @@
 	},
 	"effects": {
 		"treads": {
-			"effects": [
+			"all": [
 				{
 					"id": "",
 					"isScreenSaver": true
@@ -21,7 +21,7 @@
 			}
 		},
 		"panels": {
-			"effects": [
+			"all": [
 				{
 					"id": ""
 				}
@@ -32,7 +32,7 @@
 			}
 		},
 		"barrel": {
-			"effects": [
+			"all": [
 				{
 					"id": ""
 				}

@@ -60,7 +60,7 @@ $(document).ready(function () {
 });
 
 function displayEffect(kind, data) {
-	displayEffectsList(kind, data.effects);
+	displayEffectsList(kind, data.all);
 	displayActiveEffect(kind, data.active);
 }
 
