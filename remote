@@ -14,4 +14,4 @@ shift
 
 ssh $HOST "mkdir -p ${REMOTE}"
 rsync -avz --delete --exclude=.git --exclude-from=.gitignore "${LOCAL}/" "${HOST}:${REMOTE}/"
-ssh $HOST "cd ${REMOTE} && make $*"
+ssh $HOST "cd ${REMOTE} && make clean && make $*"

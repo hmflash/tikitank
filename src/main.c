@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
-#include <pthread.h>
 #include <errno.h>
-#include <signal.h>
 #include <prussdrv.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -12,6 +10,8 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "engine.h"
+#include "web.h"
 
 void debug_log(const char const* fmt, ...) {
 	va_list arg;
@@ -26,49 +26,8 @@ void debug_log(const char const* fmt, ...) {
 	va_end(arg);
 }
 
-struct renderer {
-	pthread_mutex_t    mutex;
-	pthread_condattr_t condattr;
-	pthread_cond_t     cond;
-	int                exit;
-};
-
-int renderer_init(struct renderer* r) {
-	pthread_mutex_init(&r->mutex, NULL);
-	pthread_condattr_init(&r->condattr);
-	pthread_condattr_setclock(&r->condattr, CLOCK_MONOTONIC);
-	pthread_cond_init(&r->cond, &r->condattr);
-	pthread_mutex_lock(&r->mutex);
-	return 0;
-}
-
-int renderer_destroy(struct renderer* r) {
-	pthread_mutex_destroy(&r->mutex);
-	pthread_cond_destroy(&r->cond);
-	pthread_condattr_destroy(&r->condattr);
-	return 0;
-}
-
-int renderer_run(struct renderer* r) {
-	int ret;
-	struct timespec tv;
-
-	clock_gettime(CLOCK_MONOTONIC, &tv);
-
-	while (!r->exit) {
-		ret = pthread_cond_timedwait(&r->cond, &r->mutex, &tv);
-
-		LOG(("Ret: %d, Errno: %d\n", ret, errno));
-
-		tv.tv_nsec += 20000000;
-		tv.tv_sec += tv.tv_nsec / 1000000000;
-		tv.tv_nsec = tv.tv_nsec % 1000000000;
-	}
-
-	return 0;
-}
-
-static int load_cape(const char* path, const char* name)
+static 
+int load_cape(const char* path, const char* name)
 {
 	FILE* fp;
 	char* pos = NULL;
@@ -77,7 +36,7 @@ static int load_cape(const char* path, const char* name)
 	ssize_t read;
 
 	fp = fopen(path, "r");
-	if (!fp)
+	if (!fp) 
 		return -1;
 
 	while ((read = getline(&line, &len, fp)) != -1 && !pos) {
@@ -106,7 +65,8 @@ static int load_cape(const char* path, const char* name)
 	return 0;
 }
 
-static int load_capes(const char* names[])
+static 
+int load_capes(const char* names[])
 {
 	DIR* d;
 	char* path = NULL;
@@ -144,37 +104,38 @@ static int load_capes(const char* names[])
 	return ret;
 }
 
-static const char* capes[] = {
+static 
+const char* capes[] = {
 	"BB-BONE-PRU-01",
 	"BB-ADC",
 	NULL
 };
 
-static struct renderer r;
-
-static void signal_handler(int signum)
-{
-	r.exit = 1;
-}
-
 int main(int argc, char** argv) {
-	if (load_capes(capes)) {
-		perror("Failed to initialize capes");
-		return -1;
+	struct engine* eng;
+	int rc;
+
+	// if (load_capes(capes)) {
+	// 	perror("Failed to initialize capes");
+	// 	return -1;
+	// }
+
+	eng = engine_init();
+	rc = web_init(eng);
+	if (rc) {
+		LOG(("Web server failed to start: (%d) %s\n", rc, strerror(rc)));
+		return rc;
 	}
-
-	renderer_init(&r);
-
-	signal(SIGINT, signal_handler);
-	signal(SIGTERM, signal_handler);
 
 	LOG(("Running engine\n"));
 
-	renderer_run(&r);
-	renderer_destroy(&r);
+	web_run();
+	engine_run();
+
+	web_destroy();
+	engine_destroy();
 
 	LOG(("Exited gracefully\n"));
 
 	return 0;
 }
-
