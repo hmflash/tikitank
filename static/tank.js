@@ -59,24 +59,24 @@ $(document).ready(function () {
 	getSettings();
 });
 
-function displayEffect(data) {
-	displayEffectsList(data);
-	displayActiveEffect(data.kind, data.active);
+function displayEffect(kind, data) {
+	displayEffectsList(kind, data.effects);
+	displayActiveEffect(kind, data.active);
 }
 
-function displayEffectsList(data) {
+function displayEffectsList(kind, effects) {
 	var html = "<ul>";
 
-	for (var i = 0, len = data.effects.length; i < len; i++) {
-		console.log(data.effects[i]);
-		var name = data.effects[i].name;
+	for (var i = 0, len = effects.length; i < len; i++) {
+		console.log(effects[i]);
+		var name = effects[i].id;
 		if (effects[i].isScreenSaver) name += "*";
-		html += "<li onClick=\"selectEffect('" + effects[i].id + "','" + data.kind + "')\">" + name + "</li>";
+		html += "<li onClick=\"selectEffect('" + effects[i].id + "','" + kind + "')\">" + name + "</li>";
 	}
 
 	html += "</ul>";
 
-	$("#" + data.kind + "EffectsList").html(html);    
+	$("#" + kind + "EffectsList").html(html);    
 }
 
 function displayActiveEffect(kind, data) {
@@ -84,43 +84,52 @@ function displayActiveEffect(kind, data) {
 		data.argumentDescription = "n/a"
 	}
 
-	$("#" + data.kind + "ArgumentDescription").html(data.argumentDescription);
-	$("#" + data.kind + "ArgumentValue").val(data.argument);
-	$("#" + data.kind + "ActiveEffect").text(data.name);
-	
-	if (data.isScreenSaver) {
-		$("#" + data.kind + "ScreenSaverButton").text("[X] SSAVER");
-	} else {
-		$("#" + data.kind + "ScreenSaverButton").html("[&nbsp;] SSAVER");
-	}
+	$("#" + kind + "ArgumentDescription").html(data.argumentDescription);
+	$("#" + kind + "ArgumentValue").val(data.argument);
+	$("#" + kind + "ActiveEffect").text(data.id);
 
-	if (data.kind == "treads") {
+	// TODO: display active colors
+	
+	if (kind == "treads") {
 		if (data.isSensorDriven) {            
 			$("#treadsAutoButton").text("[X] AUTOMATIC");
 		} else {            
 			$("#treadsAutoButton").text("[_] AUTOMATIC");
 		}
-		treadsSensorDriveValue = !data.isSensorDriven;
-		treadsScreenSaverValue = !data.isScreenSaver;
-	} else if (data.kind == "barrel") {
-		barrelScreenSaverValue = !data.isScreenSaver;
-	} else if (data.kind == "panels") {
-		panelsScreenSaverValue = !data.isScreenSaver;
+
+		if (data.isScreenSaver) {
+			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
+		} else {
+			$("#" + kind + "ScreenSaverButton").html("[&nbsp;] SSAVER");
+		}
+
+		treadsSensorDriveValue = data.isSensorDriven;
+		treadsScreenSaverValue = data.isScreenSaver;
+	} else if (kind == "barrel") {
+		if (data.isScreenSaver) {
+			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
+		} else {
+			$("#" + kind + "ScreenSaverButton").html("[&nbsp;] SSAVER");
+		}
+
+		barrelScreenSaverValue = data.isScreenSaver;
+	} else if (kind == "panels") {
+		panelsScreenSaverValue = data.isScreenSaver;
 	}   
 }
 
 function getEffects() {
 	$.getJSON("/api/effects", function (data, status) {
 		console.log(data);
-		displayEffect(data.panels);
-		displayEffect(data.treads);
-		displayEffect(data.barrel);
+		displayEffect("panels", data.panels);
+		displayEffect("treads", data.treads);
+		displayEffect("barrel", data.barrel);
 	});
 }
 
 function setEffect(obj) {
 	$.post("/api/effects", obj, function (data, status) { 
-		displayEffect(data[obj.kind]); 
+		displayEffect(obj.kind, data[obj.kind]); 
 	});
 }
 

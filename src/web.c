@@ -14,15 +14,42 @@ struct web_settings {
 	long idle_interval;
 };
 
+struct web_effects_item {
+	const char*  id;
+	int          isScreenSaver;
+};
+
+union web_effect_argument {
+	const char*  argument;
+	long*        panels_colors;
+};
+
+struct web_effect_active {
+	const char*                id;
+	union web_effect_argument  argument;
+	const char*                argumentDescription;
+	int                        isScreenSaver;
+	int                        isSensorDriven;
+};
+
+struct web_effect {
+	struct web_effects_item* effects;
+	struct web_effect_active active;
+};
+
+struct web_effects {
+	struct web_effect treads;
+	struct web_effect panels;
+	struct web_effect barrel;
+};
+
 struct web_context {
 	pthread_t           thread;
 	struct mg_server*   server;
 	struct engine*      engine;
 	volatile int        exit;
 	struct web_settings settings;
-};
-
-struct web_effects {
+	struct web_effects  effects;
 };
 
 static 
@@ -32,13 +59,10 @@ static
 const char* API_SETTINGS = "/api/settings";
 
 static
-const char* API_EFFECTS = "/api/effects";
+const char* API_EFFECTS  = "/api/effects";
 
 static
 char work_buf[64 * 1024];
-
-// static
-// struct char work_vars[1024][10];
 
 static
 struct json_token tokens[100];
@@ -46,97 +70,78 @@ struct json_token tokens[100];
 static
 int tokens_size = sizeof(tokens) / sizeof(tokens[0]);
 
-#define JSON_SETTINGS \
-"{\n"                 \
-	"\ts : i,\n"      \
-	"\ts : i,\n"      \
-	"\ts : i\n"       \
-"}\n"
+const char* JSON_SETTINGS =
+"{\n"                 
+	"\ts : i,\n"        // dmxBrightness 
+	"\ts : i,\n"        // manualTick 
+	"\ts : i\n"         // idleInterval 
+"}\n";
 
-#define JSON_DOC           \
-"{\n"                      \
-	"s : " JSON_SETTINGS   \
-"}\n"
+const char* JSON_LIST =
+"[\n"                 
+	"\tS\n"             // JSON_EFFECTS_ITEM
+"]\n";
+
+const char* JSON_EFFECTS_ITEM =
+"{\n"                 
+	"\ts : i,\n"        // id
+	"\ts : i\n"         // isScreenSaver
+"}\n";
+
+const char* JSON_KIND =
+"{\n"                 
+	"\ts : S,\n"        // effects
+	"\ts : S\n"         // active
+"}\n";
+
+const char* JSON_TREADS =
+"{\n"                 
+	"\ts : s,\n"        // id
+	"\ts : s,\n"        // argument
+	"\ts : s,\n"        // argumentDescription
+	"\ts : S,\n"        // isScreenSaver
+	"\ts : S\n"         // isSensorDriven
+"}\n";
+
+const char* JSON_BARREL =
+"{\n"                 
+	"\ts : s,\n"        // id
+	"\ts : s,\n"        // argument
+	"\ts : s,\n"        // argumentDescription
+	"\ts : S\n"         // isScreenSaver
+"}\n";
+
+const char* JSON_PANELS =
+"{\n"                 
+	"\ts : s,\n"        // id
+	"\ts : S\n"         // argument
+"}\n";
+
+const char* JSON_DOC =
+"{\n"                 
+	"s : S"             // settings
+	"s : S"             // effects
+"}\n";
 
 #define DEFAULT_DMX_BRIGHTNESS  100
 #define DEFAULT_MANUAL_TICK       0
 #define DEFAULT_IDLE_INTERVAL   120
 
 #define SETTINGS_FILE  "settings.json"
+
 #define SETTINGS       "settings"
 #define DMX_BRIGHTNESS "dmxBrightness"
 #define MANUAL_TICK    "manualTick"
 #define IDLE_INTERVAL  "idleInterval"
+#define ARGUMENT       "argument"
+#define ARGUMENT_DESC  "argumentDescription"
+#define IS_SSAVER      "isScreenSaver"
+#define IS_SDRIVEN     "isSensorDriven"
+#define ID             "id"
+#define EFFECTS        "effects"
 
 #define CONTENT_TYPE       "Content-Type"
 #define CONTENT_TYPE_JSON  "application/json"
-
-/* settings
-{
-	dmxBrightness: 0,
-	manualTick: 0,
-	idleInterval: 0
-}
-*/
-
-/* effect
-GET
-{
-	treads: {
-		kind: "treads",
-		effects: [
-			{
-				id: "",
-				name: "",
-				isScreenSaver: true
-			}
-		],
-		active: {
-			id: "",
-			name: "",
-			argument: "",
-			argumentDescription: "",
-			isScreenSaver: true,
-			isSensorDriven: true
-		}
-	},
-	panels: {
-		kind: "panels",
-		effects: [],
-		active: {
-			id: "",
-			name: "",
-			argument: "",
-			argumentDescription: "",
-			isScreenSaver: true,
-			isSensorDriven: true
-		}
-	},
-	barrel: {
-		kind: "barrel",
-		effects: [],
-		active: {
-			id: "",
-			name: "",
-			argument: "",
-			argumentDescription: "",
-			isScreenSaver: true,
-			isSensorDriven: true
-		}
-	}
-}
-
-POST
-{
-	kind: "",
-	id: "",
-	name: "",
-	argument: "",
-	argumentDescription: "",
-	isScreenSaver: true,
-	isSensorDriven: true
-}
-*/
 
 static 
 long strntol(const char* buf, size_t size, int base)
@@ -213,16 +218,16 @@ static
 int settings_save() {
 	FILE* fp;
 	size_t len;
+	char settings_buf[1024];
 
 	LOG(("settings_save> dmx_brightness: %ld\n", web.settings.dmx_brightness));
 	LOG(("settings_save> manual_tick: %ld\n", web.settings.manual_tick));
 	LOG(("settings_save> idle_interval: %ld\n", web.settings.idle_interval));
+
+	settings_json(settings_buf, sizeof(settings_buf));
 	
 	len = json_emit(work_buf, sizeof(work_buf), JSON_DOC,
-		SETTINGS,
-			DMX_BRIGHTNESS, web.settings.dmx_brightness, 
-			MANUAL_TICK,    web.settings.manual_tick, 
-			IDLE_INTERVAL,  web.settings.idle_interval
+		SETTINGS, settings_buf
 	);
 
 	fp = fopen(SETTINGS_FILE, "w");

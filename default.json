@@ -1,0 +1,48 @@
+{
+	"settings": {
+		"dmxBrightness": 100,
+		"manualTick": 0,
+		"idleInterval": 120
+	},
+	"effects": {
+		"treads": {
+			"effects": [
+				{
+					"id": "",
+					"isScreenSaver": true
+				}
+			],
+			"active": {
+				"id": "",
+				"argument": "",
+				"argumentDescription": "",
+				"isScreenSaver": true,
+				"isSensorDriven": true
+			}
+		},
+		"panels": {
+			"effects": [
+				{
+					"id": ""
+				}
+			],
+			"active": {
+				"id": "",
+				"argument": [""]
+			}
+		},
+		"barrel": {
+			"effects": [
+				{
+					"id": ""
+				}
+			],
+			"active": {
+				"id": "",
+				"argument": "",
+				"argumentDescription": "",
+				"isScreenSaver": true
+			}
+		}
+	}
+}
