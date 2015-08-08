@@ -8,41 +8,38 @@
 		"treads": {
 			"all": [
 				{
-					"id": "",
-					"isScreenSaver": true
+					"name": "",
+					"argument": 0,
+					"argumentDescription": "",
+					"color": 0,
+					"isScreenSaver": 0,
+					"isSensorDriven": 0
 				}
 			],
-			"active": {
-				"id": "",
-				"argument": "",
-				"argumentDescription": "",
-				"isScreenSaver": true,
-				"isSensorDriven": true
-			}
+			"active": 0
 		},
 		"panels": {
 			"all": [
 				{
-					"id": ""
+					"name": "",
+					"argument": 0,
+					"argumentDescription": "",
+					"color": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			],
-			"active": {
-				"id": "",
-				"argument": [""]
-			}
+			"active": 0
 		},
 		"barrel": {
 			"all": [
 				{
-					"id": ""
+					"name": "",
+					"argument": 0,
+					"argumentDescription": "",
+					"color": 0,
+					"isScreenSaver": 0
 				}
 			],
-			"active": {
-				"id": "",
-				"argument": "",
-				"argumentDescription": "",
-				"isScreenSaver": true
-			}
+			"active": 0
 		}
 	}
 }

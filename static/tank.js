@@ -48,7 +48,6 @@ $(document).ready(function () {
 		$('div.optSettings').addClass("selectTab");
 	});
 
-
 	// Global Vars
 	var treadsSensorDriveValue = false;
 	var treadsScreenSaverValue = false;
@@ -61,17 +60,16 @@ $(document).ready(function () {
 
 function displayEffect(kind, data) {
 	displayEffectsList(kind, data.all);
-	displayActiveEffect(kind, data.active);
+	displayActiveEffect(kind, data.all[data.active]);
 }
 
 function displayEffectsList(kind, effects) {
 	var html = "<ul>";
 
 	for (var i = 0, len = effects.length; i < len; i++) {
-		console.log(effects[i]);
-		var name = effects[i].id;
+		var name = effects[i].name;
 		if (effects[i].isScreenSaver) name += "*";
-		html += "<li onClick=\"selectEffect('" + effects[i].id + "','" + kind + "')\">" + name + "</li>";
+		html += "<li onClick=\"selectEffect('" + kind + "', " + i + ")\">" + name + "</li>";
 	}
 
 	html += "</ul>";
@@ -86,7 +84,7 @@ function displayActiveEffect(kind, data) {
 
 	$("#" + kind + "ArgumentDescription").html(data.argumentDescription);
 	$("#" + kind + "ArgumentValue").val(data.argument);
-	$("#" + kind + "ActiveEffect").text(data.id);
+	$("#" + kind + "ActiveEffect").text(data.name);
 
 	// TODO: display active colors
 	
@@ -100,7 +98,7 @@ function displayActiveEffect(kind, data) {
 		if (data.isScreenSaver) {
 			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
 		} else {
-			$("#" + kind + "ScreenSaverButton").html("[&nbsp;] SSAVER");
+			$("#" + kind + "ScreenSaverButton").text("[_] SSAVER");
 		}
 
 		treadsSensorDriveValue = data.isSensorDriven;
@@ -109,7 +107,7 @@ function displayActiveEffect(kind, data) {
 		if (data.isScreenSaver) {
 			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
 		} else {
-			$("#" + kind + "ScreenSaverButton").html("[&nbsp;] SSAVER");
+			$("#" + kind + "ScreenSaverButton").text("[_] SSAVER");
 		}
 
 		barrelScreenSaverValue = data.isScreenSaver;
@@ -120,7 +118,6 @@ function displayActiveEffect(kind, data) {
 
 function getEffects() {
 	$.getJSON("/api/effects", function (data, status) {
-		console.log(data);
 		displayEffect("panels", data.panels);
 		displayEffect("treads", data.treads);
 		displayEffect("barrel", data.barrel);
@@ -133,8 +130,8 @@ function setEffect(obj) {
 	});
 }
 
-function selectEffect(id, api) {
-	setEffect({ kind: api, id: id });
+function selectEffect(api, idx) {
+	setEffect({ kind: api, active: idx });
 }
 
 function setEffectParameters(api, color, arg) {
@@ -164,10 +161,7 @@ function displaySettings(data) {
 }
 
 function getSettings() {
-	console.log("Getting settings");
-	// Get panels effects
 	$.getJSON("/api/settings", function (data, status) {
-		console.log(data);
 		displaySettings(data);
 	});
 }

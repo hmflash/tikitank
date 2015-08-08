@@ -99,7 +99,8 @@ const char* capes[] = {
 	NULL
 };
 
-static int open_spi(const char* dev) {
+static 
+int open_spi(const char* dev) {
 	int fd;
 	uint32_t arg;
 
@@ -148,7 +149,9 @@ int pal_init(struct pal* p) {
 
 	if (load_capes(capes)) {
 		perror("Failed to load the capes");
-		return -1;
+		errno = 0;
+		// return -1;
+		return 0;
 	}
 
 	p->fd_treads = open_spi("/dev/spidev1.0");
@@ -170,9 +173,9 @@ int pal_init(struct pal* p) {
 }
 
 int pal_write_treads(struct pal* p, const char* buf, size_t len) {
-	int ret;
+	int ret = 0;
 
-	ret = write(p->fd_treads, buf, len);
+	// ret = write(p->fd_treads, buf, len);
 
 	return ret;
 }
