@@ -70,14 +70,14 @@ static
 char work_buf[64 * 1024];
 
 static
-struct json_token tokens[100];
+struct json_token tokens[1024];
 
 static
 int tokens_size = sizeof(tokens) / sizeof(tokens[0]);
 
 const char* JSON_DOC =
 "{\n"
-	"s : S"             // settings: JSON_SETTINGS
+	"s : S,\n"          // settings: JSON_SETTINGS
 	"s : S"             // effects: JSON_EFFECTS
 "}\n";
 
@@ -86,7 +86,7 @@ const char* JSON_SETTINGS =
 	"\ts : i,\n"        // dmxBrightness: 0
 	"\ts : i,\n"        // manualTick: 0
 	"\ts : i\n"         // idleInterval: 0
-"}\n";
+"}";
 
 const char* JSON_EFFECTS =
 "{\n"
@@ -112,7 +112,7 @@ const char* JSON_EFFECT =
 "{\n"
 	"\ts : s,\n"        // id: ""
 	"\ts : S\n"         // isScreenSaver: true|false
-"}\n";
+"}";
 
 const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 
@@ -298,9 +298,9 @@ int settings_save() {
 	char effects_buf[10 * 1024];
 
 	len = settings_json(settings_buf, sizeof(settings_buf));
-	LOG(("settings_json: %d bytes\n", len));
+	LOG(("settings_json: %zu bytes\n", len));
 	len = effects_json(effects_buf, sizeof(effects_buf));
-	LOG(("effects_json: %d bytes\n", len));
+	LOG(("effects_json: %zu bytes\n", len));
 
 	len = json_emit(work_buf, sizeof(work_buf), JSON_DOC,
 		SETTINGS, settings_buf,
@@ -453,12 +453,12 @@ void* web_thread(void* arg) {
 	return NULL;
 }
 
-int web_init(struct engine* eng) {
+int web_init(struct engine* eng, const char* port) {
 	web.exit = 0;
 	web.engine = eng;
 	web.server = mg_create_server(NULL, event_handler);
 
-	memset(&web.effects, sizeof(web.effects), 0);
+	memset(&web.effects, 0, sizeof(web.effects));
 
 	web.effects.treads.all[0].id = "rainbow";
 	web.effects.treads.all[1].id = "foo";
@@ -480,7 +480,7 @@ int web_init(struct engine* eng) {
 	web.effects.barrel.active.arg_desc = "";
 
 	mg_set_option(web.server, "document_root", "static");
-	mg_set_option(web.server, "listening_port", "9999");
+	mg_set_option(web.server, "listening_port", port);
 	
 	mg_poll_server(web.server, 0);
 

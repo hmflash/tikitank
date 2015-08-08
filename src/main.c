@@ -3,6 +3,8 @@
 #include <time.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include "common.h"
 #include "engine.h"
@@ -24,15 +26,36 @@ void debug_log(const char const* fmt, ...) {
 	va_end(arg);
 }
 
+static
+void usage(int rc) {
+	printf("usage: tikitank [-h][-p PORT]\n");
+	exit(rc);	
+}
+
 int main(int argc, char** argv) {
-	struct engine* eng;
 	int rc;
+	const char* port = "80";
+	struct engine* eng;
+
+	while ((rc = getopt(argc, argv, "hp:")) != -1) {
+		switch (rc) {
+		case 'p':
+			port = optarg;
+			break;
+		case 'h':
+			usage(0);
+			break;
+		default:
+			usage(2);
+			break;
+		}
+	}
 
 	if (pal_init(&pal))
 		return -1;
 
 	eng = engine_init(&pal);
-	rc = web_init(eng);
+	rc = web_init(eng, port);
 	if (rc) {
 		LOG(("Web server failed to start: (%d) %s\n", rc, strerror(rc)));
 		return rc;
