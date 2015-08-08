@@ -83,7 +83,7 @@ int engine_run() {
 
 	LOG(("Turning off LEDs\n"));
 
-	memset(eng.framebuf, 1, sizeof(eng.framebuf));
+	memset(eng.framebuf, 0x80, sizeof(eng.framebuf));
 	pal_write_treads(eng.pal, eng.framebuf, sizeof(eng.framebuf));
 
 	return 0;
