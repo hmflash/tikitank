@@ -149,9 +149,7 @@ int pal_init(struct pal* p) {
 
 	if (load_capes(capes)) {
 		perror("Failed to load the capes");
-		errno = 0;
-		// return -1;
-		return 0;
+		return -1;
 	}
 
 	p->fd_treads = open_spi("/dev/spidev1.0");
@@ -172,10 +170,26 @@ int pal_init(struct pal* p) {
 	return 0;
 }
 
-int pal_write_treads(struct pal* p, const char* buf, size_t len) {
+int pal_treads_write(struct pal* p, const char* buf, size_t len) {
 	int ret = 0;
 
-	// ret = write(p->fd_treads, buf, len);
+	ret = write(p->fd_treads, buf, len);
+
+	return ret;
+}
+
+int pal_barrel_write(struct pal* p, const char* buf, size_t len) {
+	int ret = 0;
+
+	ret = write(p->fd_barrel, buf, len);
+
+	return ret;
+}
+
+int pal_panels_write(struct pal* p, const char* buf, size_t len) {
+	int ret = 0;
+
+	ret = write(p->fd_panels, buf, len);
 
 	return ret;
 }
@@ -187,4 +201,3 @@ int pal_destroy(struct pal* p) {
 
 	return 0;
 }
-

@@ -22,5 +22,7 @@ struct pal {
 };
 
 int pal_init(struct pal* p);
-int pal_write_treads(struct pal* p, const char* buf, size_t len);
+int pal_treads_write(struct pal* p, const char* buf, size_t len);
+int pal_barrel_write(struct pal* p, const char* buf, size_t len);
+int pal_panels_write(struct pal* p, const char* buf, size_t len);
 int pal_destroy(struct pal* p);

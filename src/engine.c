@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "engine.h"
+#include "effects/effects.h"
 
 #define NUM_TREADS (3*32*5*3)
 
@@ -74,7 +75,7 @@ int engine_run() {
 			LOG(("ret: (%d) %s, errno: (%d) %s\n", ret, strerror(ret), errno, strerror(errno)));
 		}
 
-		pal_write_treads(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+		pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;
@@ -84,7 +85,7 @@ int engine_run() {
 	LOG(("Turning off LEDs\n"));
 
 	memset(eng.framebuf, 0x80, sizeof(eng.framebuf));
-	pal_write_treads(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+	pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
 
 	return 0;
 }
