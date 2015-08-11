@@ -10,9 +10,6 @@
 #include "engine.h"
 #include "web.h"
 
-static 
-struct pal pal;
-
 void debug_log(const char const* fmt, ...) {
 	va_list arg;
 	struct timespec tv;
@@ -35,6 +32,7 @@ void usage(int rc) {
 int main(int argc, char** argv) {
 	int rc;
 	const char* port = "80";
+	struct pal* p;
 	struct engine* eng;
 
 	while ((rc = getopt(argc, argv, "hp:")) != -1) {
@@ -51,10 +49,11 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	if (pal_init(&pal))
+	p = pal_init(425, 1); // enc_thresh & enc_delay
+	if (!p)
 		return -1;
 
-	eng = engine_init(&pal);
+	eng = engine_init(p);
 	rc = web_init(eng, port);
 	if (rc) {
 		LOG(("Web server failed to start: (%d) %s\n", rc, strerror(rc)));
@@ -68,7 +67,7 @@ int main(int argc, char** argv) {
 
 	web_destroy();
 	engine_destroy();
-	pal_destroy(&pal);
+	pal_destroy();
 
 	LOG(("Exited gracefully\n"));
 

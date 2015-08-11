@@ -15,14 +15,20 @@ struct pal {
 	int fd_treads;
 	int fd_barrel;
 	int fd_panels;
-	int fd_pru;
 
-	// Dereference to get the current number of encoder ticks
-	int* ticks;
+	// Wheel encoder: dereference to get the current values
+	unsigned int* enc_timer; // Number of ADC reads
+	unsigned int* enc_raw;   // Raw ADC value
+	unsigned int* enc_min;   // Min value for current half-tick
+	unsigned int* enc_max;   // Max value for current half-tick
+	unsigned int* enc_ticks; // Number of encoder ticks
+	unsigned int* enc_speed; // Width of last encoder tick
 };
 
-int pal_init(struct pal* p);
+struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay);
+
 int pal_treads_write(struct pal* p, const char* buf, size_t len);
 int pal_barrel_write(struct pal* p, const char* buf, size_t len);
 int pal_panels_write(struct pal* p, const char* buf, size_t len);
-int pal_destroy(struct pal* p);
+
+void pal_destroy();
