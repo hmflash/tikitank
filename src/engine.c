@@ -43,7 +43,7 @@ struct engine* engine_init(struct pal* pal) {
 	signal(SIGINT, signal_handler);
 	signal(SIGTERM, signal_handler);
 
-	return 0;
+	return &eng;
 }
 
 int engine_destroy() {
