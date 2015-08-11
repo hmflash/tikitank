@@ -29,6 +29,8 @@ EFFECT_SRC := $(wildcard $(SRCDIR)/$(EFFECT)/*.c)
 EFFECT_INC := $(wildcard $(SRCDIR)/$(EFFECT)/*.h)
 EFFECT_OBJ := $(EFFECT_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
+# pasm -V3 -b firmware.p firmware => firmware.bin
+
 .PHONY: all clean
 
 all: $(BINDIR)/$(TARGET)
