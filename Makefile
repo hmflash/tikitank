@@ -31,6 +31,8 @@ EFFECT_OBJ := $(EFFECT_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 # pasm -V3 -b firmware.p firmware => firmware.bin
 
+# TODO: Add CFLAGS=-mtune=cortex-a8 -march=armv7-a -O3
+
 .PHONY: all clean
 
 all: $(BINDIR)/$(TARGET)
