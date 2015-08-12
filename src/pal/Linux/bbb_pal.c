@@ -233,10 +233,11 @@ err_open_pru:
 static
 void pru_destroy() {
 	unsigned int arg = 1;
+	unsigned int offset = offsetof(locals_t, flags) / sizeof(word);
 
 	// Tell PRU to stop
 	prussdrv_pru_write_memory(PRUSS0_PRU0_DATARAM,
-	                          offsetof(locals_t, flags),
+	                          offset,
 	                          &arg,
 	                          sizeof(arg));
 
