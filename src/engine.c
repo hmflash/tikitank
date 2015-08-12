@@ -17,6 +17,7 @@ struct engine {
 	pthread_cond_t     cond;
 	volatile int       exit;
 	char               framebuf[NUM_TREADS + (5*3)];
+	char               panelbuf[NUM_PANELS * 3];
 };
 
 static 
@@ -68,6 +69,12 @@ int engine_run() {
 			eng.framebuf[i+2] = 0x80 | fastled_rainbow[(i + framenum) % 256][2] >> 1;
 		}
 
+		for (i = 0; i < sizeof(eng.panelbuf); i += 3) {
+			eng.panelbuf[i+0] = fastled_rainbow[framenum % 256][0];
+			eng.panelbuf[i+1] = fastled_rainbow[framenum % 256][1];
+			eng.panelbuf[i+2] = fastled_rainbow[framenum % 256][2];
+		}
+
 		++framenum;
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);
@@ -76,6 +83,7 @@ int engine_run() {
 		}
 
 		pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+		pal_panels_write(eng.pal, eng.panelbuf, sizeof(eng.panelbuf));
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;

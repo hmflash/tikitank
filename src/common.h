@@ -14,7 +14,9 @@ void debug_log(const char const* fmt, ...)
 struct pal {
 	int fd_treads;
 	int fd_barrel;
-	int fd_panels;
+	int fd_panels[2];
+
+	int panel_brightness; // 1 - 8
 
 	// Wheel encoder: dereference to get the current values
 	unsigned int* enc_timer; // Number of ADC reads
