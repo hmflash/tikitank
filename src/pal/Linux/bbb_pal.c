@@ -402,8 +402,6 @@ int open_i2c(const char* dev, int address) {
 }
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
-	unsigned int* pru;
-
 	memset(&pal, 0, sizeof(pal));
 	pal.fd_treads = -1;
 	pal.fd_barrel = -1;
@@ -429,17 +427,17 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	pal.fd_panels[0] = open_i2c("/dev/i2c-1", 0x40);
 	pal.fd_panels[1] = open_i2c("/dev/i2c-1", 0x41);
 
-	pru = (unsigned int*)pru_init(enc_thresh, enc_delay);
-	//if (!pru) {
-	//	return NULL;
-	//}
+	pal.pru = pru_init(enc_thresh, enc_delay);
+	if (pal.pru) {
+		unsigned int* p = (unsigned int*)pal.pru;
 
-	pal.enc_timer = pru + offsetof(locals_t, timer);
-	pal.enc_raw   = pru + offsetof(locals_t, enc_local[0].raw);
-	pal.enc_min   = pru + offsetof(locals_t, enc_local[0].min);
-	pal.enc_max   = pru + offsetof(locals_t, enc_local[0].max);
-	pal.enc_ticks = pru + offsetof(locals_t, enc_local[0].ticks);
-	pal.enc_speed = pru + offsetof(locals_t, enc_local[0].speed);
+		pal.enc_timer = p + offsetof(locals_t, timer);
+		pal.enc_raw   = p + offsetof(locals_t, enc_local[0].raw);
+		pal.enc_min   = p + offsetof(locals_t, enc_local[0].min);
+		pal.enc_max   = p + offsetof(locals_t, enc_local[0].max);
+		pal.enc_ticks = p + offsetof(locals_t, enc_local[0].ticks);
+		pal.enc_speed = p + offsetof(locals_t, enc_local[0].speed);
+	}
 
 	// TODO: Write the appropriate bits to ensure
 	// all leds are turned off
@@ -477,7 +475,10 @@ int pal_panels_write(struct pal* p, const char* buf, size_t len) {
 }
 
 void pal_destroy() {
-	//pru_destroy();
+	if (pal.pru) {
+		pru_destroy();
+		pal.pru = NULL;
+	}
 
 	safe_close(&pal.fd_treads);
 	safe_close(&pal.fd_barrel);
