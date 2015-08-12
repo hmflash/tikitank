@@ -253,32 +253,6 @@ void pru_destroy() {
 	prussdrv_exit();
 }
 
-// Registers
-#define REG_MODE1          0x00
-#define REG_MODE2          0x01
-#define REG_SUBADR1        0x02
-#define REG_SUBADR2        0x03
-#define REG_SUBADR3        0x04
-#define REG_ALLCALLADR     0x05
-#define REG_LED0_ON_L      0x06
-#define REG_LED0_ON_H      0x07
-#define REG_LED0_OFF_L     0x08
-#define REG_LED0_OFF_H     0x09
-#define REG_ALL_LED_ON_L   0xFA
-#define REG_ALL_LED_ON_H   0xFB
-#define REG_ALL_LED_OFF_L  0xFC
-#define REG_ALL_LED_OFF_H  0xFD
-#define REG_PRESCALE       0xFE
-
-// Mode 1 Bits
-#define M1_RESTART        0x80
-#define M1_SLEEP          0x10
-#define M1_ALLCALL        0x01
-
-// Mode 2 Bits
-#define M2_INVRT          0x10
-#define M2_OUTDRV         0x04
-
 static inline int smbus_access(int file, char read_write, __u8 command,
                                int size, union i2c_smbus_data *data)
 {
@@ -308,6 +282,59 @@ static inline int smbus_write_byte_data(int file, char command,
 	data.byte = value;
 	return smbus_access(file,I2C_SMBUS_WRITE,command,
 	                    I2C_SMBUS_BYTE_DATA, &data);
+}
+
+// Registers
+#define REG_MODE1          0x00
+#define REG_MODE2          0x01
+#define REG_SUBADR1        0x02
+#define REG_SUBADR2        0x03
+#define REG_SUBADR3        0x04
+#define REG_ALLCALLADR     0x05
+#define REG_LED0_ON_L      0x06
+#define REG_LED0_ON_H      0x07
+#define REG_LED0_OFF_L     0x08
+#define REG_LED0_OFF_H     0x09
+#define REG_ALL_LED_ON_L   0xFA
+#define REG_ALL_LED_ON_H   0xFB
+#define REG_ALL_LED_OFF_L  0xFC
+#define REG_ALL_LED_OFF_H  0xFD
+#define REG_PRESCALE       0xFE
+
+// Mode 1 Bits
+#define M1_RESTART        0x80
+#define M1_SLEEP          0x10
+#define M1_ALLCALL        0x01
+
+// Mode 2 Bits
+#define M2_INVRT          0x10
+#define M2_OUTDRV         0x04
+
+static
+void write_i2c(int fd, const char* buf) {
+	// On time always stays at 1
+	// Off time of 0 means always on
+	// Off time of 1 means always off
+	// Scale our 0-255 by brightness and
+	// Just add 1 to the [0-4095] value we get
+
+	int i;
+	int val;
+	int reg;
+
+	for (i = 0; i < 5 * 3; ++i) {
+		// Scale 8bit to 12bit using brightness
+		val = (buf[i] * 2 * pal.panel_brightness + 1) & 0xfff;
+		reg = i * 4;
+
+		smbus_write_byte_data(fd,
+		                      REG_LED0_OFF_L + reg,
+		                      val & 0xff);
+
+		smbus_write_byte_data(fd,
+		                      REG_LED0_OFF_H + reg,
+		                      val >> 8);
+	}
 }
 
 static
@@ -434,34 +461,6 @@ int pal_barrel_write(struct pal* p, const char* buf, size_t len) {
 	ret = write(p->fd_barrel, buf, len);
 
 	return ret;
-}
-
-static
-void write_i2c(int fd, const char* buf) {
-	// On time always stays at 1
-	// Off time of 0 means always on
-	// Off time of 1 means always off
-	// Scale our 0-255 by brightness and
-	// Just add 1 to the [0-4095] value we get
-
-	int i;
-	int val;
-	int reg;
-	int brightness = 8;
-
-	for (i = 0; i < 5 * 3; ++i) {
-		// Scale 8bit to 12bit using brightness
-		val = (buf[i] * 2 * pal.panel_brightness + 1) & 0xfff;
-		reg = i * 4;
-
-		smbus_write_byte_data(fd,
-		                      REG_LED0_OFF_L + reg,
-		                      val & 0xff);
-
-		smbus_write_byte_data(fd,
-		                      REG_LED0_OFF_H + reg,
-		                      val >> 8);
-	}
 }
 
 int pal_panels_write(struct pal* p, const char* buf, size_t len) {
