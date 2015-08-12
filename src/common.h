@@ -2,13 +2,14 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <time.h>
 
 #define LOG(a) debug_log a
 
 extern
 uint8_t fastled_rainbow[256][3];
 
-void debug_log(const char const* fmt, ...)
+void debug_log(const char* fmt, ...)
 	__attribute__((format(printf, 1, 2)));
 
 struct pal {
@@ -32,3 +33,5 @@ int pal_barrel_write(struct pal* p, const char* buf, size_t len);
 int pal_panels_write(struct pal* p, const char* buf, size_t len);
 
 void pal_destroy();
+
+int pal_clock_gettime(struct timespec* tv);

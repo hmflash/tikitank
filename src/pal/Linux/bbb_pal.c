@@ -11,6 +11,7 @@
 #include <linux/spi/spidev.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
+#include <time.h>
 
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
@@ -319,4 +320,8 @@ void pal_destroy(struct pal* p) {
 	safe_close(&p->fd_treads);
 	safe_close(&p->fd_barrel);
 	safe_close(&p->fd_panels);
+}
+
+int pal_clock_gettime(struct timespec* tv) {
+	return clock_gettime(CLOCK_MONOTONIC, tv);
 }

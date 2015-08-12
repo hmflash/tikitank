@@ -10,11 +10,11 @@
 #include "engine.h"
 #include "web.h"
 
-void debug_log(const char const* fmt, ...) {
+void debug_log(const char* fmt, ...) {
 	va_list arg;
 	struct timespec tv;
 
-	clock_gettime(CLOCK_MONOTONIC, &tv);
+	pal_clock_gettime(&tv);
 
 	printf("%ld.%3.3ld ", tv.tv_sec, tv.tv_nsec / 1000000);
 

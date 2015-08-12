@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "engine.h"
+#include "web.h"
 #include "effects/effects.h"
 
 #define NUM_TREADS (3*32*5*3)
@@ -34,7 +35,9 @@ struct engine* engine_init(struct pal* pal) {
 
 	pthread_mutex_init(&eng.mutex, NULL);
 	pthread_condattr_init(&eng.condattr);
+#ifdef Linux
 	pthread_condattr_setclock(&eng.condattr, CLOCK_MONOTONIC);
+#endif
 	pthread_cond_init(&eng.cond, &eng.condattr);
 	pthread_mutex_lock(&eng.mutex);
 
@@ -59,7 +62,7 @@ int engine_run() {
 	int framenum = 0;
 	struct timespec tv;
 
-	clock_gettime(CLOCK_MONOTONIC, &tv);
+	pal_clock_gettime(&tv);
 
 	while (!eng.exit) {
 		for (i = 0; i < NUM_TREADS; i += 3) {
@@ -76,6 +79,7 @@ int engine_run() {
 		}
 
 		pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+		web_treads_render(eng.framebuf, NUM_TREADS);
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;

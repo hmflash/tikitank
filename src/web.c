@@ -553,11 +553,15 @@ void on_effects(struct mg_connection* conn) {
 	}
 }
 
+static
+struct mg_connection* ws_conn;
+
 int event_handler(struct mg_connection* conn, enum mg_event ev) {
 	switch (ev) {
 	case MG_AUTH: 
 		return MG_TRUE;
 	case MG_REQUEST:
+		LOG(("MG_REQUEST:      %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 		if (!strncmp(conn->uri, API_SETTINGS, strlen(API_SETTINGS))) {
 			on_settings(conn);
 			return MG_TRUE;
@@ -566,6 +570,20 @@ int event_handler(struct mg_connection* conn, enum mg_event ev) {
 			on_effects(conn);
 			return MG_TRUE;
 		}
+		return MG_FALSE;
+	case MG_WS_HANDSHAKE:
+		LOG(("MG_WS_HANDSHAKE: %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
+		return MG_FALSE;
+	case MG_WS_CONNECT:
+		LOG(("MG_WS_CONNECT:   %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
+		ws_conn = conn;
+		return MG_TRUE;
+	case MG_CLOSE:
+		LOG(("MG_CLOSE:        %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
+		if (conn == ws_conn) {
+			ws_conn = NULL;
+		}
+		return MG_TRUE;
 	default: 
 		return MG_FALSE;
 	}
@@ -574,7 +592,7 @@ int event_handler(struct mg_connection* conn, enum mg_event ev) {
 static 
 void* web_thread(void* arg) {
 	while (!web.exit) {
-		mg_poll_server(web.server, 1000);
+		mg_poll_server(web.server, 20);
 	}
 
 	mg_destroy_server(&web.server);
@@ -624,4 +642,12 @@ void web_destroy() {
 
 	rc = pthread_join(web.thread, NULL);
 	LOG(("Web server stopped: (%d) %s\n", rc, strerror(rc)));
+}
+
+void web_treads_render(const char* buf, size_t len)
+{
+	// LOG(("render: %zu bytes\n", len));
+	if (ws_conn) {
+		mg_websocket_write(ws_conn, WEBSOCKET_OPCODE_BINARY, buf, len);
+	}
 }

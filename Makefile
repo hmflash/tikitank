@@ -1,7 +1,9 @@
-CC = gcc
-CFLAGS=-Wall -O2
+UNAME := $(shell uname)
 
-PRUFLAGS=-Wno-unused-result -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
+CC = gcc
+CFLAGS=-Wall -O2 -D$(UNAME)
+
+CFLAGS_Linux=-Wno-unused-result -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
 
 LD = gcc
 LDFLAGS=
@@ -9,25 +11,26 @@ LDFLAGS=
 TARGET=tikitank
 
 EFFECT=effects
-PRUDRV=prussdrv
+PAL=pal/$(UNAME)
 
 SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
 
-LIBS=-lpthread -lrt
+LIBS_Linux=-lrt
+LIBS=-lpthread
 
 COMMON_SRC := $(wildcard $(SRCDIR)/*.c)
 COMMON_INC := $(wildcard $(SRCDIR)/*.h)
 COMMON_OBJ := $(COMMON_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-PRUDRV_SRC := $(wildcard $(SRCDIR)/$(PRUDRV)/*.c)
-PRUDRV_INC := $(wildcard $(SRCDIR)/$(PRUDRV)/*.h)
-PRUDRV_OBJ := $(PRUDRV_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-
 EFFECT_SRC := $(wildcard $(SRCDIR)/$(EFFECT)/*.c)
 EFFECT_INC := $(wildcard $(SRCDIR)/$(EFFECT)/*.h)
 EFFECT_OBJ := $(EFFECT_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
+PAL_SRC := $(wildcard $(SRCDIR)/$(PAL)/*.c)
+PAL_INC := $(wildcard $(SRCDIR)/$(PAL)/*.h)
+PAL_OBJ := $(PAL_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 # pasm -V3 -b firmware.p firmware => firmware.bin
 
@@ -37,20 +40,20 @@ EFFECT_OBJ := $(EFFECT_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(BINDIR)/$(TARGET)
 
-$(BINDIR)/$(TARGET): $(COMMON_OBJ) $(PRUDRV_OBJ) $(EFFECT_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $(COMMON_OBJ) $(PRUDRV_OBJ) $(EFFECT_OBJ) $(LIBS)
+$(BINDIR)/$(TARGET): $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ)
+	$(LD) $(LDFLAGS) -o $@ $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ) $(LIBS) $(LIBS_$(UNAME))
 
 $(COMMON_OBJ): | $(OBJDIR)
-$(PRUDRV_OBJ): | $(OBJDIR)/$(PRUDRV)
 $(EFFECT_OBJ): | $(OBJDIR)/$(EFFECT)
+$(PAL_OBJ):    | $(OBJDIR)/$(PAL)
 
 $(OBJDIR):
 	@mkdir -p $@
 
-$(OBJDIR)/$(PRUDRV):
+$(OBJDIR)/$(EFFECT):
 	@mkdir -p $@
 
-$(OBJDIR)/$(EFFECT):
+$(OBJDIR)/$(PAL):
 	@mkdir -p $@
 
 $(BINDIR)/$(TARGET) : | $(BINDIR)
@@ -58,14 +61,14 @@ $(BINDIR)/$(TARGET) : | $(BINDIR)
 $(BINDIR):
 	@mkdir -p $@
 
-$(COMMON_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(PRUDRV_INC)
-	$(CC) $(CFLAGS) -I$(SRCDIR)/prussdrv -c -o $@ $<
-
-$(PRUDRV_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(PRUDRV_INC)
-	$(CC) $(CFLAGS) $(PRUFLAGS) -I$(SRCDIR)/prussdrv -c -o $@ $<
+$(COMMON_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(EFFECT_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(EFFECT_INC)
 	$(CC) $(CFLAGS) -I$(SRCDIR) -c -o $@ $<
+
+$(PAL_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) $(CFLAGS_$(UNAME)) -I$(SRCDIR) -c -o $@ $<
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
