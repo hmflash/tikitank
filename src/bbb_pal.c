@@ -190,7 +190,7 @@ void* pru_init(unsigned int threshold, unsigned int delay) {
 
 	memset(&locals, 0, sizeof(locals));
 	locals.eyecatcher = EYECATCHER;
-	locals.enc.encoder0 = 0xff;
+	locals.enc.encoder0 = 0; // ADC0
 	locals.enc_local[0].threshold = threshold;
 	locals.enc_local[0].delay = delay;
 	locals.enc_local[0].speed = INITIAL_ACC_VAL;
@@ -200,21 +200,21 @@ void* pru_init(unsigned int threshold, unsigned int delay) {
 	                                0,
 	                                (unsigned int*)&locals,
 	                                sizeof(locals));
-	if (err) {
+	if (err < 0) {
 		fprintf(stderr, "Failed write PRU0 memory: %s\n",
 			strerror(errno));
 		goto err_open_pru;
 	}
 
 	err = prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &ptr);
-	if (err) {
+	if (err < 0) {
 		fprintf(stderr, "Failed map PRU0 memory: %s\n",
 			strerror(errno));
 		goto err_open_pru;
 	}
 
 	err = prussdrv_exec_program(PRU0, "firmware.bin");
-	if (err) {
+	if (err < 0) {
 		fprintf(stderr, "Failed start PRU0 firmware: %s\n",
 			strerror(errno));
 		goto err_open_pru;
