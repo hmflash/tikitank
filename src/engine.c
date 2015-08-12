@@ -9,8 +9,6 @@
 #include "web.h"
 #include "effects/effects.h"
 
-#define NUM_TREADS (3*32*5*3)
-
 struct engine {
 	struct pal*        pal;
 	pthread_mutex_t    mutex;
@@ -67,15 +65,15 @@ int engine_run() {
 
 	while (!eng.exit) {
 		for (i = 0; i < NUM_TREADS; i += 3) {
-			eng.framebuf[i+0] = 0x80 | fastled_rainbow[(i + framenum) % 256][1] >> 1;
-			eng.framebuf[i+1] = 0x80 | fastled_rainbow[(i + framenum) % 256][0] >> 1;
-			eng.framebuf[i+2] = 0x80 | fastled_rainbow[(i + framenum) % 256][2] >> 1;
+			eng.framebuf[i+0] = 0x80 | RAINBOW_G(i + framenum) >> 1;
+			eng.framebuf[i+1] = 0x80 | RAINBOW_R(i + framenum) >> 1;
+			eng.framebuf[i+2] = 0x80 | RAINBOW_B(i + framenum) >> 1;
 		}
 
 		for (i = 0; i < sizeof(eng.panelbuf); i += 3) {
-			eng.panelbuf[i+0] = fastled_rainbow[framenum % 256][0];
-			eng.panelbuf[i+1] = fastled_rainbow[framenum % 256][1];
-			eng.panelbuf[i+2] = fastled_rainbow[framenum % 256][2];
+			eng.panelbuf[i+0] = RAINBOW_R(framenum);
+			eng.panelbuf[i+1] = RAINBOW_G(framenum);
+			eng.panelbuf[i+2] = RAINBOW_B(framenum);
 		}
 
 		++framenum;

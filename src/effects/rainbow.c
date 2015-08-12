@@ -3,11 +3,6 @@
 
 #include "effects.h"
 
-#define NUM_TREADS (3*32*5*3)
-
-extern
-uint8_t fastled_rainbow[256][3];
-
 void rainbow_treads(struct effect* effect, int framenum, char* framebuf, size_t framelen) {
 	int i;
 
