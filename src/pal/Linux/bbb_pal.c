@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <prussdrv.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <string.h>
@@ -13,7 +12,10 @@
 #include <sys/ioctl.h>
 #include <time.h>
 #include <linux/i2c-dev.h>
+
+#ifndef I2C_SMBUS
 #include <linux/i2c.h>
+#endif
 
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
@@ -277,8 +279,8 @@ void pru_destroy() {
 #define M2_INVRT          0x10
 #define M2_OUTDRV         0x04
 
-static inline int i2c_smbus_access(int file, char read_write, __u8 command, 
-                                   int size, union i2c_smbus_data *data)
+static inline int smbus_access(int file, char read_write, __u8 command,
+                               int size, union i2c_smbus_data *data)
 {
 	struct i2c_smbus_ioctl_data args;
 
@@ -289,35 +291,35 @@ static inline int i2c_smbus_access(int file, char read_write, __u8 command,
 	return ioctl(file, I2C_SMBUS, &args);
 }
 
-static inline int i2c_smbus_read_byte_data(int file, __u8 command)
+static inline int smbus_read_byte_data(int file, __u8 command)
 {
 	union i2c_smbus_data data;
-	if (i2c_smbus_access(file, I2C_SMBUS_READ, command,
-	                     I2C_SMBUS_BYTE_DATA, &data))
+	if (smbus_access(file, I2C_SMBUS_READ, command,
+	                 I2C_SMBUS_BYTE_DATA, &data))
 		return -1;
 	else
 		return 0x0FF & data.byte;
 }
 
-static inline int i2c_smbus_write_byte_data(int file, char command, 
-                                              char value)
+static inline int smbus_write_byte_data(int file, char command,
+                                        char value)
 {
 	union i2c_smbus_data data;
 	data.byte = value;
-	return i2c_smbus_access(file,I2C_SMBUS_WRITE,command,
-	                        I2C_SMBUS_BYTE_DATA, &data);
+	return smbus_access(file,I2C_SMBUS_WRITE,command,
+	                    I2C_SMBUS_BYTE_DATA, &data);
 }
 
 static
 void reset_i2c(int fd) {
 	// Turn off all pwm
-	i2c_smbus_write_byte_data(fd, REG_ALL_LED_ON_L, 1);
-	i2c_smbus_write_byte_data(fd, REG_ALL_LED_ON_H, 0);
-	i2c_smbus_write_byte_data(fd, REG_ALL_LED_OFF_L, 1);
-	i2c_smbus_write_byte_data(fd, REG_ALL_LED_OFF_H, 0);
+	smbus_write_byte_data(fd, REG_ALL_LED_ON_L, 1);
+	smbus_write_byte_data(fd, REG_ALL_LED_ON_H, 0);
+	smbus_write_byte_data(fd, REG_ALL_LED_OFF_L, 1);
+	smbus_write_byte_data(fd, REG_ALL_LED_OFF_H, 0);
 
 	// Disable oscillator
-	i2c_smbus_write_byte_data(fd, REG_MODE1, M1_SLEEP | M1_ALLCALL);
+	smbus_write_byte_data(fd, REG_MODE1, M1_SLEEP | M1_ALLCALL);
 	usleep(1000);
 }
 
@@ -344,7 +346,7 @@ int open_i2c(const char* dev, int address) {
 	}
 
 	// Ensure the board is connected
-	ret = i2c_smbus_read_byte_data(fd, REG_MODE1);
+	ret = smbus_read_byte_data(fd, REG_MODE1);
 	if (ret == -1) {
 		fprintf(stderr, "Error opening PCA9685 @ 0x%x: %s\n",
 			address, strerror(errno));
@@ -355,16 +357,16 @@ int open_i2c(const char* dev, int address) {
 	reset_i2c(fd);
 
 	// Configure for use w/external LED driver
-	i2c_smbus_write_byte_data(fd, REG_MODE2, M2_OUTDRV);
+	smbus_write_byte_data(fd, REG_MODE2, M2_OUTDRV);
 
 	// Enable oscillator
-	mode1 = i2c_smbus_read_byte_data(fd, REG_MODE1);
+	mode1 = smbus_read_byte_data(fd, REG_MODE1);
 	mode1 = mode1 & ~M1_SLEEP;
-	i2c_smbus_write_byte_data(fd, REG_MODE1, mode1);
+	smbus_write_byte_data(fd, REG_MODE1, mode1);
 	usleep(1000);
 
 	// Query the pwm frequency
-	prescale = i2c_smbus_read_byte_data(fd, REG_PRESCALE);
+	prescale = smbus_read_byte_data(fd, REG_PRESCALE);
 	freq = 25000000 / (4096 * (prescale + 1));
 
 	LOG(("Opened PCA9685, Addr: 0x%x, Freq: %uHz\n", address, freq));
@@ -452,13 +454,13 @@ void write_i2c(int fd, const char* buf) {
 		val = (buf[i] * 2 * pal.panel_brightness + 1) & 0xfff;
 		reg = i * 4;
 
-		i2c_smbus_write_byte_data(fd,
-		                          REG_LED0_OFF_L + reg,
-		                          val & 0xff);
+		smbus_write_byte_data(fd,
+		                      REG_LED0_OFF_L + reg,
+		                      val & 0xff);
 
-		i2c_smbus_write_byte_data(fd,
-		                          REG_LED0_OFF_H + reg,
-		                          val >> 8);
+		smbus_write_byte_data(fd,
+		                      REG_LED0_OFF_H + reg,
+		                      val >> 8);
 	}
 }
 
