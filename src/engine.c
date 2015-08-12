@@ -83,9 +83,9 @@ int engine_run() {
 			LOG(("ret: (%d) %s, errno: (%d) %s\n", ret, strerror(ret), errno, strerror(errno)));
 		}
 
-		pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+		pal_treads_write(eng.framebuf, sizeof(eng.framebuf));
 		web_treads_render(eng.framebuf, NUM_TREADS);
-		pal_panels_write(eng.pal, eng.panelbuf, sizeof(eng.panelbuf));
+		pal_panels_write(eng.panelbuf, sizeof(eng.panelbuf));
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;
@@ -95,7 +95,7 @@ int engine_run() {
 	LOG(("Turning off LEDs\n"));
 
 	memset(eng.framebuf, 0x80, sizeof(eng.framebuf));
-	pal_treads_write(eng.pal, eng.framebuf, sizeof(eng.framebuf));
+	pal_treads_write(eng.framebuf, sizeof(eng.framebuf));
 
 	return 0;
 }

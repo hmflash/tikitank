@@ -15,15 +15,15 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	return &pal;
 }
 
-int pal_treads_write(struct pal* p, const char* buf, size_t len) {
+int pal_treads_write(const char* buf, size_t len) {
 	return len;
 }
 
-int pal_barrel_write(struct pal* p, const char* buf, size_t len) {
+int pal_barrel_write(const char* buf, size_t len) {
 	return len;
 }
 
-int pal_panels_write(struct pal* p, const char* buf, size_t len) {
+int pal_panels_write(const char* buf, size_t len) {
 	return len;
 }
 

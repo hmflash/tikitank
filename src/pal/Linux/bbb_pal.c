@@ -23,8 +23,20 @@
 #include "firmware.h"
 #include "common.h"
 
+struct bbb_pal
+{
+	struct pal p;
+
+	int fd_treads;
+	int fd_barrel;
+	int fd_panels[2];
+
+	// Base address of PRU RAM
+	void* pru;
+};
+
 static
-struct pal pal;
+struct bbb_pal pal;
 
 static 
 int load_cape(const char* path, const char* name) {
@@ -325,7 +337,7 @@ void write_i2c(int fd, const char* buf) {
 
 	for (i = 0; i < 5 * 3; ++i) {
 		// Scale 8bit to 12bit using brightness
-		val = (buf[i] * 2 * pal.panel_brightness + 1) & 0xfff;
+		val = (buf[i] * 2 * pal.p.panel_brightness + 1) & 0xfff;
 		reg = i * 4;
 
 		smbus_write_byte_data(fd,
@@ -408,7 +420,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	pal.fd_barrel = -1;
 	pal.fd_panels[0] = -1;
 	pal.fd_panels[1] = -1;
-	pal.panel_brightness = 8;
+	pal.p.panel_brightness = 8;
 
 	if (load_capes(capes)) {
 		perror("Failed to load the capes");
@@ -432,37 +444,29 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	if (pal.pru) {
 		unsigned int* p = (unsigned int*)pal.pru;
 
-		pal.enc_timer = p + offsetof(locals_t, timer);
-		pal.enc_raw   = p + offsetof(locals_t, enc_local[0].raw);
-		pal.enc_min   = p + offsetof(locals_t, enc_local[0].min);
-		pal.enc_max   = p + offsetof(locals_t, enc_local[0].max);
-		pal.enc_ticks = p + offsetof(locals_t, enc_local[0].ticks);
-		pal.enc_speed = p + offsetof(locals_t, enc_local[0].speed);
+		pal.p.enc_timer = p + offsetof(locals_t, timer);
+		pal.p.enc_raw   = p + offsetof(locals_t, enc_local[0].raw);
+		pal.p.enc_min   = p + offsetof(locals_t, enc_local[0].min);
+		pal.p.enc_max   = p + offsetof(locals_t, enc_local[0].max);
+		pal.p.enc_ticks = p + offsetof(locals_t, enc_local[0].ticks);
+		pal.p.enc_speed = p + offsetof(locals_t, enc_local[0].speed);
 	}
 
 	// TODO: Write the appropriate bits to ensure
 	// all leds are turned off
 
-	return &pal;
+	return &pal.p;
 }
 
-int pal_treads_write(struct pal* p, const char* buf, size_t len) {
-	int ret = 0;
-
-	ret = write(p->fd_treads, buf, len);
-
-	return ret;
+int pal_treads_write(const char* buf, size_t len) {
+	return write(pal.fd_treads, buf, len);
 }
 
-int pal_barrel_write(struct pal* p, const char* buf, size_t len) {
-	int ret = 0;
-
-	ret = write(p->fd_barrel, buf, len);
-
-	return ret;
+int pal_barrel_write(const char* buf, size_t len) {
+	return write(pal.fd_barrel, buf, len);
 }
 
-int pal_panels_write(struct pal* p, const char* buf, size_t len) {
+int pal_panels_write(const char* buf, size_t len) {
 	if (len < 30)
 		return -1;
 
