@@ -623,6 +623,8 @@ int web_init(struct engine* eng, const char* port) {
 	mg_set_option(web.server, "document_root", "static");
 	mg_set_option(web.server, "listening_port", port);
 	
+	errno = 0;
+
 	mg_poll_server(web.server, 0);
 
 	return errno;
