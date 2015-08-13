@@ -1,5 +1,11 @@
 "use strict";
 
+// Global Vars
+var treadsSensorDriveValue = false;
+var treadsScreenSaverValue = false;
+var barrelScreenSaverValue = false;
+var panelsScreenSaverValue = false;
+
 $(document).ready(function () {
 	$('#panelsTab').show();
 	$('#treadsTab').hide();
@@ -49,12 +55,6 @@ $(document).ready(function () {
 		$('div.optBarrel').removeClass("selectTab");
 		$('div.optSettings').addClass("selectTab");
 	});
-
-	// Global Vars
-	var treadsSensorDriveValue = false;
-	var treadsScreenSaverValue = false;
-	var barrelScreenSaverValue = false;
-	var panelsScreenSaverValue = false;
 
 	getEffects();
 	getSettings();
