@@ -17,6 +17,11 @@ struct pal {
 	// Brightness of panels from 1-8
 	int panel_brightness;
 
+	// Frame buffer for effects
+	char* treads_buf; // Length: NUM_TREADS
+	char* barrel_buf; // Length: NUM_BARREL
+	char* panels_buf; // Length: NUM_PANELS
+
 	// Wheel encoder: dereference to get the current values
 	volatile unsigned int* enc_timer; // Number of ADC reads
 	volatile unsigned int* enc_raw;   // Raw ADC value
@@ -36,9 +41,9 @@ extern struct settings settings;
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay);
 
-int pal_treads_write(const char* buf, size_t len);
-int pal_barrel_write(const char* buf, size_t len);
-int pal_panels_write(const char* buf, size_t len);
+void pal_treads_write();
+void pal_barrel_write();
+void pal_panels_write();
 
 void pal_destroy();
 

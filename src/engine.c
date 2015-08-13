@@ -15,10 +15,6 @@ struct engine {
 	pthread_condattr_t condattr;
 	pthread_cond_t     cond;
 	volatile int       exit;
-
-	char               treads_buf[NUM_TREADS + (5*3)];
-	char               barrel_buf[NUM_BARREL + (5*3)];
-	char               panels_buf[NUM_PANELS * 3];
 };
 
 static 
@@ -73,17 +69,26 @@ int engine_run() {
 	pal_clock_gettime(&tv);
 
 	while (!eng.exit) {
+		char* treads_buf = eng.pal->treads_buf;
+
 		struct effect* treads;
 		struct effect* barrel;
 		struct effect* panels;
+
+		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u\n",
+		           *eng.pal->enc_timer,
+		           *eng.pal->enc_raw,
+		           *eng.pal->enc_min,
+		           *eng.pal->enc_max,
+		           *eng.pal->enc_ticks));
 
 		treads = get_active(&channel_treads);
 		barrel = get_active(&channel_barrel);
 		panels = get_active(&channel_panels);
 
-		treads->render(treads, shift, framenum, eng.treads_buf, NUM_TREADS);
-		barrel->render(barrel, shift, framenum, eng.barrel_buf, NUM_BARREL);
-		panels->render(panels, shift, framenum, eng.panels_buf, sizeof(eng.panels_buf));
+		treads->render(treads, shift, framenum, eng.pal->treads_buf, NUM_TREADS);
+		barrel->render(barrel, shift, framenum, eng.pal->barrel_buf, NUM_BARREL);
+		panels->render(panels, shift, framenum, eng.pal->panels_buf, NUM_PANELS);
 
 		++framenum;
 
@@ -96,28 +101,16 @@ int engine_run() {
 			LOG(("ret: (%d) %s, errno: (%d) %s\n", ret, strerror(ret), errno, strerror(errno)));
 		}
 
-		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u\n",
-		     *eng.pal->enc_timer,
-		     *eng.pal->enc_raw,
-		     *eng.pal->enc_min,
-		     *eng.pal->enc_max,
-		     *eng.pal->enc_ticks));
+		pal_treads_write();
+		pal_barrel_write();
+		pal_panels_write();
 
-		pal_treads_write(eng.treads_buf, sizeof(eng.treads_buf));
-		pal_barrel_write(eng.barrel_buf, sizeof(eng.barrel_buf));
-		pal_panels_write(eng.panels_buf, sizeof(eng.panels_buf));
-
-		web_treads_render(eng.treads_buf, NUM_TREADS);
+		web_treads_render(treads_buf, NUM_TREADS);
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;
 		tv.tv_nsec = tv.tv_nsec % 1000000000;
 	}
-
-	LOG(("Turning off LEDs\n"));
-
-	memset(eng.treads_buf, 0x80, NUM_TREADS);
-	pal_treads_write(eng.treads_buf, sizeof(eng.treads_buf));
 
 	return 0;
 }

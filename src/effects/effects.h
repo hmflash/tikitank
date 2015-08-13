@@ -14,8 +14,8 @@
 #define CC_B(pixel) COLOR_CORRECT(pixel, 240)
 
 #define NUM_TREADS     (3*32*5*3)
-#define NUM_BARREL      10*3  // FIXME
-#define NUM_PANELS      10
+#define NUM_BARREL     (80*3)
+#define NUM_PANELS     (10*3)
 #define MAX_EFFECTS     20
 
 #define RAINBOW_LENGTH 768

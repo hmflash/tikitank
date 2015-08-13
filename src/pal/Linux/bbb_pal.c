@@ -23,6 +23,7 @@
 
 #include "firmware.h"
 #include "common.h"
+#include "effects/effects.h"
 
 #define wordoffset(obj, member) (offsetof(obj, member) / sizeof(word))
 
@@ -36,6 +37,10 @@ struct bbb_pal
 
 	// Base address of PRU RAM
 	void* pru;
+
+	char treads_buf1[NUM_TREADS + (5*3)];
+	char barrel_buf1[NUM_BARREL + (5*3)];
+	char panels_buf1[NUM_PANELS];
 };
 
 static
@@ -466,31 +471,30 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 		pal.p.enc_speed = p + wordoffset(locals_t, enc_local[0].speed);
 	}
 
+	pal.p.treads_buf = pal.treads_buf1;
+	pal.p.barrel_buf = pal.barrel_buf1;
+	pal.p.panels_buf = pal.panels_buf1;
+
 	// TODO: Write the appropriate bits to ensure
 	// all leds are turned off
 
 	return &pal.p;
 }
 
-int pal_treads_write(const char* buf, size_t len) {
-	return write(pal.fd_treads, buf, len);
+void pal_treads_write() {
+	write(pal.fd_treads, pal.p.treads_buf, sizeof(pal.treads_buf1));
 }
 
-int pal_barrel_write(const char* buf, size_t len) {
-	return write(pal.fd_barrel, buf, len);
+void pal_barrel_write() {
+	write(pal.fd_barrel, pal.p.barrel_buf, sizeof(pal.barrel_buf1));
 }
 
-int pal_panels_write(const char* buf, size_t len) {
-	if (len < 30)
-		return -1;
-
+void pal_panels_write() {
 	// First 5 colors go out fd[0]
-	write_i2c(pal.fd_panels[0], buf);
+	write_i2c(pal.fd_panels[0], pal.p.panels_buf);
 
 	// Last 5 colors go out fd[0]
-	write_i2c(pal.fd_panels[1], buf + (5 * 3));
-
-	return 0;
+	write_i2c(pal.fd_panels[1], pal.p.panels_buf + (5 * 3));
 }
 
 void pal_destroy() {
@@ -499,8 +503,23 @@ void pal_destroy() {
 		pal.pru = NULL;
 	}
 
-	safe_close(&pal.fd_treads);
-	safe_close(&pal.fd_barrel);
+	if (pal.fd_treads != -1) {
+		// Turn off LEDs
+		memset(pal.p.treads_buf, 0x80, NUM_TREADS);
+		pal_treads_write();
+
+		close(pal.fd_treads);
+		pal.fd_treads = -1;
+	}
+
+	if (pal.fd_barrel != -1) {
+		// Turn off LEDs
+		memset(pal.p.barrel_buf, 0x80, NUM_BARREL);
+		pal_barrel_write();
+
+		close(pal.fd_barrel);
+		pal.fd_barrel = -1;
+	}
 
 	if (pal.fd_panels[0] != -1) {
 		reset_i2c(pal.fd_panels[0]);
@@ -513,6 +532,10 @@ void pal_destroy() {
 		close(pal.fd_panels[1]);
 		pal.fd_panels[1] = -1;
 	}
+
+	pal.p.treads_buf = NULL;
+	pal.p.barrel_buf = NULL;
+	pal.p.panels_buf = NULL;
 }
 
 int pal_clock_gettime(struct timespec* tv) {
