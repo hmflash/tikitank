@@ -13,7 +13,7 @@
 #include <time.h>
 #include <linux/i2c-dev.h>
 
-#ifndef I2C_SMBUS
+#ifndef I2C_SMBUS_READ
 #include <linux/i2c.h>
 #endif
 
