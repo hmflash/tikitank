@@ -83,6 +83,13 @@ int engine_run() {
 			LOG(("ret: (%d) %s, errno: (%d) %s\n", ret, strerror(ret), errno, strerror(errno)));
 		}
 
+		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u\n",
+		     *eng.pal->enc_timer,
+		     *eng.pal->enc_raw,
+		     *eng.pal->enc_min,
+		     *eng.pal->enc_max,
+		     *eng.pal->enc_ticks));
+
 		pal_treads_write(eng.framebuf, sizeof(eng.framebuf));
 		web_treads_render(eng.framebuf, NUM_TREADS);
 		pal_panels_write(eng.panelbuf, sizeof(eng.panelbuf));
