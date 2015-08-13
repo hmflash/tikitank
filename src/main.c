@@ -10,6 +10,8 @@
 #include "engine.h"
 #include "web.h"
 
+int verbosity = 0;
+
 void debug_log(const char* fmt, ...) {
 	va_list arg;
 	struct timespec tv;
@@ -25,7 +27,7 @@ void debug_log(const char* fmt, ...) {
 
 static
 void usage(int rc) {
-	printf("usage: tikitank [-h][-p PORT]\n");
+	printf("usage: tikitank [-hv][-p PORT]\n");
 	exit(rc);	
 }
 
@@ -35,10 +37,13 @@ int main(int argc, char** argv) {
 	struct pal* p;
 	struct engine* eng;
 
-	while ((rc = getopt(argc, argv, "hp:")) != -1) {
+	while ((rc = getopt(argc, argv, "hvp:")) != -1) {
 		switch (rc) {
 		case 'p':
 			port = optarg;
+			break;
+		case 'v':
+			++verbosity;
 			break;
 		case 'h':
 			usage(0);

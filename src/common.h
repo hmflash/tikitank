@@ -5,6 +5,10 @@
 #include <time.h>
 
 #define LOG(a) debug_log a
+#define DEBUG_LOG(a) if (verbosity > 0) debug_log a
+#define TRACE_LOG(a) if (verbosity > 1) debug_log a
+
+extern int verbosity;
 
 void debug_log(const char* fmt, ...)
 	__attribute__((format(printf, 1, 2)));
