@@ -3,12 +3,26 @@
 
 #include "common.h"
 
+struct osx_pal
+{
+	struct pal p;
+
+	char treads_buf[NUM_TREADS];
+	char barrel_buf[NUM_BARREL];
+	char panels_buf[NUM_PANELS];
+};
+
 static
-struct pal pal;
+struct osx_pal pal;
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	memset(&pal, 0, sizeof(pal));
-	return &pal;
+
+	pal.p.treads_buf = pal.treads_buf;
+	pal.p.barrel_buf = pal.barrel_buf;
+	pal.p.panels_buf = pal.panels_buf;
+
+	return &pal.p;
 }
 
 void pal_treads_write() {
@@ -20,7 +34,7 @@ void pal_barrel_write() {
 void pal_panels_write() {
 }
 
-void pal_destroy(struct pal* p) {
+void pal_destroy() {
 }
 
 int pal_clock_gettime(struct timespec* ts) {
