@@ -14,12 +14,12 @@ struct pal {
 	int panel_brightness;
 
 	// Wheel encoder: dereference to get the current values
-	unsigned int* enc_timer; // Number of ADC reads
-	unsigned int* enc_raw;   // Raw ADC value
-	unsigned int* enc_min;   // Min value for current half-tick
-	unsigned int* enc_max;   // Max value for current half-tick
-	unsigned int* enc_ticks; // Number of encoder ticks
-	unsigned int* enc_speed; // Width of last encoder tick
+	volatile unsigned int* enc_timer; // Number of ADC reads
+	volatile unsigned int* enc_raw;   // Raw ADC value
+	volatile unsigned int* enc_min;   // Min value for current half-tick
+	volatile unsigned int* enc_max;   // Max value for current half-tick
+	volatile unsigned int* enc_ticks; // Number of encoder ticks
+	volatile unsigned int* enc_speed; // Width of last encoder tick
 };
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay);
