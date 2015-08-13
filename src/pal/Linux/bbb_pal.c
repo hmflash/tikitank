@@ -27,6 +27,13 @@
 
 #define wordoffset(obj, member) (offsetof(obj, member) / sizeof(word))
 
+// Need trailing NULL byte for every 32 pixels
+
+#define LATCH_BYTES(x) (((x/3)+31)/32)
+
+#define TREADS_LEN (NUM_TREADS + LATCH_BYTES(NUM_TREADS))
+#define BARREL_LEN (NUM_BARREL + LATCH_BYTES(NUM_BARREL))
+
 struct bbb_pal
 {
 	struct pal p;
@@ -38,8 +45,8 @@ struct bbb_pal
 	// Base address of PRU RAM
 	void* pru;
 
-	char treads_buf1[NUM_TREADS + (5*3)];
-	char barrel_buf1[NUM_BARREL + (5*3)];
+	char treads_buf1[TREADS_LEN];
+	char barrel_buf1[BARREL_LEN];
 	char panels_buf1[NUM_PANELS];
 };
 
