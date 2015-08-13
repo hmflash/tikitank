@@ -23,6 +23,8 @@
 #include "firmware.h"
 #include "common.h"
 
+#define wordoffset(obj, member) (offsetof(obj, member) / sizeof(word))
+
 struct bbb_pal
 {
 	struct pal p;
@@ -245,11 +247,10 @@ err_open_pru:
 static
 void pru_destroy() {
 	unsigned int arg = 1;
-	unsigned int offset = offsetof(locals_t, flags) / sizeof(word);
 
 	// Tell PRU to stop
 	prussdrv_pru_write_memory(PRUSS0_PRU0_DATARAM,
-	                          offset,
+	                          wordoffset(locals_t, flags),
 	                          &arg,
 	                          sizeof(arg));
 
@@ -444,12 +445,12 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	if (pal.pru) {
 		unsigned int* p = (unsigned int*)pal.pru;
 
-		pal.p.enc_timer = p + offsetof(locals_t, timer);
-		pal.p.enc_raw   = p + offsetof(locals_t, enc_local[0].raw);
-		pal.p.enc_min   = p + offsetof(locals_t, enc_local[0].min);
-		pal.p.enc_max   = p + offsetof(locals_t, enc_local[0].max);
-		pal.p.enc_ticks = p + offsetof(locals_t, enc_local[0].ticks);
-		pal.p.enc_speed = p + offsetof(locals_t, enc_local[0].speed);
+		pal.p.enc_timer = p + wordoffset(locals_t, timer);
+		pal.p.enc_raw   = p + wordoffset(locals_t, enc_local[0].raw);
+		pal.p.enc_min   = p + wordoffset(locals_t, enc_local[0].min);
+		pal.p.enc_max   = p + wordoffset(locals_t, enc_local[0].max);
+		pal.p.enc_ticks = p + wordoffset(locals_t, enc_local[0].ticks);
+		pal.p.enc_speed = p + wordoffset(locals_t, enc_local[0].speed);
 	}
 
 	// TODO: Write the appropriate bits to ensure
