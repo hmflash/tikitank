@@ -8,10 +8,6 @@ struct pal pal;
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	memset(&pal, 0, sizeof(pal));
-	pal.fd_treads = -1;
-	pal.fd_barrel = -1;
-	pal.fd_panels[0] = -1;
-	pal.fd_panels[1] = -1;
 	return &pal;
 }
 
