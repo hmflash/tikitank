@@ -1,5 +1,7 @@
 UNAME := $(shell uname)
 
+PASM := $(shell which pasm)
+
 CC = gcc
 CFLAGS=-Wall -O2 -D$(UNAME)
 
@@ -42,6 +44,15 @@ all: $(BINDIR)/$(TARGET)
 
 $(BINDIR)/$(TARGET): $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ)
 	$(LD) $(LDFLAGS) -o $@ $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ) $(LIBS) $(LIBS_$(UNAME))
+
+ifneq ($(strip $(PASM)),)
+
+all: | $(BINDIR)/firmware.bin
+
+$(BINDIR)/firmware.bin: $(SRCDIR)/$(PAL)/firmware.p
+	$(PASM) -V3 -b $< $(basename $@)
+
+endif
 
 $(COMMON_OBJ): | $(OBJDIR)
 $(EFFECT_OBJ): | $(OBJDIR)/$(EFFECT)
