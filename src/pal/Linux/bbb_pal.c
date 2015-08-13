@@ -415,6 +415,10 @@ int open_i2c(const char* dev, int address) {
 	// Ensure everything is turned off
 	reset_i2c(fd);
 
+	// Set the pwm freq to be 24Hz
+	// val = (25000000 / (4096 * rate)) - 1
+	smbus_write_byte_data(fd, REG_PRESCALE, 0xff);
+
 	// Configure for use w/external LED driver
 	smbus_write_byte_data(fd, REG_MODE2, M2_OUTDRV);
 
