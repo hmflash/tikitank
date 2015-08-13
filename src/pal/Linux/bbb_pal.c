@@ -11,6 +11,7 @@
 #include <linux/types.h>
 #include <sys/ioctl.h>
 #include <time.h>
+#include <libgen.h>
 #include <linux/i2c-dev.h>
 
 #ifndef I2C_SMBUS_READ
@@ -183,6 +184,8 @@ void* pru_init(unsigned int threshold, unsigned int delay) {
 	locals_t locals;
 	int err;
 	void* ptr;
+	char* self;
+	char firmware[PATH_MAX];
 
 	err = prussdrv_init();
 	if (err) {
@@ -230,7 +233,17 @@ void* pru_init(unsigned int threshold, unsigned int delay) {
 		goto err_open_pru;
 	}
 
-	err = prussdrv_exec_program(PRU0, "firmware.bin");
+	self = realpath("/proc/self/exe", NULL);
+	if (!self) {
+		fprintf(stderr, "Couldn't locate PRU firmware\n");
+		goto err_open_pru;
+	}
+
+	strcpy(firmware, dirname(self));
+	strcat(firmware, "/firmware.bin");
+	free(self);
+
+	err = prussdrv_exec_program(PRU0, firmware);
 	if (err < 0) {
 		fprintf(stderr, "Failed start PRU0 firmware: %s\n",
 			strerror(errno));
