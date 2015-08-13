@@ -19,17 +19,17 @@ $(document).ready(function () {
 			i: 0
 		};
 
-		var origin = [0, 0];
+		var origin = [ 0,  0];
 		var offset = [20, 20];
 
 		var vertices = [
-			[0   , 10 ],
-			[50  , 25 ],
-			[250 , 25 ],
-			[265 , 15 ],
-			[265 , 5  ],
-			[250 , 0  ],
-			[0   , 0  ]		
+			[   0, 10 ],  //  10 px
+			[  44, 34 ],  //  45 px
+			[ 210, 34 ],  // 165 px
+			[ 226, 22 ],  //  20 px
+			[ 226, 12 ],  //  10 px
+			[ 210,  0 ],  //  20 px
+			[   0,  0 ]   // 210 px (14*5 + 14*10)
 		];
 
 		var prev = origin;
@@ -46,16 +46,21 @@ $(document).ready(function () {
 	}
 });
 
+function get_color(g) {
+	if (g.i < g.colors.byteLength) {
+		var i = g.i;
+		g.i += 1;
+		return (g.colors[i] & 0x7f) * 2;
+	}
+	return 0x00;
+}
+
 function plot(g, x, y) {
-	var j = y*g.img.width*4 + x*4;
-	var i = g.i % g.colors.byteLength;
-
-	g.img.data[j+0] = g.colors[i+0] & 0x7f * 2;  // R
-	g.img.data[j+1] = g.colors[i+1] & 0x7f * 2;  // G
-	g.img.data[j+2] = g.colors[i+2] & 0x7f * 2;  // B
-	g.img.data[j+3] = 0xff;                      // A
-
-	g.i += 3;
+	var i = y*g.img.width*4 + x*4;
+	g.img.data[i+0] = get_color(g);  // R
+	g.img.data[i+1] = get_color(g);  // G
+	g.img.data[i+2] = get_color(g);  // B
+	g.img.data[i+3] = 0xff;          // A
 }
 
 function line(g, x0, y0, x1, y1) {
