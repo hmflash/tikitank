@@ -1,13 +1,28 @@
 "use strict";
 
+var ws;
+var showPreview = false;
+
 $(document).ready(function () {
+	$('#treadsPreviewButton').click(function() {
+		if (showPreview)
+			stopPreview();
+		else
+			startPreview();
+
+		showPreview = !showPreview;
+		$('#canvas').toggle(showPreview);
+	});
+});
+
+function startPreview() {
 	var canvas = document.getElementById('canvas');
-	var width = 500;
-	var height = 500;
+	var width = 300;
+	var height = 50;
 	var ctx = canvas.getContext('2d');
 	var img = ctx.createImageData(width, height);
 
-	var ws = new WebSocket('ws://' + location.host);
+	ws = new WebSocket('ws://' + location.host);
 	ws.binaryType = 'arraybuffer';
 	
 	ws.onmessage = function(event) {
@@ -20,7 +35,7 @@ $(document).ready(function () {
 		};
 
 		var origin = [ 0,  0];
-		var offset = [20, 20];
+		var offset = [20, 10];
 
 		var vertices = [
 			[   0, 10 ],  //  10 px
@@ -44,9 +59,18 @@ $(document).ready(function () {
 
 		ctx.putImageData(img, 0, 0);
 	}
-});
 
-function get_color(g) {
+	ws.onclose = function(event) {
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, width, height);
+	}
+}
+
+function stopPreview() {
+	ws.close();
+}
+
+function getColor(g) {
 	if (g.i < g.colors.byteLength) {
 		var i = g.i;
 		g.i += 1;
@@ -57,10 +81,10 @@ function get_color(g) {
 
 function plot(g, x, y) {
 	var i = y*g.img.width*4 + x*4;
-	g.img.data[i+0] = get_color(g);  // R
-	g.img.data[i+1] = get_color(g);  // G
-	g.img.data[i+2] = get_color(g);  // B
-	g.img.data[i+3] = 0xff;          // A
+	g.img.data[i+0] = getColor(g);  // R
+	g.img.data[i+1] = getColor(g);  // G
+	g.img.data[i+2] = getColor(g);  // B
+	g.img.data[i+3] = 0xff;         // A
 }
 
 function line(g, x0, y0, x1, y1) {

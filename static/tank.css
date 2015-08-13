@@ -441,6 +441,8 @@ body {
 .blue { background-color: blue;}
 
 #canvas {
-	width: 1400px;
-	height: 1400px;
+	display: none;
+	border: 1px solid gray;
+	width:  950px;
+	height: 200px;
 }

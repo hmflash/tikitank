@@ -575,12 +575,12 @@ int event_handler(struct mg_connection* conn, enum mg_event ev) {
 		// LOG(("MG_WS_HANDSHAKE: %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 		return MG_FALSE;
 	case MG_WS_CONNECT:
-		// LOG(("MG_WS_CONNECT:   %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
+		LOG(("MG_WS_CONNECT:   %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 		ws_conn = conn;
 		return MG_TRUE;
 	case MG_CLOSE:
-		// LOG(("MG_CLOSE:        %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 		if (conn == ws_conn) {
+			LOG(("MG_CLOSE:        %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 			ws_conn = NULL;
 		}
 		return MG_TRUE;

@@ -11,6 +11,7 @@
   <script src="raphael-min.js"></script>
   <script src="colorwheel.js"></script>
   <script src="tank.js"></script>
+  <script src="view.js"></script>
 </head>
 <body>
   <div id="headerBar">
@@ -95,6 +96,9 @@
               </div>
               <div id="treadsScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('treads', !treadsScreenSaverValue)">
                 SCREEN SAVER
+              </div>
+              <div id="treadsPreviewButton" class="effectControlButton">
+                PREVIEW
               </div>
             </div>
           </div>
@@ -219,5 +223,8 @@
    </script>
  </div>
 </div>
+  <canvas id="canvas" width="280" height="58">
+    Sorry, your browser doesn't support the &lt;canvas&gt; element.
+  </canvas>
 </body>
 </html>
