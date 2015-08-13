@@ -16,6 +16,7 @@
 #define NUM_TREADS     (3*32*5*3)
 #define NUM_BARREL      10*3  // FIXME
 #define NUM_PANELS      10
+#define MAX_EFFECTS     20
 
 #define RAINBOW_LENGTH 768
 
@@ -52,11 +53,12 @@ struct effect {
 	void (*render)(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
 };
 
-extern struct effect* effects_treads[];
-extern int effects_treads_num;
+struct channel {
+	long                active;
+	int                 num_effects;
+	struct effect**     effects;
+};
 
-extern struct effect* effects_barrel[];
-extern int effects_barrel_num;
-
-extern struct effect* effects_panels[];
-extern int effects_panels_num;
+extern struct channel channel_treads;
+extern struct channel channel_barrel;
+extern struct channel channel_panels;

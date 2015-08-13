@@ -65,6 +65,8 @@ int main(int argc, char** argv) {
 		return rc;
 	}
 
+	settings_load();
+
 	LOG(("Running engine\n"));
 
 	web_run();

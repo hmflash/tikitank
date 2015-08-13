@@ -7,52 +7,23 @@
 #include "mongoose.h"
 #include "frozen.h"
 #include "common.h"
-
-#define NUM_PANELS  10
-#define MAX_EFFECTS 10
-
-struct web_settings {
-	long                dmx_brightness;
-	long                manual_tick;
-	long                idle_interval;
-};
-
-union web_color {
-	long                value;
-	long                values[NUM_PANELS];
-};
-
-struct web_effect {
-	const char*         name;
-	long                argument;
-	const char*         arg_desc;
-	union web_color     color;
-	long                screen_saver;
-	long                sensor_driven;
-};
-
-struct web_channel {
-	struct web_effect   all[MAX_EFFECTS];
-	long                active;
-};
-
-struct web_effects {
-	struct web_channel  treads;
-	struct web_channel  panels;
-	struct web_channel  barrel;
-};
+#include "effects/effects.h"
+#include "engine.h"
 
 struct web_context {
 	pthread_t           thread;
 	struct mg_server*   server;
 	struct engine*      engine;
 	volatile int        exit;
-	struct web_settings settings;
-	struct web_effects  effects;
 };
+
+struct settings settings;
 
 static 
 struct web_context web;
+
+static
+struct mg_connection* ws_conn;
 
 static
 const char* API_SETTINGS = "/api/settings";
@@ -161,46 +132,45 @@ void load_long(struct json_token* tokens, const char* path, long* into) {
 }
 
 static
-void channel_load(struct json_token* tokens, const char* kind, struct web_channel* channel) {
+void channel_load(struct json_token* tokens, const char* kind, struct channel* channel) {
 	char path[256];
 	long active;
 	const struct json_token* token;
+
+	// LOG(("channel_load> %s\n", kind));
 	
 	snprintf(path, sizeof(path), EFFECTS ".%s." ALL, kind);
 	token = find_json_token(tokens, path);
 	if (token) {
 		int i;
 
-		for (i = 0; i < MAX_EFFECTS && i < token->num_desc; i++) {
-			if (channel->all[i].name) {
-				snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" ARGUMENT, kind, i);
-				load_long(tokens, path, &channel->all[i].argument);
+		for (i = 0; i < channel->num_effects && i < token->num_desc; i++) {
+			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" ARGUMENT, kind, i);
+			load_long(tokens, path, &channel->effects[i]->argument);
 
-				snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SSAVER, kind, i);
-				load_long(tokens, path, &channel->all[i].screen_saver);
+			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SSAVER, kind, i);
+			load_long(tokens, path, &channel->effects[i]->screen_saver);
 
-				snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SDRIVEN, kind, i);
-				load_long(tokens, path, &channel->all[i].sensor_driven);
-			}
+			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SDRIVEN, kind, i);
+			load_long(tokens, path, &channel->effects[i]->sensor_driven);
 		}
 	}
 
 	snprintf(path, sizeof(path), EFFECTS ".%s." ACTIVE, kind);
 	load_long(tokens, path, &active);
-	if (active < MAX_EFFECTS && channel->all[active].name) {
+	if (active < channel->num_effects && channel->effects[active]->name) {
 		channel->active = active;
 	}
 }
 
-static
 int settings_load() {
 	FILE* fp;
 	size_t len;
 	int ret;
 
-	web.settings.dmx_brightness = DEFAULT_DMX_BRIGHTNESS;
-	web.settings.manual_tick    = DEFAULT_MANUAL_TICK;
-	web.settings.idle_interval  = DEFAULT_IDLE_INTERVAL;
+	settings.dmx_brightness = DEFAULT_DMX_BRIGHTNESS;
+	settings.manual_tick    = DEFAULT_MANUAL_TICK;
+	settings.idle_interval  = DEFAULT_IDLE_INTERVAL;
 
 	fp = fopen(SETTINGS_FILE, "r");
 	if (!fp) {
@@ -221,13 +191,13 @@ int settings_load() {
 		return ret;
 	}
 
-	load_long(tokens, SETTINGS "." DMX_BRIGHTNESS, &web.settings.dmx_brightness);
-	load_long(tokens, SETTINGS "." MANUAL_TICK,    &web.settings.manual_tick);
-	load_long(tokens, SETTINGS "." IDLE_INTERVAL,  &web.settings.idle_interval);
+	load_long(tokens, SETTINGS "." DMX_BRIGHTNESS, &settings.dmx_brightness);
+	load_long(tokens, SETTINGS "." MANUAL_TICK,    &settings.manual_tick);
+	load_long(tokens, SETTINGS "." IDLE_INTERVAL,  &settings.idle_interval);
 
-	channel_load(tokens, TREADS, &web.effects.treads);
-	channel_load(tokens, PANELS, &web.effects.panels);
-	channel_load(tokens, BARREL, &web.effects.barrel);
+	channel_load(tokens, TREADS, &channel_treads);
+	channel_load(tokens, PANELS, &channel_panels);
+	channel_load(tokens, BARREL, &channel_barrel);
 
 	return 0;
 }
@@ -235,34 +205,34 @@ int settings_load() {
 static
 int settings_json(char* buf, size_t len) {
 	return json_emit(buf, len, JSON_SETTINGS, 
-		DMX_BRIGHTNESS, web.settings.dmx_brightness, 
-		MANUAL_TICK,    web.settings.manual_tick, 
-		IDLE_INTERVAL,  web.settings.idle_interval
+		DMX_BRIGHTNESS, settings.dmx_brightness, 
+		MANUAL_TICK,    settings.manual_tick, 
+		IDLE_INTERVAL,  settings.idle_interval
 	);
 }
 
 static
-int color_json(char* buf, size_t len, struct web_channel* channel, union web_color* color) {
-	if (channel == &web.effects.panels) {
-		long* values = color->values;
+int color_json(char* buf, size_t len, struct channel* channel, union color_arg* arg) {
+	if (channel == &channel_panels) {
+		union color* values = arg->colors;
 		return json_emit(buf, len, JSON_PANELS_COLOR,
-			values[0],
-			values[1],
-			values[2],
-			values[3],
-			values[4],
-			values[5],
-			values[6],
-			values[7],
-			values[8],
-			values[9]
+			values[0].value,
+			values[1].value,
+			values[2].value,
+			values[3].value,
+			values[4].value,
+			values[5].value,
+			values[6].value,
+			values[7].value,
+			values[8].value,
+			values[9].value
 		);
 	} 
-	return json_emit_long(buf, len, color->value);
+	return json_emit_long(buf, len, arg->color.value);
 }
 
 static 
-int channel_json(char* buf, size_t len, struct web_channel* channel) {
+int channel_json(char* buf, size_t len, struct channel* channel) {
 	int i;
 	int ret;
 	int first = 1;
@@ -271,32 +241,34 @@ int channel_json(char* buf, size_t len, struct web_channel* channel) {
 
 	*ptr = 0;
 
-	for (i = 0; i < MAX_EFFECTS; i++) {
-		struct web_effect* effect = &channel->all[i];
-		if (effect->name) {
-			char color_buf[1024];
-			char effect_buf[1024];
+	// LOG(("channel_json> %p\n", channel));
 
-			color_json(color_buf, sizeof(color_buf), channel, &effect->color);
+	for (i = 0; i < channel->num_effects; i++) {
+		struct effect* effect = channel->effects[i];
+		char color_buf[1024];
+		char effect_buf[1024];
+	
+		// LOG(("channel_json> effect: %s\n", effect->name));
 
-			json_emit(effect_buf, sizeof(effect_buf), JSON_EFFECT,
-				NAME,          effect->name,
-				ARGUMENT,      effect->argument,
-				ARGUMENT_DESC, effect->arg_desc ? effect->arg_desc : "",
-				COLOR,         color_buf,
-				IS_SSAVER,     effect->screen_saver,
-				IS_SDRIVEN,    effect->sensor_driven
-			);
+		color_json(color_buf, sizeof(color_buf), channel, &effect->color_arg);
 
-			if (first) {
-				first = 0;
-				ret = sprintf(ptr, "%s", effect_buf);
-			} else {
-				ret = sprintf(ptr, ",\n%s", effect_buf);
-			}
+		json_emit(effect_buf, sizeof(effect_buf), JSON_EFFECT,
+			NAME,          effect->name,
+			ARGUMENT,      effect->argument,
+			ARGUMENT_DESC, effect->arg_desc ? effect->arg_desc : "",
+			COLOR,         color_buf,
+			IS_SSAVER,     effect->screen_saver,
+			IS_SDRIVEN,    effect->sensor_driven
+		);
 
-			ptr += ret;
+		if (first) {
+			first = 0;
+			ret = sprintf(ptr, "%s", effect_buf);
+		} else {
+			ret = sprintf(ptr, ",\n%s", effect_buf);
 		}
+
+		ptr += ret;
 	}
 
 	return json_emit(buf, len, JSON_CHANNEL,
@@ -311,9 +283,9 @@ int effects_json(char* buf, size_t len) {
 	char panels_buf[MAX_EFFECTS * 1024];
 	char barrel_buf[MAX_EFFECTS * 1024];
 
-	channel_json(treads_buf, sizeof(treads_buf), &web.effects.treads);
-	channel_json(panels_buf, sizeof(panels_buf), &web.effects.panels);
-	channel_json(barrel_buf, sizeof(barrel_buf), &web.effects.barrel);
+	channel_json(treads_buf, sizeof(treads_buf), &channel_treads);
+	channel_json(panels_buf, sizeof(panels_buf), &channel_panels);
+	channel_json(barrel_buf, sizeof(barrel_buf), &channel_barrel);
 
 	return json_emit(buf, len, JSON_EFFECTS,
 		TREADS, treads_buf,
@@ -374,17 +346,17 @@ void settings_post(struct mg_connection* conn) {
 
 	len = mg_get_var(conn, DMX_BRIGHTNESS, buf, sizeof(buf));
 	if (len > 0) {
-		web.settings.dmx_brightness = strtol(buf, NULL, 10);
+		settings.dmx_brightness = strtol(buf, NULL, 10);
 	}
 
 	len = mg_get_var(conn, MANUAL_TICK, buf, sizeof(buf));
 	if (len > 0) {
-		web.settings.manual_tick = strtol(buf, NULL, 10);
+		settings.manual_tick = strtol(buf, NULL, 10);
 	}
 
 	len = mg_get_var(conn, IDLE_INTERVAL, buf, sizeof(buf));
 	if (len > 0) {
-		web.settings.idle_interval = strtol(buf, NULL, 10);
+		settings.idle_interval = strtol(buf, NULL, 10);
 	}
 
 	rc = settings_save();
@@ -440,7 +412,7 @@ void effects_post(struct mg_connection* conn) {
 	char kind[256];
 	char arg1[256];
 	char arg2[256];
-	struct web_channel* channel;
+	struct channel* channel;
 
 	settings_load();
 
@@ -452,11 +424,11 @@ void effects_post(struct mg_connection* conn) {
 	}
 
 	if(!strncmp(kind, "treads", sizeof(kind))) {
-		channel = &web.effects.treads;
+		channel = &channel_treads;
 	} else if(!strncmp(kind, "barrel", sizeof(kind))) {
-		channel = &web.effects.barrel;
+		channel = &channel_barrel;
 	} else if(!strncmp(kind, "panels", sizeof(kind))) {
-		channel = &web.effects.panels;
+		channel = &channel_panels;
 	} else {
 		mg_printf_data(conn, "Invalid kind");
 		mg_send_status(conn, 400);
@@ -470,7 +442,7 @@ void effects_post(struct mg_connection* conn) {
 		LOG(("selectEffect: kind=%s active=%s\n", kind, arg1));
 
 		idx = strntol(arg1, len1, 10);
-		if (idx >= 0 && idx < MAX_EFFECTS) {
+		if (idx >= 0 && idx < channel->num_effects) {
 			channel->active = idx;
 			effects_post_reply(conn);
 			return;
@@ -485,9 +457,9 @@ void effects_post(struct mg_connection* conn) {
 	if (len1 > 0) {
 		LOG(("setEffectScreenSaver: %s\n", arg1));
 		if (!strncmp(arg1, "true", sizeof(arg1))) {
-			channel->all[channel->active].screen_saver = 1;
+			channel->effects[channel->active]->screen_saver = 1;
 		} else {
-			channel->all[channel->active].screen_saver = 0;
+			channel->effects[channel->active]->screen_saver = 0;
 		}
 		effects_post_reply(conn);
 		return;
@@ -497,9 +469,9 @@ void effects_post(struct mg_connection* conn) {
 	if (len1 > 0) {
 		LOG(("setEffectSensorDrive: %s\n", arg1));
 		if (!strncmp(arg1, "true", sizeof(arg1))) {
-			channel->all[channel->active].sensor_driven = 1;
+			channel->effects[channel->active]->sensor_driven = 1;
 		} else {
-			channel->all[channel->active].sensor_driven = 0;
+			channel->effects[channel->active]->sensor_driven = 0;
 		}
 		effects_post_reply(conn);
 		return;
@@ -513,18 +485,18 @@ void effects_post(struct mg_connection* conn) {
 		LOG(("setEffectParameters: %s, %s\n", arg1, arg2));
 		idx = strntol(arg2, len2, 10);
 		if (idx < NUM_PANELS) {
-			channel->all[channel->active].color.values[idx] = strntol(arg1+1, len1-1, 16);
+			channel->effects[channel->active]->color_arg.colors[idx].value = strntol(arg1+1, len1-1, 16);
 		}
 		effects_post_reply(conn);
 		return;
 	} else if (len1 > 0) {
 		LOG(("setEffectColor: %s\n", arg1));
-		channel->all[channel->active].color.value = strntol(arg1+1, len1-1, 16);
+		channel->effects[channel->active]->color_arg.color.value = strntol(arg1+1, len1-1, 16);
 		effects_post_reply(conn);
 		return;
 	} else if (len2 > 0) {
 		LOG(("setEffectArgument: %s\n", arg2));
-		channel->all[channel->active].argument = strntol(arg2, len2, 10);
+		channel->effects[channel->active]->argument = strntol(arg2, len2, 10);
 		effects_post_reply(conn);
 		return;
 	}
@@ -554,23 +526,32 @@ void on_effects(struct mg_connection* conn) {
 }
 
 static
-struct mg_connection* ws_conn;
+int on_request(struct mg_connection* conn) {
+	int ret = MG_FALSE;
+
+	// LOG(("MG_REQUEST:      %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
+
+	engine_lock();
+
+	if (!strncmp(conn->uri, API_SETTINGS, strlen(API_SETTINGS))) {
+		on_settings(conn);
+		ret = MG_TRUE;
+	} else if (!strncmp(conn->uri, API_EFFECTS, strlen(API_EFFECTS))) {
+		on_effects(conn);
+		ret = MG_TRUE;
+	}
+
+	engine_unlock();
+
+	return ret;
+}
 
 int event_handler(struct mg_connection* conn, enum mg_event ev) {
 	switch (ev) {
 	case MG_AUTH: 
 		return MG_TRUE;
 	case MG_REQUEST:
-		// LOG(("MG_REQUEST:      %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
-		if (!strncmp(conn->uri, API_SETTINGS, strlen(API_SETTINGS))) {
-			on_settings(conn);
-			return MG_TRUE;
-		}
-		if (!strncmp(conn->uri, API_EFFECTS, strlen(API_EFFECTS))) {
-			on_effects(conn);
-			return MG_TRUE;
-		}
-		return MG_FALSE;
+		return on_request(conn);
 	case MG_WS_HANDSHAKE:
 		// LOG(("MG_WS_HANDSHAKE: %p %d %d\n", conn, conn->is_websocket, conn->wsbits));
 		return MG_FALSE;
@@ -600,25 +581,9 @@ void* web_thread(void* arg) {
 }
 
 int web_init(struct engine* eng, const char* port) {
-	web.exit = 0;
+	memset(&web, 0, sizeof(web));
 	web.engine = eng;
 	web.server = mg_create_server(NULL, event_handler);
-
-	memset(&web.effects, 0, sizeof(web.effects));
-
-	web.effects.treads.all[0].name = "rainbow";
-	web.effects.treads.all[0].arg_desc = "rainbow arg";
-	web.effects.treads.all[1].name = "foo";
-	web.effects.treads.all[1].arg_desc = "foo arg";
-	web.effects.treads.all[2].name = "bar";
-	web.effects.treads.all[2].arg_desc = "bar arg";
-	
-	web.effects.panels.all[0].name = "foo";
-	web.effects.panels.all[1].name = "bar";
-	web.effects.panels.all[2].name = "rainbow";
-	
-	web.effects.barrel.all[0].name = "rainbow";
-	web.effects.barrel.all[1].name = "foo";
 
 	mg_set_option(web.server, "document_root", "static");
 	mg_set_option(web.server, "listening_port", port);

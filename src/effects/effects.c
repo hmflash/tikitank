@@ -51,20 +51,31 @@ struct effect* effects_treads[] = {
 	&effect_treads_off,
 	&effect_treads_simple,
 	&effect_treads_rainbow,
-	NULL
 };
 
 struct effect* effects_barrel[] = {
 	&effect_barrel_off,
-	NULL
 };
 
 struct effect* effects_panels[] = {
 	&effect_panels_off,
 	&effect_panels_rainbow,
-	NULL
 };
 
-int effects_treads_num = sizeof(effects_treads) / sizeof(*effects_treads);
-int effects_barrel_num = sizeof(effects_barrel) / sizeof(*effects_barrel);
-int effects_panels_num = sizeof(effects_panels) / sizeof(*effects_panels);
+struct channel channel_treads = {
+	.active      = 0,
+	.num_effects = sizeof(effects_treads) / sizeof(*effects_treads),
+	.effects     = effects_treads,
+};
+
+struct channel channel_barrel = {
+	.active      = 0,
+	.num_effects = sizeof(effects_barrel) / sizeof(*effects_barrel),
+	.effects     = effects_treads,
+};
+
+struct channel channel_panels = {
+	.active      = 0,
+	.num_effects = sizeof(effects_panels) / sizeof(*effects_panels),
+	.effects     = effects_panels,
+};

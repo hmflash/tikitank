@@ -16,13 +16,8 @@ struct engine {
 	pthread_cond_t     cond;
 	volatile int       exit;
 
-	int                treads_active;
 	char               treads_buf[NUM_TREADS + (5*3)];
-
-	int                barrel_active;
 	char               barrel_buf[NUM_BARREL + (5*3)];
-
-	int                panels_active;
 	char               panels_buf[NUM_PANELS * 3];
 };
 
@@ -38,7 +33,6 @@ void signal_handler(int signum)
 struct engine* engine_init(struct pal* pal) {
 	memset(&eng, 0, sizeof(eng));
 	eng.pal = pal;
-	eng.treads_active = 1;
 
 	pthread_mutex_init(&eng.mutex, NULL);
 	pthread_condattr_init(&eng.condattr);
@@ -50,9 +44,9 @@ struct engine* engine_init(struct pal* pal) {
 	signal(SIGINT, signal_handler);
 	signal(SIGTERM, signal_handler);
 
-	LOG(("%d treads effects\n", effects_treads_num));
-	LOG(("%d barrel effects\n", effects_barrel_num));
-	LOG(("%d panels effects\n", effects_panels_num));
+	LOG(("%d treads effects\n", channel_treads.num_effects));
+	LOG(("%d barrel effects\n", channel_barrel.num_effects));
+	LOG(("%d panels effects\n", channel_panels.num_effects));
 
 	return &eng;
 }
@@ -64,8 +58,8 @@ int engine_destroy() {
 	return 0;
 }
 
-struct effect* get_active(struct effect** effects, int active, int max) {
-	return effects[active < max ? active : 0];
+struct effect* get_active(struct channel* c) {
+	return c->effects[c->active < c->num_effects ? c->active : 0];
 }
 
 int engine_run() {
@@ -83,9 +77,9 @@ int engine_run() {
 		struct effect* barrel;
 		struct effect* panels;
 
-		treads = get_active(effects_treads, eng.treads_active, effects_treads_num);
-		barrel = get_active(effects_barrel, eng.barrel_active, effects_barrel_num);
-		panels = get_active(effects_panels, eng.panels_active, effects_panels_num);
+		treads = get_active(&channel_treads);
+		barrel = get_active(&channel_barrel);
+		panels = get_active(&channel_panels);
 
 		treads->render(treads, shift, framenum, eng.treads_buf, NUM_TREADS);
 		barrel->render(barrel, shift, framenum, eng.barrel_buf, NUM_BARREL);
@@ -126,4 +120,12 @@ int engine_run() {
 	pal_treads_write(eng.treads_buf, sizeof(eng.treads_buf));
 
 	return 0;
+}
+
+void engine_lock() {
+	pthread_mutex_lock(&eng.mutex);
+}
+
+void engine_unlock() {
+	pthread_mutex_unlock(&eng.mutex);
 }

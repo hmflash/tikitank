@@ -26,6 +26,14 @@ struct pal {
 	volatile unsigned int* enc_speed; // Width of last encoder tick
 };
 
+struct settings {
+	long                dmx_brightness;
+	long                manual_tick;
+	long                idle_interval;
+};
+
+extern struct settings settings;
+
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay);
 
 int pal_treads_write(const char* buf, size_t len);
@@ -35,3 +43,5 @@ int pal_panels_write(const char* buf, size_t len);
 void pal_destroy();
 
 int pal_clock_gettime(struct timespec* tv);
+
+int settings_load();
