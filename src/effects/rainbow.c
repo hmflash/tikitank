@@ -7,9 +7,9 @@ void rainbow_treads(struct render_args* args) {
 	int i;
 
 	for (i = 0; i < args->framelen; i += 3) {
-		args->framebuf[i+0] = 0x80 | RAINBOW_G(i + (4 * args->framenum)) >> 1;
-		args->framebuf[i+1] = 0x80 | RAINBOW_R(i + (4 * args->framenum)) >> 1;
-		args->framebuf[i+2] = 0x80 | RAINBOW_B(i + (4 * args->framenum)) >> 1;
+		args->framebuf[i+0] = 0x80 | RAINBOW_G(args->framelen - i + (4 * args->framenum)) >> 1;
+		args->framebuf[i+1] = 0x80 | RAINBOW_R(args->framelen - i + (4 * args->framenum)) >> 1;
+		args->framebuf[i+2] = 0x80 | RAINBOW_B(args->framelen - i + (4 * args->framenum)) >> 1;
 	}
 }
 
