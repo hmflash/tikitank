@@ -2,6 +2,7 @@
 #include <sys/time.h>
 
 #include "common.h"
+#include "effects/effects.h"
 
 struct osx_pal
 {
