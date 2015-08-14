@@ -7,9 +7,11 @@ void off_barrel(struct render_args* args);
 void off_panels(struct render_args* args);
 
 void simple_treads(struct render_args* args);
+void simple_panels(struct render_args* args);
 void antialias_treads(struct render_args* args);
 
 void rainbow_treads(struct render_args* args);
+void rainbow_barrel(struct render_args* args);
 void rainbow_panels(struct render_args* args);
 void rolling_rainbow_treads(struct render_args* args);
 
@@ -49,10 +51,22 @@ struct effect effect_barrel_off = {
 	.render     = off_barrel,
 };
 
+struct effect effect_barrel_rainbow = {
+	.name       = "rainbow",
+	.arg_desc   = "N/A",
+	.render     = rainbow_barrel,
+};
+
 struct effect effect_panels_off = {
 	.name       = "off",
 	.arg_desc   = "N/A",
 	.render     = off_panels,
+};
+
+struct effect effect_panels_simple = {
+	.name       = "simple",
+	.arg_desc   = "N/A",
+	.render     = simple_panels,
 };
 
 struct effect effect_panels_rainbow = {
@@ -71,10 +85,12 @@ struct effect* effects_treads[] = {
 
 struct effect* effects_barrel[] = {
 	&effect_barrel_off,
+	&effect_barrel_rainbow,
 };
 
 struct effect* effects_panels[] = {
 	&effect_panels_off,
+	&effect_panels_simple,
 	&effect_panels_rainbow,
 };
 
@@ -87,7 +103,7 @@ struct channel channel_treads = {
 struct channel channel_barrel = {
 	.active      = 0,
 	.num_effects = sizeof(effects_barrel) / sizeof(*effects_barrel),
-	.effects     = effects_treads,
+	.effects     = effects_barrel,
 };
 
 struct channel channel_panels = {

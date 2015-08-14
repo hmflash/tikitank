@@ -20,3 +20,16 @@ void simple_treads(struct render_args* args) {
 		}
 	}
 }
+
+void simple_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen) {
+	int i;
+	union color color;
+
+	for (i = 0; i < framelen; i += 3) {
+		color = effect->color_arg.colors[i / 3];
+
+		framebuf[i+0] = color.rgb.red;
+		framebuf[i+1] = color.rgb.green;
+		framebuf[i+2] = color.rgb.blue;
+	}
+}

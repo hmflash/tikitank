@@ -70,13 +70,13 @@ $(BINDIR)/$(TARGET) : | $(BINDIR)
 $(BINDIR):
 	@mkdir -p $@
 
-$(COMMON_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC)
+$(COMMON_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(EFFECT_INC)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(EFFECT_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(EFFECT_INC)
 	$(CC) $(CFLAGS) -I$(SRCDIR) -c -o $@ $<
 
-$(PAL_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+$(PAL_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(EFFECT_INC)
 	$(CC) $(CFLAGS) $(CFLAGS_$(UNAME)) -I$(SRCDIR) -I$(SRCDIR)/$(PAL) -c -o $@ $<
 
 clean:
