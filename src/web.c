@@ -108,8 +108,7 @@ const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 #define CONTENT_TYPE_JSON  "application/json"
 
 static 
-long strntol(const char* buf, size_t size, int base)
-{
+long strntol(const char* buf, size_t size, int base) {
 	static char str[100];
 	if (size >= (sizeof(str) - 1)) {
 		return 0;
@@ -611,8 +610,7 @@ void web_destroy() {
 	LOG(("Web server stopped: (%d) %s\n", rc, strerror(rc)));
 }
 
-void web_treads_render(const char* buf, size_t len)
-{
+void web_treads_render(const char* buf, size_t len) {
 	// LOG(("render: %zu bytes\n", len));
 	if (ws_conn) {
 		mg_websocket_write(ws_conn, WEBSOCKET_OPCODE_BINARY, buf, len);

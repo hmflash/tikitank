@@ -21,8 +21,7 @@ static
 struct engine eng;
 
 static 
-void signal_handler(int signum)
-{
+void signal_handler(int signum) {
 	eng.exit = 1;
 }
 
