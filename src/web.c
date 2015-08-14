@@ -152,6 +152,18 @@ void channel_load(struct json_token* tokens, const char* kind, struct channel* c
 
 			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SDRIVEN, kind, i);
 			load_long(tokens, path, &channel->effects[i]->sensor_driven);
+			
+			if (channel == &channel_panels) {
+				int j;
+
+				for (j = 0; j < NUM_PANELS/3; j++) {
+					snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" COLOR "[%d]", kind, i, j);
+					load_long(tokens, path, &channel->effects[i]->color_arg.colors[j].value);
+				}
+			} else {
+				snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" COLOR, kind, i);
+				load_long(tokens, path, &channel->effects[i]->color_arg.color.value);
+			}
 		}
 	}
 
@@ -483,7 +495,7 @@ void effects_post(struct mg_connection* conn) {
 		int idx;
 		LOG(("setEffectParameters: %s, %s\n", arg1, arg2));
 		idx = strntol(arg2, len2, 10);
-		if (idx < NUM_PANELS) {
+		if (idx < NUM_PANELS/3) {
 			channel->effects[channel->active]->color_arg.colors[idx].value = strntol(arg1+1, len1-1, 16);
 		}
 		effects_post_reply(conn);
