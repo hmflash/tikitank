@@ -47,7 +47,7 @@ struct effect;
 struct render_args {
 	struct effect*      effect;
 	int                 shift_quotient;
-	int                 shift_remainder;
+	uint8_t             shift_remainder;
 	int                 framenum;
 	char*               framebuf;
 	size_t              framelen;

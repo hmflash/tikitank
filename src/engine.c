@@ -60,8 +60,7 @@ struct effect* get_active(struct channel* c) {
 int engine_run() {
 	int ret;
 	int framenum = 0;
-	int shift_quotient = 0;
-	int shift_remainder = 0;
+	int shift = 0;
 	struct timespec tv;
 
 	pthread_mutex_lock(&eng.mutex);
@@ -72,8 +71,8 @@ int engine_run() {
 		char* treads_buf = eng.pal->treads_buf;
 		struct render_args treads_args = {
 			.effect          = get_active(&channel_treads),
-			.shift_quotient  = shift_quotient,
-			.shift_remainder = shift_remainder,
+			.shift_quotient  = shift / 0xff,
+			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
 			.framebuf        = treads_buf,
 			.framelen        = NUM_TREADS,
@@ -81,8 +80,8 @@ int engine_run() {
 
 		struct render_args barrel_args = {
 			.effect          = get_active(&channel_barrel),
-			.shift_quotient  = shift_quotient,
-			.shift_remainder = shift_remainder,
+			.shift_quotient  = shift / 0xff,
+			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
 			.framebuf        = eng.pal->barrel_buf,
 			.framelen        = NUM_BARREL,
@@ -90,8 +89,8 @@ int engine_run() {
 
 		struct render_args panels_args = {
 			.effect          = get_active(&channel_panels),
-			.shift_quotient  = shift_quotient,
-			.shift_remainder = shift_remainder,
+			.shift_quotient  = shift / 0xff,
+			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
 			.framebuf        = eng.pal->panels_buf,
 			.framelen        = NUM_PANELS,
@@ -109,11 +108,7 @@ int engine_run() {
 		panels_args.effect->render(&panels_args);
 
 		++framenum;
-		++shift_remainder;
-
-		if (shift_remainder % 10 == 0) {
-			++shift_quotient;
-		}
+		shift += settings.manual_tick;
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);
 		if (ret != ETIMEDOUT) {
