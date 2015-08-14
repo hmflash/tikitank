@@ -10,11 +10,13 @@ uint8_t scale_color(uint8_t color, uint8_t scale) {
 
 void antialias_treads(struct render_args* args) {
 	int i;
+	int j;
+	int cycle;
 
 	for (i = 0; i < args->framelen/3; i++) {
 		char* pixel = &args->framebuf[i*3];
 		union color color = args->effect->color_arg.color;
-		int cycle = (args->framelen + args->shift_quotient - i) % 15;
+		get_cycle(args, i, &j, &cycle);
 
 		if (cycle == 9) {         // left edge
 			pixel[0] = 0x80 | scale_color(color.rgb.green, args->shift_remainder);
@@ -38,11 +40,12 @@ void antialias_treads(struct render_args* args) {
 
 void rolling_rainbow_treads(struct render_args* args) {
 	int i;
+	int j;
+	int cycle;
 
 	for (i = 0; i < args->framelen/3; i++) {
 		char* pixel = &args->framebuf[i*3];
-		int j = args->framelen + args->shift_quotient - i;
-		int cycle = j % 15;
+		get_cycle(args, i, &j, &cycle);
 
 		if (cycle == 9) {         // left edge
 			pixel[0] = 0x80 | scale_color(RAINBOW_G(j), args->shift_remainder);
