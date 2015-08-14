@@ -81,8 +81,8 @@ function getColor(g) {
 
 function plot(g, x, y) {
 	var i = y*g.img.width*4 + x*4;
-	g.img.data[i+0] = getColor(g);  // R
 	g.img.data[i+1] = getColor(g);  // G
+	g.img.data[i+0] = getColor(g);  // R
 	g.img.data[i+2] = getColor(g);  // B
 	g.img.data[i+3] = 0xff;         // A
 }
