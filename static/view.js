@@ -34,8 +34,8 @@ function startPreview() {
 			i: 0
 		};
 
-		var origin = [ 0,  0];
-		var offset = [20, 10];
+		var origin = [ 0, 0];
+		var offset = [20, 5];
 
 		var vertices = [
 			[   0, 10 ],  //  10 px

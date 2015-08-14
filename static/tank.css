@@ -21,8 +21,9 @@ body {
 	background-color: rgb(192,192,192);
 	float:left;
 	width: 605px;
-	height: 520px;
+	height: 450px;
 	margin-right:5px;
+	padding: 25px 25px 0px 25px;
 }
 
 #tabHeader {
@@ -56,7 +57,7 @@ body {
 	background-color: rgb(192,192,192);
 	float: left;
 	width: 300px;
-	height: 520px;
+	height: 450px;
 	padding: 25px 25px 0px 25px;
 }
 
@@ -112,6 +113,7 @@ body {
 	height: 625px;
 	float: left;
 }
+
 #effectDisplay > .displayName {
 	width: 305px;
 	height: auto;
@@ -119,6 +121,7 @@ body {
 	padding: 10px;
 	font-size: 1.6em;
 }
+
 #effectDisplay {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
@@ -130,7 +133,7 @@ body {
 	top: 10px;
 	left: 10px;
 	width: 325px;
-	height: 340px;
+	height: 275px;
 	border: 2px solid #666666;
 	overflow: scroll;
 }
@@ -150,6 +153,7 @@ body {
 .effectsList ul li:nth-child(odd) {
 	background-color: #ffffff;
 }
+
 .effectsList ul li:nth-child(even) {
 	background-color: #efefef;
 }
@@ -189,11 +193,13 @@ body {
 	height: 370px;
 	float: left;
 }
+
 #effectsRight_bodyMap{
 	width: 305px;
 	height: 625px;
 	float: left;
 }
+
 #effectDisplay_bodyMap > .displayName_bodyMap {
 	width: 265px;
 	height: auto;
@@ -201,6 +207,7 @@ body {
 	padding: 10px;
 	font-size: 1.2em;
 }
+
 #effectDisplay_bodyMap {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
@@ -212,7 +219,7 @@ body {
 	top: 10px;
 	left: 10px;
 	width: 280px;
-	height: 340px;
+	height: 275px;
 	border: 2px solid #666666;
 	overflow: scroll;
 }
@@ -232,6 +239,7 @@ body {
 .effectsList_bodyMap ul li:nth-child(odd) {
 	background-color: #ffffff;
 }
+
 .effectsList_bodyMap ul li:nth-child(even) {
 	background-color: #efefef;
 }
@@ -443,6 +451,6 @@ body {
 #canvas {
 	display: none;
 	border: 1px solid gray;
-	width:  950px;
-	height: 200px;
+	width: 1000px;
+	height: 170px;
 }
