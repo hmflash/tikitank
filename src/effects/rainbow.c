@@ -7,9 +7,9 @@ void rainbow_treads(struct effect* effect, int shift, int framenum, char* frameb
 	int i;
 
 	for (i = 0; i < framelen; i += 3) {
-		framebuf[i+0] = 0x80 | RAINBOW_R(i + framenum) >> 1;
-		framebuf[i+1] = 0x80 | RAINBOW_G(i + framenum) >> 1;
-		framebuf[i+2] = 0x80 | RAINBOW_B(i + framenum) >> 1;
+		framebuf[i+0] = 0x80 | RAINBOW_G(i + (4 * framenum)) >> 1;
+		framebuf[i+1] = 0x80 | RAINBOW_R(i + (4 * framenum)) >> 1;
+		framebuf[i+2] = 0x80 | RAINBOW_B(i + (4 * framenum)) >> 1;
 	}
 }
 
@@ -17,9 +17,9 @@ void rainbow_barrel(struct effect* effect, int shift, int framenum, char* frameb
 	int i;
 
 	for (i = 0; i < framelen; i += 3) {
-		framebuf[i+0] = 0x80 | RAINBOW_G(i + framenum) >> 1;
-		framebuf[i+1] = 0x80 | RAINBOW_R(i + framenum) >> 1;
-		framebuf[i+2] = 0x80 | RAINBOW_B(i + framenum) >> 1;
+		framebuf[i+0] = 0x80 | RAINBOW_G(i + (4 * framenum)) >> 1;
+		framebuf[i+1] = 0x80 | RAINBOW_R(i + (4 * framenum)) >> 1;
+		framebuf[i+2] = 0x80 | RAINBOW_B(i + (4 * framenum)) >> 1;
 	}
 }
 
