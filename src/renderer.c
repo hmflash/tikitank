@@ -16,7 +16,7 @@ void* renderer_run(void* arg) {
 	pthread_cond_signal(&r->cond);
 	pthread_mutex_lock(&r->mutex);
 
-	while (1) {		
+	while (1) {
 		ret = pthread_cond_wait(&r->cond, &r->mutex);
 		if (ret != 0) {
 			LOG(("%s thread, ret: (%d) %s, errno: (%d) %s\n",
