@@ -464,7 +464,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	}
 
 	pal.fd_barrel = open_spi("/dev/spidev2.0");
-	if (pal.fd_treads == -1) {
+	if (pal.fd_barrel == -1) {
 		return NULL;
 	}
 
