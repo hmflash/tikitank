@@ -34,8 +34,7 @@
 #define TREADS_LEN (NUM_TREADS + LATCH_BYTES(NUM_TREADS))
 #define BARREL_LEN (NUM_BARREL + LATCH_BYTES(NUM_BARREL))
 
-struct bbb_pal
-{
+struct bbb_pal {
 	struct pal p;
 
 	int fd_treads;

@@ -2,16 +2,17 @@
 
 #include "effects.h"
 
-void off_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void off_barrel(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void off_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void off_treads(struct render_args* args);
+void off_barrel(struct render_args* args);
+void off_panels(struct render_args* args);
 
-void simple_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void simple_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void simple_treads(struct render_args* args);
+void simple_panels(struct render_args* args);
+void antialias_treads(struct render_args* args);
 
-void rainbow_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void rainbow_barrel(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void rainbow_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void rainbow_treads(struct render_args* args);
+void rainbow_barrel(struct render_args* args);
+void rainbow_panels(struct render_args* args);
 
 struct effect effect_treads_off = {
 	.name       = "off",
@@ -23,6 +24,12 @@ struct effect effect_treads_simple = {
 	.name       = "simple",
 	.arg_desc   = "N/A",
 	.render     = simple_treads,
+};
+
+struct effect effect_treads_antialias = {
+	.name       = "antialias",
+	.arg_desc   = "N/A",
+	.render     = antialias_treads,
 };
 
 struct effect effect_treads_rainbow = {
@@ -64,6 +71,7 @@ struct effect effect_panels_rainbow = {
 struct effect* effects_treads[] = {
 	&effect_treads_off,
 	&effect_treads_simple,
+	&effect_treads_antialias,
 	&effect_treads_rainbow,
 };
 

@@ -3,20 +3,20 @@
 
 #include "effects.h"
 
-void simple_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen) {
+void simple_treads(struct render_args* args) {
 	int i;
 
-	for (i = 0; i < framelen; i += 3) {
-		int cycle = (framelen - i + shift*3) % (15*3);
+	for (i = 0; i < args->framelen; i += 3) {
+		int cycle = (args->framelen - i + args->shift_quotient*3) % (15*3);
 
 		if (cycle >= (10*3)) {
-			framebuf[i+0] = 0xff;
-			framebuf[i+1] = 0xff;
-			framebuf[i+2] = 0xff;
+			args->framebuf[i+0] = 0x80 | args->effect->color_arg.color.rgb.red;
+			args->framebuf[i+1] = 0x80 | args->effect->color_arg.color.rgb.green;
+			args->framebuf[i+2] = 0x80 | args->effect->color_arg.color.rgb.blue;
 		} else {
-			framebuf[i+0] = 0x80;
-			framebuf[i+1] = 0x80;
-			framebuf[i+2] = 0x80;
+			args->framebuf[i+0] = 0x80;
+			args->framebuf[i+1] = 0x80;
+			args->framebuf[i+2] = 0x80;
 		}
 	}
 }

@@ -34,8 +34,6 @@ PAL_SRC := $(wildcard $(SRCDIR)/$(PAL)/*.c)
 PAL_INC := $(wildcard $(SRCDIR)/$(PAL)/*.h)
 PAL_OBJ := $(PAL_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-# pasm -V3 -b firmware.p firmware => firmware.bin
-
 # TODO: Add CFLAGS=-mtune=cortex-a8 -march=armv7-a -O3
 
 .PHONY: all clean

@@ -29,9 +29,9 @@ extern char linear_rainbow[RAINBOW_LENGTH][3];
 
 union color {
 	struct {
-		uint8_t         red;
-		uint8_t         green;
 		uint8_t         blue;
+		uint8_t         green;
+		uint8_t         red;
 		uint8_t         alpha;         // unused
 	} rgb;
 	long                value;
@@ -39,7 +39,18 @@ union color {
 
 union color_arg {
 	union color         color;
-	union color         colors[NUM_PANELS];
+	union color         colors[NUM_PANELS/3];
+};
+
+struct effect;
+
+struct render_args {
+	struct effect*      effect;
+	int                 shift_quotient;
+	uint8_t             shift_remainder;
+	int                 framenum;
+	char*               framebuf;
+	size_t              framelen;
 };
 
 struct effect {
@@ -50,7 +61,7 @@ struct effect {
 	long                screen_saver;
 	long                sensor_driven;
 
-	void (*render)(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+	void (*render)(struct render_args* args);
 };
 
 struct channel {

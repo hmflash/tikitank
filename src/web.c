@@ -108,8 +108,7 @@ const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 #define CONTENT_TYPE_JSON  "application/json"
 
 static 
-long strntol(const char* buf, size_t size, int base)
-{
+long strntol(const char* buf, size_t size, int base) {
 	static char str[100];
 	if (size >= (sizeof(str) - 1)) {
 		return 0;
@@ -153,6 +152,18 @@ void channel_load(struct json_token* tokens, const char* kind, struct channel* c
 
 			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SDRIVEN, kind, i);
 			load_long(tokens, path, &channel->effects[i]->sensor_driven);
+			
+			if (channel == &channel_panels) {
+				int j;
+
+				for (j = 0; j < NUM_PANELS/3; j++) {
+					snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" COLOR "[%d]", kind, i, j);
+					load_long(tokens, path, &channel->effects[i]->color_arg.colors[j].value);
+				}
+			} else {
+				snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" COLOR, kind, i);
+				load_long(tokens, path, &channel->effects[i]->color_arg.color.value);
+			}
 		}
 	}
 
@@ -484,7 +495,7 @@ void effects_post(struct mg_connection* conn) {
 		int idx;
 		LOG(("setEffectParameters: %s, %s\n", arg1, arg2));
 		idx = strntol(arg2, len2, 10);
-		if (idx < NUM_PANELS) {
+		if (idx < NUM_PANELS/3) {
 			channel->effects[channel->active]->color_arg.colors[idx].value = strntol(arg1+1, len1-1, 16);
 		}
 		effects_post_reply(conn);
@@ -611,8 +622,7 @@ void web_destroy() {
 	LOG(("Web server stopped: (%d) %s\n", rc, strerror(rc)));
 }
 
-void web_treads_render(const char* buf, size_t len)
-{
+void web_treads_render(const char* buf, size_t len) {
 	// LOG(("render: %zu bytes\n", len));
 	if (ws_conn) {
 		mg_websocket_write(ws_conn, WEBSOCKET_OPCODE_BINARY, buf, len);
