@@ -424,7 +424,7 @@ int open_i2c(const char* dev, int address) {
 
 	// Set the pwm freq to be 24Hz
 	// val = (25000000 / (4096 * rate)) - 1
-	smbus_write_byte_data(fd, REG_PRESCALE, 0xff);
+	//smbus_write_byte_data(fd, REG_PRESCALE, 0x66);
 
 	// Configure for use w/external LED driver
 	smbus_write_byte_data(fd, REG_MODE2, M2_OUTDRV);
@@ -439,7 +439,8 @@ int open_i2c(const char* dev, int address) {
 	prescale = smbus_read_byte_data(fd, REG_PRESCALE);
 	freq = 25000000 / (4096 * (prescale + 1));
 
-	LOG(("Opened PCA9685, Addr: 0x%x, Freq: %uHz\n", address, freq));
+	LOG(("Opened PCA9685, Addr: 0x%x, Freq: %uHz (0x%x)\n",
+	     address, freq, prescale));
 
 	return fd;
 }
