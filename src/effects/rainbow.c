@@ -27,8 +27,8 @@ void rainbow_panels(struct effect* effect, int shift, int framenum, char* frameb
 	int i;
 
 	for (i = 0; i < framelen; i += 3) {
-		framebuf[i+0] = RAINBOW_R(framenum);
-		framebuf[i+1] = RAINBOW_G(framenum);
-		framebuf[i+2] = RAINBOW_B(framenum);
+		framebuf[i+0] = CC_R(RAINBOW_R(framenum));
+		framebuf[i+1] = CC_G(RAINBOW_G(framenum));
+		framebuf[i+2] = CC_B(RAINBOW_B(framenum));
 	}
 }
