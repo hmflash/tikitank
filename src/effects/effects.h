@@ -29,9 +29,9 @@ extern char linear_rainbow[RAINBOW_LENGTH][3];
 
 union color {
 	struct {
-		uint8_t         red;
-		uint8_t         green;
 		uint8_t         blue;
+		uint8_t         green;
+		uint8_t         red;
 		uint8_t         alpha;         // unused
 	} rgb;
 	long                value;
