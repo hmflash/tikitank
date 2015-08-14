@@ -13,8 +13,8 @@
 #define CC_G(pixel) COLOR_CORRECT(pixel, 176)
 #define CC_B(pixel) COLOR_CORRECT(pixel, 240)
 
-#define NUM_TREADS     (3*32*5*3)
-#define NUM_BARREL     (80*3)
+#define NUM_TREADS     (478*3)
+#define NUM_BARREL     (76*3)
 #define NUM_PANELS     (10*3)
 #define MAX_EFFECTS     20
 
