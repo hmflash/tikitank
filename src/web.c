@@ -183,7 +183,7 @@ int settings_load() {
 
 	fclose(fp);
 	
-	LOG(("settings_load> %s\n", work_buf));
+	DEBUG_LOG(("settings_load> %s\n", work_buf));
 
 	ret = parse_json(work_buf, len, tokens, tokens_size);
 	if (ret < 0) {
