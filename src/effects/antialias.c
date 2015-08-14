@@ -35,3 +35,31 @@ void antialias_treads(struct render_args* args) {
 		}
 	}
 }
+
+void rolling_rainbow_treads(struct render_args* args) {
+	int i;
+
+	for (i = 0; i < args->framelen/3; i++) {
+		char* pixel = &args->framebuf[i*3];
+		int j = args->framelen + args->shift_quotient - i;
+		int cycle = j % 15;
+
+		if (cycle == 9) {         // left edge
+			pixel[0] = 0x80 | scale_color(RAINBOW_R(j), args->shift_remainder);
+			pixel[1] = 0x80 | scale_color(RAINBOW_G(j), args->shift_remainder);
+			pixel[2] = 0x80 | scale_color(RAINBOW_B(j), args->shift_remainder);
+		} else if (cycle == 14) { // right edge
+			pixel[0] = 0x80 | scale_color(RAINBOW_R(j), 0xff - args->shift_remainder);
+			pixel[1] = 0x80 | scale_color(RAINBOW_G(j), 0xff - args->shift_remainder);
+			pixel[2] = 0x80 | scale_color(RAINBOW_B(j), 0xff - args->shift_remainder);
+		} else if (cycle >= 10) { // middle
+			pixel[0] = 0x80 | RAINBOW_R(j) >> 1;
+			pixel[1] = 0x80 | RAINBOW_G(j) >> 1;
+			pixel[2] = 0x80 | RAINBOW_B(j) >> 1;
+		} else {
+			pixel[0] = 0x80;
+			pixel[1] = 0x80;
+			pixel[2] = 0x80;
+		}
+	}
+}
