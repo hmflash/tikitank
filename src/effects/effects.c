@@ -71,7 +71,7 @@ struct channel channel_treads = {
 struct channel channel_barrel = {
 	.active      = 0,
 	.num_effects = sizeof(effects_barrel) / sizeof(*effects_barrel),
-	.effects     = effects_treads,
+	.effects     = effects_barrel,
 };
 
 struct channel channel_panels = {
