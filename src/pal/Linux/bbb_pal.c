@@ -13,6 +13,7 @@
 #include <time.h>
 #include <libgen.h>
 #include <linux/i2c-dev.h>
+#include <assert.h>
 
 #ifndef I2C_SMBUS_READ
 #include <linux/i2c.h>
@@ -23,6 +24,7 @@
 
 #include "firmware.h"
 #include "common.h"
+#include "renderer.h"
 #include "effects/effects.h"
 
 #define wordoffset(obj, member) (offsetof(obj, member) / sizeof(word))
@@ -46,7 +48,11 @@ struct bbb_pal {
 
 	char treads_buf1[TREADS_LEN];
 	char barrel_buf1[BARREL_LEN];
+
 	char panels_buf1[NUM_PANELS];
+	char panels_buf2[NUM_PANELS];
+
+	struct renderer panel;
 };
 
 static
@@ -349,14 +355,14 @@ static inline int smbus_write_byte_data(int file, char command,
 #define M2_OUTDRV         0x04
 
 static
-void write_i2c(int fd, const char* buf) {
+void write_single_i2c(int fd, const char* buf) {
 	// On time always stays at 1
 	// Off time of 0 means always on
 	// Off time of 1 means always off
 	// Scale our 0-255 by brightness and
 	// Just add 1 to the [0-4095] value we get
 
-	int i;
+	size_t i;
 	int val;
 	int reg;
 
@@ -373,6 +379,22 @@ void write_i2c(int fd, const char* buf) {
 		                      REG_LED0_OFF_H + reg,
 		                      val >> 8);
 	}
+}
+
+static
+int write_i2c(int fd, const char* buf, size_t len) {
+	// Helper to make i2c look like spi writes
+	assert(NUM_PANELS == (10 * 3));
+	assert(len == NUM_PANELS);
+	assert(fd == -1);
+
+	// First 5 chanels go to pwn driver 1
+	write_single_i2c(pal.fd_panels[0], buf);
+
+	// Second 5 chanels go to pwn driver 2
+	write_single_i2c(pal.fd_panels[1], buf + (NUM_PANELS / 2));
+
+	return len;
 }
 
 static
@@ -484,7 +506,17 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 
 	pal.p.treads_buf = pal.treads_buf1;
 	pal.p.barrel_buf = pal.barrel_buf1;
-	pal.p.panels_buf = pal.panels_buf1;
+
+	if (renderer_init(&pal.panels,
+	              "Panels",
+	              -1,
+	              pal.panels_buf1,
+	              pal.panels_buf2,
+	              NUM_PANELS,
+	              write_i2c,
+	              &pal.p.panels_buf)) {
+		LOG(("Failed to start panel renderer thread: %s\n", strerror(errno)));
+	}
 
 	// TODO: Write the appropriate bits to ensure
 	// all leds are turned off
@@ -501,14 +533,12 @@ void pal_barrel_write() {
 }
 
 void pal_panels_write() {
-	// First 5 colors go out fd[0]
-	write_i2c(pal.fd_panels[0], pal.p.panels_buf);
-
-	// Last 5 colors go out fd[0]
-	write_i2c(pal.fd_panels[1], pal.p.panels_buf + (5 * 3));
+	renderer_swap(&pal.panel, &pal.p.panels_buf);
 }
 
 void pal_destroy() {
+	renderer_destroy(&pal.panel);
+
 	if (pal.pru) {
 		pru_destroy();
 		pal.pru = NULL;
