@@ -9,6 +9,7 @@ void off_panels(struct effect* effect, int shift, int framenum, char* framebuf, 
 void simple_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
 
 void rainbow_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void rainbow_barrel(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
 void rainbow_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
 
 struct effect effect_treads_off = {
@@ -35,6 +36,12 @@ struct effect effect_barrel_off = {
 	.render     = off_barrel,
 };
 
+struct effect effect_barrel_rainbow = {
+	.name       = "rainbow",
+	.arg_desc   = "N/A",
+	.render     = rainbow_barrel,
+};
+
 struct effect effect_panels_off = {
 	.name       = "off",
 	.arg_desc   = "N/A",
@@ -55,6 +62,7 @@ struct effect* effects_treads[] = {
 
 struct effect* effects_barrel[] = {
 	&effect_barrel_off,
+	&effect_barrel_rainbow,
 };
 
 struct effect* effects_panels[] = {
