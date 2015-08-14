@@ -2,14 +2,14 @@
 
 #include "effects.h"
 
-void off_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen) {
-	memset(framebuf, 0x80, framelen);
+void off_treads(struct render_args* args) {
+	memset(args->framebuf, 0x80, args->framelen);
 }
 
-void off_barrel(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen) {
-	memset(framebuf, 0x80, framelen);
+void off_barrel(struct render_args* args) {
+	memset(args->framebuf, 0x80, args->framelen);
 }
 
-void off_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen) {
-	memset(framebuf, 0, framelen);
+void off_panels(struct render_args* args) {
+	memset(args->framebuf, 0, args->framelen);
 }

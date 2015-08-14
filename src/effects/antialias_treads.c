@@ -3,7 +3,7 @@
 
 #include "effects.h"
 
-void simple_treads(struct render_args* args) {
+void antialias_treads(struct render_args* args) {
 	int i;
 
 	for (i = 0; i < args->framelen; i += 3) {

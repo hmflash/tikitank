@@ -60,7 +60,8 @@ struct effect* get_active(struct channel* c) {
 int engine_run() {
 	int ret;
 	int framenum = 0;
-	int shift = 0;
+	int shift_quotient = 0;
+	int shift_remainder = 0;
 	struct timespec tv;
 
 	pthread_mutex_lock(&eng.mutex);
@@ -69,10 +70,32 @@ int engine_run() {
 
 	while (!eng.exit) {
 		char* treads_buf = eng.pal->treads_buf;
+		struct render_args treads_args = {
+			.effect          = get_active(&channel_treads),
+			.shift_quotient  = shift_quotient,
+			.shift_remainder = shift_remainder,
+			.framenum        = framenum,
+			.framebuf        = treads_buf,
+			.framelen        = NUM_TREADS,
+		};
 
-		struct effect* treads;
-		struct effect* barrel;
-		struct effect* panels;
+		struct render_args barrel_args = {
+			.effect          = get_active(&channel_barrel),
+			.shift_quotient  = shift_quotient,
+			.shift_remainder = shift_remainder,
+			.framenum        = framenum,
+			.framebuf        = eng.pal->barrel_buf,
+			.framelen        = NUM_BARREL,
+		};
+
+		struct render_args panels_args = {
+			.effect          = get_active(&channel_panels),
+			.shift_quotient  = shift_quotient,
+			.shift_remainder = shift_remainder,
+			.framenum        = framenum,
+			.framebuf        = eng.pal->panels_buf,
+			.framelen        = NUM_PANELS,
+		};
 
 		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u\n",
 		           *eng.pal->enc_timer,
@@ -81,18 +104,15 @@ int engine_run() {
 		           *eng.pal->enc_max,
 		           *eng.pal->enc_ticks));
 
-		treads = get_active(&channel_treads);
-		barrel = get_active(&channel_barrel);
-		panels = get_active(&channel_panels);
-
-		treads->render(treads, shift, framenum, eng.pal->treads_buf, NUM_TREADS);
-		barrel->render(barrel, shift, framenum, eng.pal->barrel_buf, NUM_BARREL);
-		panels->render(panels, shift, framenum, eng.pal->panels_buf, NUM_PANELS);
+		treads_args.effect->render(&treads_args);
+		barrel_args.effect->render(&barrel_args);
+		panels_args.effect->render(&panels_args);
 
 		++framenum;
+		++shift_remainder;
 
-		if (framenum % 4 == 0) {
-			++shift;
+		if (shift_remainder % 10 == 0) {
+			++shift_quotient;
 		}
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);

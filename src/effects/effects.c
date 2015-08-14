@@ -2,14 +2,14 @@
 
 #include "effects.h"
 
-void off_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void off_barrel(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void off_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void off_treads(struct render_args* args);
+void off_barrel(struct render_args* args);
+void off_panels(struct render_args* args);
 
-void simple_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void simple_treads(struct render_args* args);
 
-void rainbow_treads(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
-void rainbow_panels(struct effect* effect, int shift, int framenum, char* framebuf, size_t framelen);
+void rainbow_treads(struct render_args* args);
+void rainbow_panels(struct render_args* args);
 
 struct effect effect_treads_off = {
 	.name       = "off",
