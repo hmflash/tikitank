@@ -507,7 +507,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	pal.p.treads_buf = pal.treads_buf1;
 	pal.p.barrel_buf = pal.barrel_buf1;
 
-	if (renderer_init(&pal.panels,
+	if (renderer_init(&pal.panel,
 	              "Panels",
 	              -1,
 	              pal.panels_buf1,

@@ -74,8 +74,4 @@ extern struct channel channel_treads;
 extern struct channel channel_barrel;
 extern struct channel channel_panels;
 
-inline
-void get_cycle(struct render_args* args, int i, int* j, int* cycle) {
-	*j = args->framelen + args->shift_quotient - i;
-	*cycle = *j % 15;
-}
+void get_cycle(struct render_args* args, int i, int* j, int* cycle);

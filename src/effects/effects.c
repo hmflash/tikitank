@@ -15,6 +15,12 @@ void rainbow_barrel(struct render_args* args);
 void rainbow_panels(struct render_args* args);
 void rolling_rainbow_treads(struct render_args* args);
 
+inline
+void get_cycle(struct render_args* args, int i, int* j, int* cycle) {
+	*j = args->framelen + args->shift_quotient - i;
+	*cycle = *j % 15;
+}
+
 struct effect effect_treads_off = {
 	.name       = "off",
 	.arg_desc   = "N/A",
