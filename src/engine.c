@@ -1,4 +1,4 @@
-#include <errno.h>
+	#include <errno.h>
 #include <string.h>
 #include <signal.h>
 #include <time.h>
@@ -9,12 +9,32 @@
 #include "web.h"
 #include "effects/effects.h"
 
+// conversions:
+// 3 in/tick
+// 32 px/m
+// 3 in = 0.0254 m
+// 3 in * 0.0254 m = 0.0762 m
+// 0.0762 m/tick
+// 32 px/m * 0.0762 m/tick = 2.4384 px/tick
+
+#define   INCH_PER_TICK     3
+#define  METER_PER_INCH     0.0254
+#define    LED_PER_METER   32
+#define    INC_PER_LED    256
+
+#define    LED_PER_TICK   (LED_PER_METER * INCH_PER_TICK * METER_PER_INCH)
+#define    INC_PER_TICK   (INC_PER_LED * LED_PER_TICK)
+
+#define EWMA_ALPHA          0.01
+
 struct engine {
 	struct pal*        pal;
 	pthread_mutex_t    mutex;
 	pthread_condattr_t condattr;
 	pthread_cond_t     cond;
 	volatile int       exit;
+	unsigned int       last_tick;
+	unsigned int       idle_frames;
 };
 
 static 
@@ -28,6 +48,9 @@ void signal_handler(int signum) {
 struct engine* engine_init(struct pal* pal) {
 	memset(&eng, 0, sizeof(eng));
 	eng.pal = pal;
+
+	LOG(("led/tick = %g\n", LED_PER_TICK));
+	LOG(("inc/tick = %g\n", INC_PER_TICK));
 
 	pthread_mutex_init(&eng.mutex, NULL);
 	pthread_condattr_init(&eng.condattr);
@@ -61,13 +84,19 @@ int engine_run() {
 	int ret;
 	int framenum = 0;
 	int shift = 0;
+	double shift_last = 0;
 	struct timespec tv;
 
 	pthread_mutex_lock(&eng.mutex);
 
 	pal_clock_gettime(&tv);
+	
+	eng.last_tick = *eng.pal->enc_ticks;
 
 	while (!eng.exit) {
+		double shift_inc;
+		unsigned int sensor_ticks = *eng.pal->enc_ticks;
+		int dt = (int)sensor_ticks - (int)eng.last_tick;
 		char* treads_buf = eng.pal->treads_buf;
 		struct render_args treads_args = {
 			.effect          = get_active(&channel_treads),
@@ -96,19 +125,25 @@ int engine_run() {
 			.framelen        = NUM_PANELS,
 		};
 
-		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u\n",
+		eng.last_tick = sensor_ticks;
+
+		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u, Delta: %d\n",
 		           *eng.pal->enc_timer,
 		           *eng.pal->enc_raw,
 		           *eng.pal->enc_min,
 		           *eng.pal->enc_max,
-		           *eng.pal->enc_ticks));
+		           *eng.pal->enc_ticks,
+		           dt));
 
 		treads_args.effect->render(&treads_args);
 		barrel_args.effect->render(&barrel_args);
 		panels_args.effect->render(&panels_args);
 
 		++framenum;
-		shift += settings.manual_tick;
+		shift_inc = settings.manual_tick ? settings.manual_tick : dt * INC_PER_TICK;
+		shift_inc = EWMA_ALPHA * shift_inc + (1 - EWMA_ALPHA) * shift_last;
+		shift_last = shift_inc;
+		shift += shift_inc;
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);
 		if (ret != ETIMEDOUT) {
