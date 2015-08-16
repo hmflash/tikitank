@@ -2,6 +2,7 @@
 
 // Global Vars
 
+var cw;
 var global = {
 	treads: {
 		auto: false,
@@ -18,7 +19,7 @@ var global = {
 };
 
 $(document).ready(function () {
-	window.cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
+	cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
 	cw.input($("#rightContainer input")[0]);
 	cw.color("#FF0000");
 	window.scrollTo(0, 1);
@@ -74,7 +75,7 @@ $(document).ready(function () {
 
 	$('.panel').click(function () {
 		var index = $(this).attr('data-id');
-		setEffect({ 
+		setEffect({
 			kind: 'panels', 
 			color: cw.color().hex.toString(), 
 			argument: index 
@@ -161,8 +162,6 @@ function displayActiveEffect(kind, data) {
 	$("#" + kind + "ArgumentValue").val(data.argument);
 	$("#" + kind + "ActiveEffect").text(data.name);
 
-	// TODO: display active colors
-
 	var autoButton = $(".button.effect.auto." + kind);
 	global[kind].auto = data.sensor_driven;
 	if (data.sensor_driven) {
@@ -179,15 +178,15 @@ function displayActiveEffect(kind, data) {
 		idleButton.text("[_] SSAVER");
 	}
 
-	if (kind == "treads") {
-	} else if (kind == "barrel") {
-	} else if (kind == "panels") {
+	if (kind == "panels") {
 		for (var i = 0; i < data.color.length; i++) {
 			var panel = $('.panel[data-id=' + i + ']');
 			var raw = data.color[i];
 			panel.css({ fill: intToRgb(raw) });
 		}
-	}   
+	} else {
+		cw.color(intToRgb(data.color));
+	}
 }
 
 function getEffects() {
