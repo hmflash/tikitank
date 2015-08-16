@@ -20,7 +20,7 @@
  <div id="pageWrapper">
   <div id="leftContainer">
     <div id="tabHeader">
-      <div class="tabOption optPanels">Panels</div>
+      <div class="tabOption optPanels selectTab">Panels</div>
       <div class="tabOption optTreads">Treads</div>
       <div class="tabOption optBarrel">Barrel</div>
       <div class="tabOption optSettings">Settings</div>
@@ -77,19 +77,19 @@
               <input id="treadsArgumentValue" type="text">
             </div>
             <div id="effectControlWrapper">
-              <div class="effectControlButton" onclick="setEffectArgument('treads', treadsArgumentValue.value)">
+              <div class="button effect argument treads" data-channel="treads">
                 SET VALUE
               </div>
-              <div class="effectControlButton" onclick="setEffectColor('treads', cw.color().hex)">
+              <div class="button effect color treads" data-channel="treads">
                 SET COLOR
               </div>
-              <div id="treadsAutoButton" class="effectControlButton" onclick="setEffectSensorDrive('treads', !treadsSensorDriveValue)">
+              <div class="button effect auto treads" data-channel="treads">
                 AUTOMATIC
               </div>
-              <div id="treadsScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('treads', !treadsScreenSaverValue)">
+              <div class="button effect idle treads" data-channel="treads">
                 SCREEN SAVER
               </div>
-              <div id="treadsPreviewButton" class="effectControlButton">
+              <div id="treadsPreviewButton" class="button effect">
                 PREVIEW
               </div>
             </div>
@@ -118,13 +118,13 @@
               <input id="barrelArgumentValue" type="text">
             </div>
             <div id="effectControlWrapper">
-              <div class="effectControlButton" onclick="setEffectArgument('barrel', barrelArgumentValue.value)">
+              <div class="button effect argument barrel" data-channel="barrel">
                 SET VALUE
               </div>
-              <div class="effectControlButton" onclick="setEffectColor('barrel', cw.color().hex)">
+              <div class="button effect color barrel" data-channel="barrel">
                 SET COLOR
               </div>
-              <div id="barrelScreenSaverButton" class="effectControlButton" onclick="setEffectScreenSaver('barrel', !barrelScreenSaverValue)">
+              <div class="button effect idle barrel" data-channel="barrel">
                 SCREEN SAVER
               </div>
             </div>
@@ -133,59 +133,33 @@
       </div>
 
       <div id="settingsTab">
-        <div id="settingsWrapper">
-          <div class="setRowContainer">
-            <div class="settingLabel">Brightness:</div>
-            <div id="brightInputWrap">
-              <div class="settingDisplay">
-                <input id="settingsDmxBrightness" type="text" name="">
-              </div>
-              <div class="settingControlWrapper">
-                <div class="settingControlButton" onclick="setDmxBrightness(settingsDmxBrightness.value)">
-                  SET VALUE
-                </div>
-              </div>
+        <label>Brightness:</label>
+        <ul class="brightness">
+          <li class="button">1</li>
+          <li class="button">2</li>
+          <li class="button">3</li>
+          <li class="button">4</li>
+          <li class="button">5</li>
+          <li class="button">6</li>
+          <li class="button">7</li>
+          <li class="button">8</li>
+        </ul>
+        <hr>
+        <div>
+          <label>Manual tick interval [ms]:</label>
+          <span>
+            <input id="manualTick" type="text">
+            <div class="button manualTick">
+              SET VALUE
             </div>
-            <div class="brightButton" onclick="setDmxBrightness('10')">
-              10%
-            </div>
-            <div class="brightButton" onclick="setDmxBrightness('25')">
-              25%
-            </div>
-            <div class="brightButton" onclick="setDmxBrightness('50')">
-              50%
-            </div>
-            <div class="brightButton" onclick="setDmxBrightness('100')">
-              100%
-            </div>
-          </div>
-          <div class="settingHR"><hr/></div>
-          <div class="setRowContainer">
-            <div class="settingLabel">Manual tick interval [ms]:</div>
-            <div id="brightInputWrap">
-              <div class="settingDisplay">
-                <input id="settingsManualTick" type="text" name="">
-              </div>
-              <div class="settingControlWrapper">
-                <div class="settingControlButton" onclick="setManualTick(settingsManualTick.value)">
-                  SET VALUE
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="settingHR"><hr/></div>
-          <div class="setRowContainer">
-            <div class="settingLabel">Screensaver effect interval [mins]:</div>
-            <div id="brightInputWrap">
-              <div class="settingDisplay">
-                <input id="settingsScreenSaverInterval" type="text" name="">
-              </div>
-              <div class="settingControlWrapper">
-                <div class="settingControlButton" onclick="setScreenSaverInterval(settingsScreenSaverInterval.value)">
-                  SET VALUE
-                </div>
-              </div>
-            </div>
+          </span>
+        </div>
+        <hr>
+        <div>
+          <label>Screensaver effect interval [mins]:</label>
+          <input id="idleInterval" type="text">
+          <div class="button idleInterval">
+            SET VALUE
           </div>
         </div>
       </div>

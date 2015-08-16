@@ -42,6 +42,7 @@ body {
 	font-size: 1em;
 	font-weight: bold;
 	padding-top: 15px;
+	cursor: pointer;
 }
 
 .selectTab {
@@ -178,14 +179,9 @@ body {
 	font-size: 2em;
 }
 
-.effectControlButton {
+.button.effect {
 	width: 200px;
 	height: 30px;
-	font-size: 1.5em;
-	background-color: #333333;
-	font-family: arial;
-	color: #efefef;
-	text-align: center;
 	padding: 10px;
 	margin-bottom: 10px;
 }
@@ -246,73 +242,57 @@ body {
 	background-color: #efefef;
 }
 
-#settingsWrapper {
-	position: relative;
-	width: 605px;
+#settingsTab {
+	margin-top: 5px;
 }
 
-.setRowContainer {
-	width: 605px;
-	height: 120px;
-	margin: 10px 0px 20px 10px;
-}
-
-#brightInputWrap {
-	width: 235px;
-	height: 100px;
-	float: left;
-	margin-top: -5px;
-}
-
-.settingControlWrapper {
-	position: relative;
-	top: 0px;
-	left: 10px;
-	width: 200px;
-	height: 50px;
-}
-
-.settingDisplay {
-	height: 60px;
-}
-
-.settingDisplay input {
-	font-family: Helvetica, Arial;
-	width: 210px;
-	height: 35px;
-	font-size: 2em;
-	margin:10px;
-}
-
-.settingLabel {
+#settingsTab label {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
-	padding-left: 10px;
+	line-height: 10px;
 }
 
-.settingControlButton {
-	width: 195px;
-	height: 25px;
-	font-size: 1.5em;
-	background-color: #333333;
-	font-family: arial;
-	color: #efefef;
-	text-align: center;
-	padding: 10px;
-	margin-bottom: 10px;
+#settingsTab ul {
+	margin: 5px;
+	padding: 0;
 }
 
-.brightButton {
-	float: left;
-	width: 75px;
-	height: 55px;
-	background-color: #333333;
-	color: #ffffff;
+#settingsTab ul li {
+	display: inline-block;
+	list-style: none;
+	width: 60px;
+	height: 60px;
+	line-height: 60px;
+	margin: 0px 5px;
+}
+
+.button {
 	font-family: Helvetica, Arial;
 	font-size: 1.5em;
-	margin: 15px 5px 0px 5px;
+	background-color: #333333;
+	color: #efefef;
 	text-align: center;
-	padding-top: 20px;
+	cursor: pointer;
+}
+
+.button.active {
+	background-color: white;
+	color: black;
+}
+
+#settingsTab input {
+	display: block;	
+	width: 210px;
+	height: 35px;
+	font-family: Helvetica, Arial;
+	font-size: 2em;
+	margin: 10px 0px;
+}
+
+#settingsTab div.button {
+	width: 195px;
+	padding: 10px;
+	margin: 10px 0px;
 }
 
 .magenta { background-color: #7F0A7F; }

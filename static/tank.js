@@ -1,11 +1,21 @@
 "use strict";
 
 // Global Vars
-var treadsSensorDriveValue = false;
-var treadsScreenSaverValue = false;
-var barrelScreenSaverValue = false;
-var panelsScreenSaverValue = false;
 
+var global = {
+	treads: {
+		auto: false,
+		idle: false
+	},
+	barrel: {
+		auto: false,
+		idle: false
+	},
+	panels: {
+		auto: false,
+		idle: false
+	}
+};
 
 $(document).ready(function () {
 	window.cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
@@ -64,11 +74,50 @@ $(document).ready(function () {
 
 	$('.panel').click(function () {
 		var index = $(this).attr('data-id');
-		setEffectParameters('panels', cw.color().hex, index);
+		setEffect({ 
+			kind: 'panels', 
+			color: cw.color().hex.toString(), 
+			argument: index 
+		});
 	});
 
 	$('.colorOption').click(function() {
 		cw.color($(this).attr('data-color'));
+	});
+
+	$('.brightness .button').click(function() {
+		setSetting({ brightness: $(this).text() });
+	});
+
+	$('.button.manualTick').click(function() {
+		setSetting({ manualTick: $('#manualTick').val() });
+	});
+
+	$('.button.idleInterval').click(function() {
+		setSetting({ idleInterval: $('#idleInterval').val() });
+	});
+
+	$('.button.effect.argument').click(function() {
+		var channel = $(this).attr('data-channel');
+		var value = $('#' + channel + 'ArgumentValue').val();
+		setEffect({ kind: channel, argument: value });
+	});
+
+	$('.button.effect.color').click(function() {
+		var channel = $(this).attr('data-channel');
+		setEffect({ kind: channel, color: cw.color().hex.toString() });
+	});
+
+	$('.button.effect.auto').click(function() {
+		var channel = $(this).attr('data-channel');
+		var value = global[channel].auto;
+		setEffect({ kind: channel, sensor_driven: !value });
+	});
+
+	$('.button.effect.idle').click(function() {
+		var channel = $(this).attr('data-channel');
+		var value = global[channel].idle;
+		setEffect({ kind: channel, screen_saver: !value });
 	});
 
 	getEffects();
@@ -85,7 +134,8 @@ function displayEffectsList(kind, effects) {
 
 	for (var i = 0, len = effects.length; i < len; i++) {
 		var name = effects[i].name;
-		if (effects[i].isScreenSaver) name += "*";
+		if (effects[i].screen_saver) 
+			name += "*";
 		html += "<li onClick=\"selectEffect('" + kind + "', " + i + ")\">" + name + "</li>";
 	}
 
@@ -94,51 +144,48 @@ function displayEffectsList(kind, effects) {
 	$("#" + kind + "EffectsList").html(html);    
 }
 
+function intToRgb(raw) {
+	return 'rgb(' + [
+		(raw >> 16) & 0xff,
+		(raw >> 8) & 0xff,
+		raw & 0xff
+	].join(',') + ')';
+}
+
 function displayActiveEffect(kind, data) {
-	if (data.argumentDescription == null) {
-		data.argumentDescription = "n/a"
+	if (data.arg_desc == null) {
+		data.arg_desc = "n/a"
 	}
 
-	$("#" + kind + "ArgumentDescription").html(data.argumentDescription);
+	$("#" + kind + "ArgumentDescription").html(data.arg_desc);
 	$("#" + kind + "ArgumentValue").val(data.argument);
 	$("#" + kind + "ActiveEffect").text(data.name);
 
 	// TODO: display active colors
-	
+
+	var autoButton = $(".button.effect.auto." + kind);
+	global[kind].auto = data.sensor_driven;
+	if (data.sensor_driven) {
+		autoButton.text("[X] AUTOMATIC");
+	} else {            
+		autoButton.text("[_] AUTOMATIC");
+	}
+
+	global[kind].idle = data.screen_saver;
+	var idleButton = $(".button.effect.idle." + kind);
+	if (data.screen_saver) {
+		idleButton.text("[X] SSAVER");
+	} else {
+		idleButton.text("[_] SSAVER");
+	}
+
 	if (kind == "treads") {
-		if (data.isSensorDriven) {            
-			$("#treadsAutoButton").text("[X] AUTOMATIC");
-		} else {            
-			$("#treadsAutoButton").text("[_] AUTOMATIC");
-		}
-
-		if (data.isScreenSaver) {
-			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
-		} else {
-			$("#" + kind + "ScreenSaverButton").text("[_] SSAVER");
-		}
-
-		treadsSensorDriveValue = data.isSensorDriven;
-		treadsScreenSaverValue = data.isScreenSaver;
 	} else if (kind == "barrel") {
-		if (data.isScreenSaver) {
-			$("#" + kind + "ScreenSaverButton").text("[X] SSAVER");
-		} else {
-			$("#" + kind + "ScreenSaverButton").text("[_] SSAVER");
-		}
-
-		barrelScreenSaverValue = data.isScreenSaver;
 	} else if (kind == "panels") {
-		panelsScreenSaverValue = data.isScreenSaver;
 		for (var i = 0; i < data.color.length; i++) {
 			var panel = $('.panel[data-id=' + i + ']');
 			var raw = data.color[i];
-			var color = 'rgb(' + [
-				(raw >> 16) & 0xff,
-				(raw >> 8) & 0xff,
-				raw & 0xff
-			].join(',') + ')';
-			panel.css({ fill: color });
+			panel.css({ fill: intToRgb(raw) });
 		}
 	}   
 }
@@ -161,30 +208,11 @@ function selectEffect(api, idx) {
 	setEffect({ kind: api, active: idx });
 }
 
-function setEffectParameters(api, color, arg) {
-	setEffect({ kind: api, color: color.toString(), argument: arg });
-}
-
-function setEffectColor(api, color) {
-	setEffect({ kind: api, color: color.toString() });
-}
-
-function setEffectArgument(api, arg) {
-	setEffect({ kind: api, argument: arg });
-}
-
-function setEffectSensorDrive(api, arg) {
-	setEffect({ kind: api, isSensorDriven: arg });
-}
-
-function setEffectScreenSaver(api, arg) {
-	setEffect({ kind: api, isScreenSaver: arg });
-}
-
 function displaySettings(data) {
-	$("#settingsDmxBrightness").val(data.dmxBrightness);
-	$("#settingsManualTick").val(data.manualTick);
-	$("#settingsScreenSaverInterval").val(data.idleInterval);
+	$(".brightness .button").removeClass('active');
+	$(".brightness .button:nth-child(" + data.brightness + ")").addClass('active');
+	$("#manualTick").val(data.manualTick);
+	$("#idleInterval").val(data.idleInterval);
 }
 
 function getSettings() {
@@ -197,16 +225,4 @@ function setSetting(obj) {
 	$.post("/api/settings", obj, function (data, status) { 
 		displaySettings(data); 
 	});
-}
-
-function setDmxBrightness(arg) {
-	setSetting({ dmxBrightness: arg });
-}
-
-function setManualTick(arg) {
-	setSetting({ manualTick: arg });
-}
-
-function setScreenSaverInterval(arg) {
-	setSetting({ idleInterval: arg });
 }

@@ -32,7 +32,7 @@ struct pal {
 };
 
 struct settings {
-	long                dmx_brightness;
+	long                brightness;
 	long                manual_tick;
 	long                idle_interval;
 };

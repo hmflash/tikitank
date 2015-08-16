@@ -48,7 +48,7 @@ const char* JSON_DOC =
 
 const char* JSON_SETTINGS =
 "{\n"
-	"\t\ts : i,\n"        // dmxBrightness: 0
+	"\t\ts : i,\n"        // brightness: 0
 	"\t\ts : i,\n"        // manualTick: 0
 	"\t\ts : i\n"         // idleInterval: 0
 "\t}";
@@ -72,29 +72,29 @@ const char* JSON_EFFECT =
 "\t\t\t\t{\n"
 	"\t\t\t\t\ts : s,\n"  // name: ""
 	"\t\t\t\t\ts : i,\n"  // argument: 0
-	"\t\t\t\t\ts : s,\n"  // argumentDescription: ""
+	"\t\t\t\t\ts : s,\n"  // arg_desc: ""
 	"\t\t\t\t\ts : S,\n"  // color: 0|[0]
-	"\t\t\t\t\ts : i,\n"  // isScreenSaver 0|1
-	"\t\t\t\t\ts : i\n"   // isSensorDriven: 0|1
+	"\t\t\t\t\ts : i,\n"  // screen_saver 0|1
+	"\t\t\t\t\ts : i\n"   // sensor_driven: 0|1
 "\t\t\t\t}";
 
 const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 
-#define DEFAULT_DMX_BRIGHTNESS  100
+#define DEFAULT_BRIGHTNESS      100
 #define DEFAULT_MANUAL_TICK       0
 #define DEFAULT_IDLE_INTERVAL   120
 
 #define SETTINGS_FILE      "settings.json"
 
 #define SETTINGS           "settings"
-#define DMX_BRIGHTNESS     "dmxBrightness"
+#define BRIGHTNESS         "brightness"
 #define MANUAL_TICK        "manualTick"
 #define IDLE_INTERVAL      "idleInterval"
 #define ARGUMENT           "argument"
-#define ARGUMENT_DESC      "argumentDescription"
+#define ARGUMENT_DESC      "arg_desc"
 #define COLOR              "color"
-#define IS_SSAVER          "isScreenSaver"
-#define IS_SDRIVEN         "isSensorDriven"
+#define IS_SSAVER          "screen_saver"
+#define IS_SDRIVEN         "sensor_driven"
 #define NAME               "name"
 #define EFFECTS            "effects"
 #define TREADS             "treads"
@@ -179,7 +179,7 @@ int settings_load() {
 	size_t len;
 	int ret;
 
-	settings.dmx_brightness = DEFAULT_DMX_BRIGHTNESS;
+	settings.brightness     = DEFAULT_BRIGHTNESS;
 	settings.manual_tick    = DEFAULT_MANUAL_TICK;
 	settings.idle_interval  = DEFAULT_IDLE_INTERVAL;
 
@@ -202,7 +202,7 @@ int settings_load() {
 		return ret;
 	}
 
-	load_long(tokens, SETTINGS "." DMX_BRIGHTNESS, &settings.dmx_brightness);
+	load_long(tokens, SETTINGS "." BRIGHTNESS,     &settings.brightness);
 	load_long(tokens, SETTINGS "." MANUAL_TICK,    &settings.manual_tick);
 	load_long(tokens, SETTINGS "." IDLE_INTERVAL,  &settings.idle_interval);
 
@@ -216,7 +216,7 @@ int settings_load() {
 static
 int settings_json(char* buf, size_t len) {
 	return json_emit(buf, len, JSON_SETTINGS, 
-		DMX_BRIGHTNESS, settings.dmx_brightness, 
+		BRIGHTNESS,     settings.brightness, 
 		MANUAL_TICK,    settings.manual_tick, 
 		IDLE_INTERVAL,  settings.idle_interval
 	);
@@ -355,9 +355,9 @@ void settings_post(struct mg_connection* conn) {
 
 	settings_load();
 
-	len = mg_get_var(conn, DMX_BRIGHTNESS, buf, sizeof(buf));
+	len = mg_get_var(conn, BRIGHTNESS, buf, sizeof(buf));
 	if (len > 0) {
-		settings.dmx_brightness = strtol(buf, NULL, 10);
+		settings.brightness = strtol(buf, NULL, 10);
 	}
 
 	len = mg_get_var(conn, MANUAL_TICK, buf, sizeof(buf));
