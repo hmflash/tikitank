@@ -23,7 +23,7 @@ body {
 	width: 605px;
 	height: 450px;
 	margin-right:5px;
-	padding: 25px 25px 0px 25px;
+	padding: 20px 5px 0px 5px;
 }
 
 #tabHeader {
@@ -59,7 +59,7 @@ body {
 	float: left;
 	width: 300px;
 	height: 450px;
-	padding: 25px 25px 0px 25px;
+	padding: 20px 15px 0px 20px;
 }
 
 #wheelWrapper {
@@ -290,9 +290,13 @@ body {
 }
 
 .settingsGroup {
-	display: flex;
+	height: 140px
 }
 
-.settingsGroup span {
-	padding-right: 10px;
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
 }
