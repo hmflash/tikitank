@@ -66,6 +66,7 @@ struct effect {
 
 struct channel {
 	long                active;
+	long                idle;
 	int                 num_effects;
 	struct effect**     effects;
 };

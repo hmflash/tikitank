@@ -133,7 +133,7 @@ void load_long(struct json_token* tokens, const char* path, long* into) {
 static
 void channel_load(struct json_token* tokens, const char* kind, struct channel* channel) {
 	char path[256];
-	long active;
+	long active = 0;
 	const struct json_token* token;
 
 	// LOG(("channel_load> %s\n", kind));

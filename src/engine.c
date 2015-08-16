@@ -21,6 +21,8 @@
 #define  METER_PER_INCH     0.0254
 #define    LED_PER_METER   32
 #define    INC_PER_LED    256
+#define  FRAME_PER_SEC     50
+#define    SEC_PER_MIN     60
 
 #define    LED_PER_TICK   (LED_PER_METER * INCH_PER_TICK * METER_PER_INCH)
 #define    INC_PER_TICK   (INC_PER_LED * LED_PER_TICK)
@@ -76,7 +78,30 @@ int engine_destroy() {
 	return 0;
 }
 
-struct effect* get_active(struct channel* c) {
+void select_next_screen_saver(struct channel* c) {
+	int i;
+	int j;
+
+	for (i = 0, j = c->idle + 1; i < c->num_effects; i++, j++) {
+		struct effect* effect = c->effects[j % c->num_effects];
+		if (effect->screen_saver) {
+			LOG(("next screen saver: %s\n", effect->name));
+			c->idle = j % c->num_effects;
+			return;
+		}
+	}
+
+	LOG(("no screen saver set, using 1st effect\n"));
+	c->idle = 0;
+}
+
+struct effect* get_effect(struct channel* c) {
+	if (eng.idle_frames >= settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN) {
+		if (eng.idle_frames % (settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN) == 0) {
+			select_next_screen_saver(c);
+		}
+		return c->effects[c->idle < c->num_effects ? c->idle : 0];
+	}
 	return c->effects[c->active < c->num_effects ? c->active : 0];
 }
 
@@ -99,7 +124,7 @@ int engine_run() {
 		int dt = (int)sensor_ticks - (int)eng.last_tick;
 		char* treads_buf = eng.pal->treads_buf;
 		struct render_args treads_args = {
-			.effect          = get_active(&channel_treads),
+			.effect          = get_effect(&channel_treads),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
@@ -108,7 +133,7 @@ int engine_run() {
 		};
 
 		struct render_args barrel_args = {
-			.effect          = get_active(&channel_barrel),
+			.effect          = get_effect(&channel_barrel),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
@@ -117,7 +142,7 @@ int engine_run() {
 		};
 
 		struct render_args panels_args = {
-			.effect          = get_active(&channel_panels),
+			.effect          = get_effect(&channel_panels),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
@@ -144,6 +169,12 @@ int engine_run() {
 		shift_inc = EWMA_ALPHA * shift_inc + (1 - EWMA_ALPHA) * shift_last;
 		shift_last = shift_inc;
 		shift += shift_inc;
+
+		if (shift_inc >= 1.0) {
+			eng.idle_frames = 0;
+		} else {
+			eng.idle_frames++;
+		}
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);
 		if (ret != ETIMEDOUT) {
