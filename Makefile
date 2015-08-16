@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 PASM := $(shell which pasm)
 
 CC = gcc
-CFLAGS=-Wall -O2 -D$(UNAME)
+CFLAGS=-Wall -O3 -D$(UNAME)
 
 CFLAGS_Linux=-Wno-unused-result -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
 
