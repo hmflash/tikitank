@@ -98,6 +98,10 @@ $(document).ready(function () {
 		setSetting({ idleInterval: $('#idleInterval').val() });
 	});
 
+	$('.button.alpha').click(function() {
+		setSetting({ alpha: $('#alpha').val() });
+	});
+
 	$('.button.effect.argument').click(function() {
 		var channel = $(this).attr('data-channel');
 		var value = $('#' + channel + 'ArgumentValue').val();
@@ -212,6 +216,7 @@ function displaySettings(data) {
 	$(".brightness .button:nth-child(" + data.brightness + ")").addClass('active');
 	$("#manualTick").val(data.manualTick);
 	$("#idleInterval").val(data.idleInterval);
+	$("#alpha").val(data.alpha);
 }
 
 function getSettings() {

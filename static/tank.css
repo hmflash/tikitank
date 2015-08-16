@@ -267,7 +267,6 @@ body {
 #settingsTab div.button {
 	width: 195px;
 	padding: 10px;
-	margin: 10px 0px;
 }
 
 .magenta { background-color: #7F0A7F; }
@@ -288,4 +287,12 @@ body {
 	fill: black;
 	stroke: black;
 	cursor: pointer;
+}
+
+.settingsGroup {
+	display: flex;
+}
+
+.settingsGroup span {
+	padding-right: 10px;
 }

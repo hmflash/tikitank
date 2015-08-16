@@ -35,6 +35,7 @@ struct settings {
 	long                brightness;
 	long                manual_tick;
 	long                idle_interval;
+	long                alpha;
 };
 
 extern struct settings settings;

@@ -120,6 +120,7 @@ int engine_run() {
 
 	while (!eng.exit) {
 		double shift_inc;
+		double alpha = settings.alpha / 100.0;
 		unsigned int sensor_ticks = *eng.pal->enc_ticks;
 		int dt = (int)sensor_ticks - (int)eng.last_tick;
 		char* treads_buf = eng.pal->treads_buf;
@@ -166,7 +167,7 @@ int engine_run() {
 
 		++framenum;
 		shift_inc = settings.manual_tick ? settings.manual_tick : dt * INC_PER_TICK;
-		shift_inc = EWMA_ALPHA * shift_inc + (1 - EWMA_ALPHA) * shift_last;
+		shift_inc = alpha * shift_inc + (1.0 - alpha) * shift_last;
 		shift_last = shift_inc;
 		shift += shift_inc;
 

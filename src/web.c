@@ -50,7 +50,8 @@ const char* JSON_SETTINGS =
 "{\n"
 	"\t\ts : i,\n"        // brightness: 0
 	"\t\ts : i,\n"        // manualTick: 0
-	"\t\ts : i\n"         // idleInterval: 0
+	"\t\ts : i,\n"        // idleInterval: 0
+	"\t\ts : i\n"         // alpha: 0
 "\t}";
 
 const char* JSON_EFFECTS =
@@ -103,6 +104,7 @@ const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 #define ALL                "all"
 #define ACTIVE             "active"
 #define KIND               "kind"
+#define ALPHA              "alpha"
 
 #define CONTENT_TYPE       "Content-Type"
 #define CONTENT_TYPE_JSON  "application/json"
@@ -205,6 +207,7 @@ int settings_load() {
 	load_long(tokens, SETTINGS "." BRIGHTNESS,     &settings.brightness);
 	load_long(tokens, SETTINGS "." MANUAL_TICK,    &settings.manual_tick);
 	load_long(tokens, SETTINGS "." IDLE_INTERVAL,  &settings.idle_interval);
+	load_long(tokens, SETTINGS "." ALPHA,          &settings.alpha);
 
 	channel_load(tokens, TREADS, &channel_treads);
 	channel_load(tokens, PANELS, &channel_panels);
@@ -218,7 +221,8 @@ int settings_json(char* buf, size_t len) {
 	return json_emit(buf, len, JSON_SETTINGS, 
 		BRIGHTNESS,     settings.brightness, 
 		MANUAL_TICK,    settings.manual_tick, 
-		IDLE_INTERVAL,  settings.idle_interval
+		IDLE_INTERVAL,  settings.idle_interval,
+		ALPHA,          settings.alpha
 	);
 }
 
@@ -368,6 +372,11 @@ void settings_post(struct mg_connection* conn) {
 	len = mg_get_var(conn, IDLE_INTERVAL, buf, sizeof(buf));
 	if (len > 0) {
 		settings.idle_interval = strtol(buf, NULL, 10);
+	}
+
+	len = mg_get_var(conn, ALPHA, buf, sizeof(buf));
+	if (len > 0) {
+		settings.alpha = strtol(buf, NULL, 10);
 	}
 
 	rc = settings_save();
