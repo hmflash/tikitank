@@ -6,7 +6,13 @@ var treadsScreenSaverValue = false;
 var barrelScreenSaverValue = false;
 var panelsScreenSaverValue = false;
 
+
 $(document).ready(function () {
+	window.cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
+	cw.input($("#rightContainer input")[0]);
+	cw.color("#FF0000");
+	window.scrollTo(0, 1);
+
 	$('#panelsTab').show();
 	$('#treadsTab').hide();
 	$('#barrelTab').hide();
@@ -54,6 +60,15 @@ $(document).ready(function () {
 		$('div.optTreads').removeClass("selectTab");
 		$('div.optBarrel').removeClass("selectTab");
 		$('div.optSettings').addClass("selectTab");
+	});
+
+	$('.panel').click(function () {
+		var index = $(this).attr('data-id');
+		setEffectParameters('panels', cw.color().hex, index);
+	});
+
+	$('.colorOption').click(function() {
+		cw.color($(this).attr('data-color'));
 	});
 
 	getEffects();
@@ -115,6 +130,16 @@ function displayActiveEffect(kind, data) {
 		barrelScreenSaverValue = data.isScreenSaver;
 	} else if (kind == "panels") {
 		panelsScreenSaverValue = data.isScreenSaver;
+		for (var i = 0; i < data.color.length; i++) {
+			var panel = $('.panel[data-id=' + i + ']');
+			var raw = data.color[i];
+			var color = 'rgb(' + [
+				(raw >> 16) & 0xff,
+				(raw >> 8) & 0xff,
+				raw & 0xff
+			].join(',') + ')';
+			panel.css({ fill: color });
+		}
 	}   
 }
 

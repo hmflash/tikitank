@@ -28,26 +28,18 @@
     <div id="controlContainer">
       <div id="panelsTab">
         <div id="effectsWrapper">
-          <div id="effectsLeft_bodyMap">
-            <img src="panels.png" width="256" height="356" usemap="#panelsmap" />
-
-            <map name="panelsmap">
-              <area shape="rect" alt="grill" href="javascript:setEffectParameters('panels', cw.color().hex, 0)" coords="18, 10, 239, 59" />
-
-              <area shape="poly" alt="cabin_F" href="javascript:setEffectParameters('panels', cw.color().hex, 1)" coords="19, 65, 239, 65, 189, 114, 68, 114, 19, 65" />
-              <area shape="poly" alt="cabin_L" href="javascript:setEffectParameters('panels', cw.color().hex, 4)" coords="9, 65, 9, 244, 58, 244, 58, 114, 9, 65" />
-              <area shape="poly" alt="cabin_R" href="javascript:setEffectParameters('panels', cw.color().hex, 9)" coords="249, 65, 249, 244, 199, 244, 199, 115, 249, 65" />
-
-              <area shape="poly" alt="turret_F" href="javascript:setEffectParameters('panels', cw.color().hex, 2)" coords="79, 124, 178,124, 128, 199, 79, 124" />
-              <area shape="poly" alt="turret_L" href="javascript:setEffectParameters('panels', cw.color().hex, 3)" coords="69, 125, 69, 249, 119, 200, 69, 125" />
-              <area shape="poly" alt="turret_R" href="javascript:setEffectParameters('panels', cw.color().hex, 8)" coords="187, 125, 187, 250, 138, 199, 187, 125" />
-
-              <area shape="rect" alt="side_L" href="javascript:setEffectParameters('panels', cw.color().hex, 5)" coords="9, 249, 58, 344" />
-              <area shape="rect" alt="side_R" href="javascript:setEffectParameters('panels', cw.color().hex, 7)" coords="199, 250, 249, 343" />
-              <area shape="rect" alt="bridge" href="javascript:setEffectParameters('panels', cw.color().hex, 6)" coords="69, 294, 188, 343" />
-            </map>
-
-          </div>
+          <svg id="effectsLeft_bodyMap">
+            <rect data-id="0" class="panel" x="18" y="10" width="220" height="50"/>
+            <polygon data-id="1" class="panel" points="19, 65, 239, 65, 189, 114, 68, 114, 19, 65" />
+            <polygon data-id="2" class="panel" points="79, 124, 178,124, 128, 199, 79, 124" />
+            <polygon data-id="3" class="panel" points="69, 125, 69, 249, 119, 200, 69, 125" />
+            <polygon data-id="4" class="panel" points="9, 65, 9, 244, 58, 244, 58, 114, 9, 65" />
+            <rect data-id="5" class="panel" x="9" y="249" width="50" height="100"/>
+            <rect data-id="6" class="panel" x="69" y="300" width="120" height="50"/>
+            <rect data-id="7" class="panel" x="199" y="250" width="50" height="100"/>
+            <polygon data-id="8" class="panel" points="187, 125, 187, 250, 138, 199, 187, 125" />
+            <polygon data-id="9" class="panel" points="249, 65, 249, 244, 199, 244, 199, 115, 249, 65" />
+          </svg>
           <div id="effectsRight_bodyMap">
             <div id="effectDisplay_bodyMap">
               current effect:
@@ -202,25 +194,18 @@
 
   <div id="rightContainer">
     <div id="colorGrid">
-      <div class="colorOption magenta" onclick="cw.color('#7F0A7F')"></div>
-      <div class="colorOption red" onclick="cw.color('#FF0000')"></div>
-      <div class="colorOption orange" onclick="cw.color('#FFA500')"></div>
-      <div class="colorOption yellow" onclick="cw.color('#FFFF00')"></div>
-      <div class="colorOption green" onclick="cw.color('#00FF00')"></div>
-      <div class="colorOption blue" onclick="cw.color('#0000FF')"></div>
+      <div class="colorOption magenta" data-color="#7F0A7F"></div>
+      <div class="colorOption red" data-color="#FF0000"></div>
+      <div class="colorOption orange" data-color="#FFA500"></div>
+      <div class="colorOption yellow" data-color="#FFFF00"></div>
+      <div class="colorOption green" data-color="#00FF00"></div>
+      <div class="colorOption blue" data-color="#0000FF"></div>
     </div>
 
     <div class="colorwheel"></div>
     <p align="center">
       <input class="colorInput" name="input_example" value="#FFAA37" type="text" size="10" />
     </p>
-
-    <script>
-     var cw = Raphael.colorwheel($("#rightContainer .colorwheel")[0], 300);
-     cw.input($("#rightContainer input")[0]);
-     cw.color("#FF0000");
-     window.scrollTo(0, 1);
-   </script>
  </div>
 </div>
   <canvas id="canvas" width="280" height="50">

@@ -163,6 +163,7 @@ body {
 	height: 625px;
 	float: left;
 }
+
 #effectControlWrapper {
 	position: relative;
 	top: 10px;
@@ -170,6 +171,7 @@ body {
 	width: 230px;
 	height: 605px;
 }
+
 #effectsRight > #effectDisplay input {
 	width: 210px;
 	height: 35px;
@@ -242,134 +244,6 @@ body {
 
 .effectsList_bodyMap ul li:nth-child(even) {
 	background-color: #efefef;
-}
-
-.tankMap {float:left;}
-
-.turretFront {
-	position: absolute;
-	top: 130px;
-	left: 100px;
-}
-
-.turretLeft {
-	position: absolute;
-	top: 130px;
-	left: 90px;
-}
-
-.turretRight {
-	position: absolute;
-	top: 130px;
-	left: 160px;
-}
-
-.rearDeck {
-	position: absolute;
-	top: 300px;
-	left: 90px;
-}
-
-.sideLeft {
-	position: absolute;
-	top: 255px;
-	left: 30px;
-}
-
-.sideRight {
-	position: absolute;
-	top: 255px;
-	left: 220px;
-}
-
-.cabFront {
-	position: absolute;
-	top: 70px;
-	left: 40px;
-}
-
-.cabLeft {
-	position: absolute;
-	top: 130px;
-	left: 30px;
-}
-
-.cabRight {
-	position: absolute;
-	top: 130px;
-	left: 220px;
-}
-
-.frontGrill {
-	position: absolute;
-	top: 15px;
-	left: 55px;
-}
-
-#triangle-down { 
-	width: 0; 
-	height: 0; 
-	border-left: 50px solid transparent; 
-	border-right: 50px solid transparent; 
-	border-top: 75px solid red; 
-}
-
-#triangle-left { 
-	width: 0;
-	height: 0; 
-	border-top: 75px solid transparent; 
-	border-right: 50px solid red; 
-	border-bottom: 50px solid transparent; 
-}
-
-#triangle-right { 
-	width: 0; 
-	height: 0; 
-	border-top: 75px solid transparent; 
-	border-left: 50px solid red; 
-	border-bottom: 50px solid transparent; 
-}
-
-#rectangle_side { 
-	width: 50px; 
-	height: 95px; 
-	background: red; 
-}
-
-#rectangle_G { 
-	width: 190px; 
-	height: 50px; 
-	background: red; 
-}
-
-#rectangle_F { 
-	width: 220px; 
-	height: 50px; 
-	background: red; 
-}
-
-#rectangle_R { 
-	width: 120px; 
-	height: 50px; 
-	background: red; 
-}
-
-#trapezoid { 
-	width: 220px; 
-	height: 50px; 
-	background: red; 
-}
-
-#trapezoid_L { 
-	width: 50px; 
-	height: 110px; 
-	background: red; 
-}
-
-#trapezoid_R { 
-	width: 50px; 
-	height: 110px; 
-	background: red;
 }
 
 #settingsWrapper {
@@ -453,4 +327,10 @@ body {
 	border: 1px solid gray;
 	width: 1000px;
 	height: 170px;
+}
+
+.panel {
+	fill: black;
+	stroke: black;
+	cursor: pointer;
 }
