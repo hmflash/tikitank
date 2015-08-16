@@ -28,7 +28,7 @@
     <div id="controlContainer">
       <div id="panelsTab">
         <div id="effectsWrapper">
-          <svg id="effectsLeft_bodyMap">
+          <svg class="effectsLeft">
             <rect data-id="0" class="panel" x="18" y="10" width="220" height="50"/>
             <polygon data-id="1" class="panel" points="19, 65, 239, 65, 189, 114, 68, 114, 19, 65" />
             <polygon data-id="2" class="panel" points="79, 124, 178,124, 128, 199, 79, 124" />
@@ -40,14 +40,14 @@
             <polygon data-id="8" class="panel" points="187, 125, 187, 250, 138, 199, 187, 125" />
             <polygon data-id="9" class="panel" points="249, 65, 249, 244, 199, 244, 199, 115, 249, 65" />
           </svg>
-          <div id="effectsRight_bodyMap">
-            <div id="effectDisplay_bodyMap">
+          <div class="effectsRight">
+            <div class="effectDisplay">
               current effect:
-              <div id="panelsActiveEffect" class="displayName_bodyMap">
+              <div id="panelsActiveEffect" class="displayName">
                 CURRENT EFFECT
               </div>
             </div>
-            <div id="panelsEffectsList" class="effectsList_bodyMap">
+            <div id="panelsEffectsList" class="effectsList">
               <ul>
                 <li>No FX :(</li>
               </ul>
@@ -58,8 +58,8 @@
 
       <div id="treadsTab">
         <div id="effectsWrapper">
-          <div id="effectsLeft">
-            <div id="effectDisplay">
+          <div class="effectsLeft">
+            <div class="effectDisplay">
               current effect:
               <div id="treadsActiveEffect" class="displayName">
                 CURRENT EFFECT
@@ -71,12 +71,12 @@
               </ul>
             </div>
           </div>
-          <div id="effectsRight">
-            <div id="effectDisplay">
+          <div class="effectsRight">
+            <div class="effectDisplay">
               <div id="treadsArgumentDescription">input:</div>
               <input id="treadsArgumentValue" type="text">
             </div>
-            <div id="effectControlWrapper">
+            <div class="effectControlWrapper">
               <div class="button effect argument treads" data-channel="treads">
                 SET VALUE
               </div>
@@ -99,8 +99,8 @@
 
       <div id="barrelTab">
         <div id="effectsWrapper">
-          <div id="effectsLeft">
-            <div id="effectDisplay">
+          <div class="effectsLeft">
+            <div class="effectDisplay">
               current effect:
               <div id="barrelActiveEffect" class="displayName">
                 CURRENT EFFECT
@@ -112,12 +112,12 @@
               </ul>
             </div>
           </div>
-          <div id="effectsRight">
-            <div id="effectDisplay">
+          <div class="effectsRight">
+            <div class="effectDisplay">
               <div id="barrelArgumentDescription">input:</div>
               <input id="barrelArgumentValue" type="text">
             </div>
-            <div id="effectControlWrapper">
+            <div class="effectControlWrapper">
               <div class="button effect argument barrel" data-channel="barrel">
                 SET VALUE
               </div>

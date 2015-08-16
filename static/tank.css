@@ -109,13 +109,25 @@ body {
 	z-index: 100;
 }
 
-#effectsLeft {
+.effectsLeft {
 	width: 355px;
 	height: 625px;
 	float: left;
 }
 
-#effectDisplay > .displayName {
+#panelsTab .effectsLeft {
+	width: 300px;
+	height: 370px;
+	float: left;
+}
+
+#panelsTab .effectsRight{
+	width: 305px;
+	height: 625px;
+	float: left;
+}
+
+.effectDisplay > .displayName {
 	width: 305px;
 	height: auto;
 	background-color: #efefef;
@@ -123,7 +135,7 @@ body {
 	font-size: 1.6em;
 }
 
-#effectDisplay {
+.effectDisplay {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
 	padding: 10px;
@@ -139,6 +151,10 @@ body {
 	overflow: scroll;
 }
 
+#panelsTab .effectsList {
+	width: 280px;
+}
+
 .effectsList ul {
 	list-style-type: none;
 	padding: 0px;
@@ -149,6 +165,7 @@ body {
 	font-family: Helvetica, Arial;
 	font-size: 2em;
 	padding: 10px;
+	cursor: pointer;
 }
 
 .effectsList ul li:nth-child(odd) {
@@ -159,13 +176,13 @@ body {
 	background-color: #efefef;
 }
 
-#effectsRight{
+.effectsRight{
 	width: 250px;
 	height: 625px;
 	float: left;
 }
 
-#effectControlWrapper {
+.effectControlWrapper {
 	position: relative;
 	top: 10px;
 	left: 10px;
@@ -173,7 +190,7 @@ body {
 	height: 605px;
 }
 
-#effectsRight > #effectDisplay input {
+.effectsRight > .effectDisplay input {
 	width: 210px;
 	height: 35px;
 	font-size: 2em;
@@ -186,60 +203,18 @@ body {
 	margin-bottom: 10px;
 }
 
-#effectsLeft_bodyMap {
-	width: 300px;
-	height: 370px;
-	float: left;
-}
-
-#effectsRight_bodyMap{
-	width: 305px;
-	height: 625px;
-	float: left;
-}
-
-#effectDisplay_bodyMap > .displayName_bodyMap {
-	width: 265px;
-	height: auto;
-	background-color: #efefef;
-	padding: 10px;
-	font-size: 1.2em;
-}
-
-#effectDisplay_bodyMap {
+#panelsTab .effectDisplay {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
 	padding: 10px;
 }
 
-.effectsList_bodyMap {
-	position: relative;
-	top: 10px;
-	left: 10px;
-	width: 280px;
-	height: 275px;
-	border: 2px solid #666666;
-	overflow: scroll;
-}
-
-.effectsList_bodyMap ul {
-	list-style-type: none;
-	padding: 0px;
-	margin: 0px;
-}
-
-.effectsList_bodyMap ul li {
-	font-family: Helvetica, Arial;
-	font-size: 2em;
-	padding: 10px;
-}
-
-.effectsList_bodyMap ul li:nth-child(odd) {
-	background-color: #ffffff;
-}
-
-.effectsList_bodyMap ul li:nth-child(even) {
+#panelsTab .effectDisplay > .displayName {
+	width: 265px;
+	height: auto;
 	background-color: #efefef;
+	padding: 10px;
+	font-size: 1.2em;
 }
 
 #settingsTab {
