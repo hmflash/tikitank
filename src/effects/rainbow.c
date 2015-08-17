@@ -3,13 +3,23 @@
 
 #include "effects.h"
 
+// new = ((old - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
+// old_min = 0
+// old_max = RAINBOW_LENGTH
+// new_min = 0
+// new_max = framelen
+// new = (i / RAINBOW_LENGTH) * framelen
+
 void rainbow_treads(struct render_args* args) {
 	int i;
+	int speed = 4 * args->framenum;
 
 	for (i = 0; i < args->framelen; i += 3) {
-		args->framebuf[i+0] = 0x80 | RAINBOW_G(args->framelen - i + (4 * args->framenum)) >> 1;
-		args->framebuf[i+1] = 0x80 | RAINBOW_R(args->framelen - i + (4 * args->framenum)) >> 1;
-		args->framebuf[i+2] = 0x80 | RAINBOW_B(args->framelen - i + (4 * args->framenum)) >> 1;
+		int index = args->framelen - i + args->framenum + speed;
+		int scaled = index * args->framelen / RAINBOW_LENGTH / 4;
+		args->framebuf[i+0] = 0x80 | RAINBOW_G(scaled) >> 1;
+		args->framebuf[i+1] = 0x80 | RAINBOW_R(scaled) >> 1;
+		args->framebuf[i+2] = 0x80 | RAINBOW_B(scaled) >> 1;
 	}
 }
 
