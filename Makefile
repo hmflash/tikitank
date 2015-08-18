@@ -8,7 +8,7 @@ CFLAGS=-Wall -O3 -D$(UNAME)
 CFLAGS_Linux=-Wno-unused-result -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
 
 LD = gcc
-LDFLAGS=
+LDFLAGS=-L/lib/arm-linux-gnueabihf
 
 TARGET=tikitank
 
@@ -19,7 +19,7 @@ SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
 
-LIBS_Linux=-lrt
+LIBS_Linux=-lrt -l:libusb-0.1.so.4.4.4
 LIBS=-lpthread
 
 COMMON_SRC := $(wildcard $(SRCDIR)/*.c)

@@ -12,6 +12,7 @@
 #include <sys/ioctl.h>
 #include <time.h>
 #include <libgen.h>
+#include <usb.h>
 #include <linux/i2c-dev.h>
 #include <assert.h>
 
@@ -42,6 +43,9 @@ struct bbb_pal {
 	int fd_treads;
 	int fd_barrel;
 	int fd_panels[2];
+
+	// Handle to DMX board
+	usb_dev_handle* dmx;
 
 	// Base address of PRU RAM
 	void* pru;
@@ -297,6 +301,137 @@ void pru_destroy() {
 	prussdrv_exit();
 }
 
+static int usbGetStringAscii(usb_dev_handle* dev, int index, int langid, char *buf, int buflen)
+{
+	char buffer[256];
+	int  rval, i;
+
+	rval = usb_control_msg(dev,
+	                       USB_ENDPOINT_IN,
+	                       USB_REQ_GET_DESCRIPTOR,
+	                       (USB_DT_STRING << 8) + index,
+	                       langid,
+	                       buffer,
+	                       sizeof(buffer),
+	                       1000);
+
+	if(rval < 0)
+		return rval;
+
+	if(buffer[1] != USB_DT_STRING)
+		return 0;
+
+	if ((unsigned char)buffer[0] < rval)
+		rval = (unsigned char)buffer[0];
+
+	rval /= 2;
+
+	// lossy conversion to ISO Latin1
+	for(i=1;i<rval;i++) {
+		// destination buffer overflow
+		if (i > buflen)
+			break;
+
+		buf[i-1] = buffer[2 * i];
+
+		// outside of ISO Latin1 range
+		if (buffer[2 * i + 1] != 0)
+			buf[i-1] = '?';
+	}
+
+	buf[i-1] = 0;
+	return i-1;
+}
+
+#define UDMX_VID 0x16C0  /* VOTI */
+#define UDMX_PID 0x05DC  /* Obdev's free shared PID */
+#define cmd_SetChannelRange 2
+
+static usb_dev_handle* dmx_try_open(struct usb_device* dev) {
+	usb_dev_handle *handle;
+	char            buf[256];
+	int             len;
+
+	// we need to open the device in order to query strings
+	handle = usb_open(dev);
+	if (!handle) {
+		fprintf(stderr, "Warning: cannot open USB device: %s\n", usb_strerror());
+		return NULL;
+	}
+
+	// now find out whether the device actually is obdev's Remote Sensor:
+	len = usbGetStringAscii(handle, dev->descriptor.iManufacturer, 0x0409, buf, sizeof(buf));
+	if (len < 0) {
+		fprintf(stderr, "Warning: cannot query manufacturer for device: %s\n", usb_strerror());
+		goto skip_device;
+	}
+
+	if (strcmp(buf, "www.anyma.ch") != 0)
+		goto skip_device;
+
+	len = usbGetStringAscii(handle, dev->descriptor.iProduct, 0x0409, buf, sizeof(buf));
+	if (len < 0) {
+		fprintf(stderr, "Warning: cannot query product for device: %s\n", usb_strerror());
+		goto skip_device;
+	}
+
+	if (strcmp(buf, "uDMX") == 0)
+		return handle;
+
+skip_device:
+	usb_close(handle);
+	return NULL;
+}
+
+static usb_dev_handle* dmx_find_device(void)
+{
+	struct usb_bus    *bus;
+	struct usb_device *dev;
+	usb_dev_handle    *handle;
+
+	usb_init();
+	usb_find_busses();
+	usb_find_devices();
+
+	for (bus=usb_busses; bus; bus=bus->next) {
+		for (dev=bus->devices; dev; dev=dev->next) {
+			if (dev->descriptor.idVendor != UDMX_VID)
+				continue;
+			if (dev->descriptor.idProduct != UDMX_PID)
+				continue;
+			if ((handle = dmx_try_open(dev)) != NULL)
+				return handle;
+		}
+	}
+
+	fprintf(stderr, "Could not find USB device www.anyma.ch/uDMX\n");
+
+	return NULL;
+}
+
+static int dmx_write(int fd, const char* buf, size_t len) {
+	int ret;
+
+	// Helper to make dmx look like spi writes
+	assert(NUM_PANELS == (10 * 3));
+	assert(len == NUM_PANELS);
+	assert(fd == -1);
+
+	if (!pal.dmx)
+		return -1;
+
+	ret = usb_control_msg(pal.dmx,
+	                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT,
+	                      cmd_SetChannelRange,
+	                      NUM_PANELS, // Number Of Channels
+	                      0,          // First Channel
+	                      (char*)buf,        // Values
+	                      len,     // Length
+	                      5000);      // Timeout
+
+	return ret;
+}
+
 static inline int smbus_access(int file, char read_write, __u8 command,
                                int size, union i2c_smbus_data *data)
 {
@@ -491,6 +626,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 
 	pal.fd_panels[0] = open_i2c("/dev/i2c-1", 0x40);
 	pal.fd_panels[1] = open_i2c("/dev/i2c-1", 0x41);
+	pal.dmx = dmx_find_device();
 
 	pal.pru = pru_init(enc_thresh, enc_delay);
 	if (pal.pru) {
@@ -513,7 +649,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	              pal.panels_buf1,
 	              pal.panels_buf2,
 	              NUM_PANELS,
-	              write_i2c,
+	              dmx_write,
 	              &pal.p.panels_buf)) {
 		LOG(("Failed to start panel renderer thread: %s\n", strerror(errno)));
 	}
@@ -533,7 +669,9 @@ void pal_barrel_write() {
 }
 
 void pal_panels_write() {
-	renderer_swap(&pal.panel, &pal.p.panels_buf);
+	if (renderer_swap(&pal.panel, &pal.p.panels_buf)) {
+		TRACE_LOG(("Dropping panel frame!\n"));
+	}
 }
 
 void pal_destroy() {
@@ -542,6 +680,15 @@ void pal_destroy() {
 	if (pal.pru) {
 		pru_destroy();
 		pal.pru = NULL;
+	}
+
+	if (pal.dmx != NULL) {
+		// Turn off LEDs w/o using renderer obj
+		memset(pal.p.panels_buf, 0, NUM_PANELS);
+		dmx_write(-1, pal.p.panels_buf, NUM_PANELS);
+
+		usb_close(pal.dmx);
+		pal.dmx = NULL;
 	}
 
 	if (pal.fd_treads != -1) {
