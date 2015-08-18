@@ -57,10 +57,10 @@ int renderer_init(struct renderer* r,
 
 	pthread_mutex_init(&r->mutex, NULL);
 	pthread_cond_init(&r->cond, NULL);
-	pthread_create(&r->thread, NULL, renderer_run, r);
 
 	// Ensure rendering thread is started before returning
 	pthread_mutex_lock(&r->mutex);
+	pthread_create(&r->thread, NULL, renderer_run, r);
 	pthread_cond_wait(&r->cond, &r->mutex);
 	pthread_mutex_unlock(&r->mutex);
 
