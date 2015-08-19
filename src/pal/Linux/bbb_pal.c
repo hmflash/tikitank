@@ -93,8 +93,8 @@ int load_cape(const char* path, const char* name) {
 	fprintf(fp, "%s", name);
 	fclose(fp);
 
-	// Give cape 200ms to load
-	usleep(200000);
+	// Give cape 1 second to load
+	usleep(1000000);
 
 	LOG(("Cape '%s' loaded\n", name));
 	return 0;
