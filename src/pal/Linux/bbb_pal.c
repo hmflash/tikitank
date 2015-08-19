@@ -651,6 +651,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned i
 	              pal.panels_buf2,
 	              NUM_PANELS,
 	              dmx_write,
+	              //write_i2c,
 	              &pal.p.panels_buf)) {
 		LOG(("Failed to start panel renderer thread: %s\n", strerror(errno)));
 	}
