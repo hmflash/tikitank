@@ -83,7 +83,7 @@ START:
 	// Configure STEP1 to read from configured pin
 	LBBO tmp0, locals, 0x40, 1
 	LSL tmp0, tmp0, 19
-	ADD tmp0, tmp0, 1
+	ADD tmp0, tmp0, 1 // 1 & 0x80 for 16 avg samples
 	SBBO tmp0, adc_, STEP1, 4   // Open pin in continuous mode
 	MOV tmp0, 0
 	SBBO tmp0, adc_, DELAY1, 4  // Open pin w/o delay
