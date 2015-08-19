@@ -17,7 +17,7 @@
 // 0.0762 m/tick
 // 32 px/m * 0.0762 m/tick = 2.4384 px/tick
 
-#define   INCH_PER_TICK     3
+#define   INCH_PER_TICK     2.75
 #define  METER_PER_INCH     0.0254
 #define    LED_PER_METER   32
 #define    INC_PER_LED    256
