@@ -40,7 +40,7 @@ struct settings {
 
 extern struct settings settings;
 
-struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay);
+struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned int ema_pow);
 
 void pal_treads_write();
 void pal_barrel_write();

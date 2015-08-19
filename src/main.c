@@ -54,7 +54,8 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	p = pal_init(425, 1); // enc_thresh & enc_delay
+	// enc_thresh, enc_delay, ema_pow
+	p = pal_init(1250, 1, 0);
 	if (!p)
 		return -1;
 

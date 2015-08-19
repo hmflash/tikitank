@@ -200,7 +200,7 @@ err_open_spi:
 }
 
 static
-void* pru_init(unsigned int threshold, unsigned int delay) {
+void* pru_init(unsigned int threshold, unsigned int delay, unsigned int ema_pow) {
 	tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
 	locals_t locals;
 	int err;
@@ -232,6 +232,7 @@ void* pru_init(unsigned int threshold, unsigned int delay) {
 	memset(&locals, 0, sizeof(locals));
 	locals.eyecatcher = EYECATCHER;
 	locals.enc.encoder0 = 0; // ADC0
+	locals.ema_pow =  ema_pow;
 	locals.enc_local[0].threshold = threshold;
 	locals.enc_local[0].delay = delay;
 	locals.enc_local[0].speed = INITIAL_ACC_VAL;
@@ -601,7 +602,7 @@ int open_i2c(const char* dev, int address) {
 	return fd;
 }
 
-struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
+struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned int ema_pow) {
 	memset(&pal, 0, sizeof(pal));
 	pal.fd_treads = -1;
 	pal.fd_barrel = -1;
@@ -628,7 +629,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
 	pal.fd_panels[1] = open_i2c("/dev/i2c-1", 0x41);
 	pal.dmx = dmx_find_device();
 
-	pal.pru = pru_init(enc_thresh, enc_delay);
+	pal.pru = pru_init(enc_thresh, enc_delay, ema_pow);
 	if (pal.pru) {
 		unsigned int* p = (unsigned int*)pal.pru;
 
