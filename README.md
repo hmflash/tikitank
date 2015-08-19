@@ -62,3 +62,4 @@ Hall Connector
 1. [Programmable Realitme Unit](http://processors.wiki.ti.com/index.php/Programmable_Realtime_Unit)
 1. [PRU PRojects](http://processors.wiki.ti.com/index.php/PRU_Projects)
 1. [Cape Firmwares](https://github.com/jadonk/cape-firmware)
+1. [AM335x Technical Reference Manual](http://www.ti.com/lit/ug/spruh73l/spruh73l.pdf)
