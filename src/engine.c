@@ -124,6 +124,19 @@ int engine_run() {
 		unsigned int sensor_ticks = *eng.pal->enc_ticks;
 		int dt = (int)sensor_ticks - (int)eng.last_tick;
 		char* treads_buf = eng.pal->treads_buf;
+
+		++framenum;
+		shift_inc = settings.manual_tick ? settings.manual_tick : dt * INC_PER_TICK;
+		shift_inc = alpha * shift_inc + (1.0 - alpha) * shift_last;
+		shift_last = shift_inc;
+		shift += shift_inc;
+
+		if (shift_inc >= 1.0) {
+			eng.idle_frames = 0;
+		} else {
+			eng.idle_frames++;
+		}
+
 		struct render_args treads_args = {
 			.effect          = get_effect(&channel_treads),
 			.shift_quotient  = shift / 0xff,
@@ -164,18 +177,6 @@ int engine_run() {
 		treads_args.effect->render(&treads_args);
 		barrel_args.effect->render(&barrel_args);
 		panels_args.effect->render(&panels_args);
-
-		++framenum;
-		shift_inc = settings.manual_tick ? settings.manual_tick : dt * INC_PER_TICK;
-		shift_inc = alpha * shift_inc + (1.0 - alpha) * shift_last;
-		shift_last = shift_inc;
-		shift += shift_inc;
-
-		if (shift_inc >= 1.0) {
-			eng.idle_frames = 0;
-		} else {
-			eng.idle_frames++;
-		}
 
 		ret = pthread_cond_timedwait(&eng.cond, &eng.mutex, &tv);
 		if (ret != ETIMEDOUT) {
