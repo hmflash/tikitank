@@ -36,6 +36,7 @@
 
 #define TREADS_LEN (NUM_TREADS + LATCH_BYTES(NUM_TREADS))
 #define BARREL_LEN (NUM_BARREL + LATCH_BYTES(NUM_BARREL))
+#define MAX_BRIGHTNESS 8
 
 struct bbb_pal {
 	struct pal p;
@@ -410,8 +411,11 @@ static usb_dev_handle* dmx_find_device(void)
 	return NULL;
 }
 
-static int dmx_write(int fd, const char* buf, size_t len) {
+static 
+int dmx_write(int fd, const char* buf, size_t len) {
+	int i;
 	int ret;
+	char* ptr = (char*)buf;
 
 	// Helper to make dmx look like spi writes
 	assert(NUM_PANELS == (10 * 3));
@@ -421,14 +425,18 @@ static int dmx_write(int fd, const char* buf, size_t len) {
 	if (!pal.dmx)
 		return -1;
 
+	for (i = 0; i < NUM_PANELS; i++) {
+		ptr[i] = ptr[i] >> (MAX_BRIGHTNESS - settings.brightness);
+	}
+
 	ret = usb_control_msg(pal.dmx,
 	                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT,
 	                      cmd_SetChannelRange,
-	                      NUM_PANELS, // Number Of Channels
-	                      0,          // First Channel
-	                      (char*)buf,        // Values
-	                      len,     // Length
-	                      5000);      // Timeout
+	                      NUM_PANELS,     // Number Of Channels
+	                      0,              // First Channel
+	                      (char*)buf,     // Values
+	                      len,            // Length
+	                      5000);          // Timeout
 
 	return ret;
 }
