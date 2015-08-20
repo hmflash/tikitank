@@ -8,7 +8,7 @@ CFLAGS=-Wall -O3 -D$(UNAME)
 CFLAGS_Linux=-Wno-unused-result -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
 
 LD = gcc
-LDFLAGS=-L/lib/arm-linux-gnueabihf
+LDFLAGS_Linux=-L/lib/arm-linux-gnueabihf
 
 TARGET=tikitank
 
@@ -41,7 +41,7 @@ PAL_OBJ := $(PAL_SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: $(BINDIR)/$(TARGET)
 
 $(BINDIR)/$(TARGET): $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ) $(LIBS) $(LIBS_$(UNAME))
+	$(LD) $(LDFLAGS) $(LDFLAGS_$(UNAME)) -o $@ $(COMMON_OBJ) $(EFFECT_OBJ) $(PAL_OBJ) $(LIBS) $(LIBS_$(UNAME))
 
 ifneq ($(strip $(PASM)),)
 
