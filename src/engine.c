@@ -96,8 +96,9 @@ void select_next_screen_saver(struct channel* c) {
 }
 
 struct effect* get_effect(struct channel* c) {
-	if (eng.idle_frames >= settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN) {
-		if (eng.idle_frames % (settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN) == 0) {
+	int idle_interval = settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN;
+	if (c != &channel_panels && eng.idle_frames >= idle_interval) {
+		if (eng.idle_frames % idle_interval == 0) {
 			select_next_screen_saver(c);
 		}
 		return c->effects[c->idle < c->num_effects ? c->idle : 0];
