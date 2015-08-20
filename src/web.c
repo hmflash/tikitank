@@ -501,22 +501,24 @@ void effects_post(struct mg_connection* conn) {
 	len2 = mg_get_var(conn, ARGUMENT, arg2, sizeof(arg2));
 
 	if (len1 > 0 && len2 > 0) {
-		int idx;
-		LOG(("setEffectParameters: %s, %s\n", arg1, arg2));
-		idx = strntol(arg2, len2, 10);
+		long idx = strntol(arg2, len2, 10);
+		long color = strntol(arg1+1, len1-1, 16);
+		LOG(("setEffectParameters: %ld, %lx\n", idx, color));
 		if (idx < NUM_PANELS/3) {
-			channel->effects[channel->active]->color_arg.colors[idx].value = strntol(arg1+1, len1-1, 16);
+			channel->effects[channel->active]->color_arg.colors[idx].value = color;
 		}
 		effects_post_reply(conn);
 		return;
 	} else if (len1 > 0) {
-		LOG(("setEffectColor: %s\n", arg1));
-		channel->effects[channel->active]->color_arg.color.value = strntol(arg1+1, len1-1, 16);
+		long color = strntol(arg1+1, len1-1, 16);
+		LOG(("setEffectColor: %lx\n", color));
+		channel->effects[channel->active]->color_arg.color.value = color;
 		effects_post_reply(conn);
 		return;
 	} else if (len2 > 0) {
-		LOG(("setEffectArgument: %s\n", arg2));
-		channel->effects[channel->active]->argument = strntol(arg2, len2, 10);
+		long value = strntol(arg2, len2, 10);
+		LOG(("setEffectArgument: %ld\n", value));
+		channel->effects[channel->active]->argument = value;
 		effects_post_reply(conn);
 		return;
 	}
