@@ -7,10 +7,11 @@ if [ "$1" == "" ]; then
 	exit 1
 fi
 
+SELF=`hostname`
 HOST=$1
 LOCAL="`pwd`"
 DIRNAME="`basename "$LOCAL"`"
-REMOTE="${DIRNAME// /\\ }"
+REMOTE="${SELF}/${DIRNAME// /\\ }"
 
 shift
 
