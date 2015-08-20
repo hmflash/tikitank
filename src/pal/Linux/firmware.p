@@ -114,14 +114,25 @@ CAPTURE:
 	MAX enc_speed, enc_speed, enc_acc
 
 	// Read current ADC value from fifo
-	LBBO enc_value, fifo0data, 0, 4
+	// LBBO enc_value, fifo0data, 0, 4
 
 	// Perform moving average and store in enc_value
-	// LBBO tmp0, fifo0data, 0, 4
-	// LBBO ema_pow, locals, 0x1c, 4
-	// LSR tmp1, enc_value, ema_pow
-	// SUB tmp1, tmp0, tmp1
-	// ADD enc_value, enc_value, tmp1
+	LBBO tmp0, fifo0data, 0, 4
+
+	QBLT NEW_LESS, enc_value, tmp0
+NEW_GREATER:
+	SUB tmp0, tmp0, enc_value
+	LSR tmp0, tmp0, ema_pow
+	ADD enc_value, enc_value, tmp0
+
+	JMP EMA_DONE
+
+NEW_LESS:
+	SUB tmp0, enc_value, tmp0
+	LSR tmp0, tmp0, ema_pow
+	SUB enc_value, enc_value, tmp0
+
+EMA_DONE:
 
 	// Update min and max
 	MIN enc_min, enc_value, enc_min

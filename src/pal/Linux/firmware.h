@@ -37,7 +37,7 @@ typedef struct {
 	
 	word reserved0;
 	
-	word ema_pow;				// exponent for EMA averaging: ema += (value - ema/2^ema_pow)
+	word ema_pow;				// exponent for EMA averaging: ema += ((value - ema)/2^ema_pow)
 	
 	word ain_ema[8];			// captured and EMA-averaged values of all 8 ADC pins
 	
