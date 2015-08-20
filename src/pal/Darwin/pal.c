@@ -77,7 +77,7 @@ void* pal_thread(void* arg) {
 	return NULL;
 }
 
-struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay) {
+struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned int ema_pow) {
 	int rc;
 
 	memset(&pal, 0, sizeof(pal));
