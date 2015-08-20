@@ -63,7 +63,7 @@ static
 struct bbb_pal pal;
 
 static 
-int load_cape(const char* path, const char* name) {
+int load_cape(const char* path, const char* name, int* loaded) {
 	FILE* fp;
 	char* pos = NULL;
 	char* line = NULL;
@@ -93,8 +93,7 @@ int load_cape(const char* path, const char* name) {
 	fprintf(fp, "%s", name);
 	fclose(fp);
 
-	// Give cape 1 second to load
-	usleep(1000000);
+	*loaded = 1;
 
 	LOG(("Cape '%s' loaded\n", name));
 	return 0;
@@ -105,6 +104,7 @@ int load_capes(const char* names[]) {
 	DIR* d;
 	char* path = NULL;
 	int ret = 0;
+	int loaded = 0;
 
 	d = opendir("/sys/devices");
 	if (!d)
@@ -131,8 +131,12 @@ int load_capes(const char* names[]) {
 	}
 
 	for (; *names && !ret; ++names) {
-		ret = load_cape(path, *names);
+		ret = load_cape(path, *names, &loaded);
 	}
+
+	// Give cape 1 second to load
+	if (loaded)
+		usleep(1000000);
 
 	free(path);
 	return ret;
