@@ -166,13 +166,14 @@ int engine_run() {
 
 		eng.last_tick = sensor_ticks;
 
-		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u, Delta: %d\n",
+		DEBUG_LOG(("Timer: %u, Raw: %u, Min: %u, Max: %u, Ticks: %u, Delta: %d, Speed: %u\n",
 		           *eng.pal->enc_timer,
 		           *eng.pal->enc_raw,
 		           *eng.pal->enc_min,
 		           *eng.pal->enc_max,
 		           *eng.pal->enc_ticks,
-		           dt));
+		           dt,
+			   *eng.pal->enc_speed));
 
 		treads_args.effect->render(&treads_args);
 		barrel_args.effect->render(&barrel_args);

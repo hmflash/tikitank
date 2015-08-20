@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 	}
 
 	// enc_thresh, enc_delay, ema_pow
-	p = pal_init(1250, 1, 0);
+	p = pal_init(1250, 1, 2);
 	if (!p)
 		return -1;
 
