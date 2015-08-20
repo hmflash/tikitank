@@ -54,8 +54,8 @@ START:
 	MOV enc_min, 0xffff
 	MOV enc_max, 0
 	MOV enc_ticks, 0
-	MOV enc_speed, 0
-	MOV enc_acc, 0
+	MOV enc_speed, 0x7fffffff
+	MOV enc_acc, 0x7fffffff
 	MOV enc_delay, 0
 	MOV enc_up, 0
 	MOV enc_down, 0
@@ -109,15 +109,13 @@ CAPTURE:
 	ADD  ticks, ticks, 1
 	SBBO ticks, locals, 0x04, 4
 
-	// Disabled for the moment to keep speed up
-	// increment encoder ticks
-	// ADD enc_acc, enc_acc, 1
-	// MAX enc_speed, enc_speed, enc_acc
+	// increment encoder speed accumulator ticks
+	ADD enc_acc, enc_acc, 1
+	MAX enc_speed, enc_speed, enc_acc
 
 	// Read current ADC value from fifo
 	LBBO enc_value, fifo0data, 0, 4
 
-	// Disabled for the moment to keep speed up
 	// Perform moving average and store in enc_value
 	// LBBO tmp0, fifo0data, 0, 4
 	// LBBO ema_pow, locals, 0x1c, 4
@@ -131,7 +129,7 @@ CAPTURE:
 
 	CALL PROCESS
 
-	SBBO &enc_value, locals, 0x48, 16
+	SBBO &enc_value, locals, 0x48, 20
 
 	JMP CAPTURE
 
@@ -173,9 +171,9 @@ TOLOW:
 
 	ADD enc_ticks, enc_ticks, 1
 
-	// Disabled for the moment to keep speed up
-	// MOV enc_speed, enc_acc
-	// MOV enc_acc, 0
+	// Update speed from acumulated cycle count
+	MOV enc_speed, enc_acc
+	MOV enc_acc, 0
 
 	RET
 	
