@@ -18,6 +18,7 @@ PAL=pal/$(UNAME)
 SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
+PREFIX=/opt/tikitank
 
 LIBS_Linux=-lrt -l:libusb-0.1.so.4.4.4
 LIBS=-lpthread
@@ -81,3 +82,10 @@ $(PAL_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(COMMON_INC) $(EFFECT_INC)
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
+
+install: all
+	mkdir -p $(PREFIX)
+	cp $(BINDIR)/$(TARGET) $(PREFIX)
+	cp -a static $(PREFIX)
+	cp init /etc/init.d/tikitank
+	update-rc.d tikitank defaults

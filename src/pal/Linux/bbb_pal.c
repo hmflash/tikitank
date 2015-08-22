@@ -168,32 +168,28 @@ int open_spi(const char* dev) {
 	// Open spi device
 	fd = open(dev, O_RDWR, 0);
 	if (fd == -1) {
-		fprintf(stderr, "Error opening %s: %s\n",
-			dev, strerror(errno));
+		LOG(("Error opening %s: %s\n", dev, strerror(errno)));
 		goto err_open_spi;
 	}
 
 	// LEDs require mode 0
 	arg = SPI_MODE_0;
 	if (ioctl(fd, SPI_IOC_WR_MODE, &arg) == -1) {
-		fprintf(stderr, "Error setting %s mode: %s\n",
-			dev, strerror(errno));
+		LOG(("Error setting %s mode: %s\n", dev, strerror(errno)));
 		goto err_open_spi;
 	}
 
 	// LEDs are 8 bits per word
 	arg = 8;
 	if (ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &arg) == -1) {
-		fprintf(stderr, "Error setting %s BPW: %s\n",
-			dev, strerror(errno));
+		LOG(("Error setting %s BPW: %s\n", dev, strerror(errno)));
 		goto err_open_spi;
 	}
 
 	// Run LEDs at 4mhz
 	arg = 4000000;
 	if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &arg) == -1) {
-		fprintf(stderr, "Error setting %s speed: %s\n",
-			dev, strerror(errno));
+		LOG(("Error setting %s speed: %s\n", dev, strerror(errno)));
 		goto err_open_spi;
 	}
 
@@ -215,22 +211,19 @@ void* pru_init(unsigned int threshold, unsigned int delay, unsigned int ema_pow)
 
 	err = prussdrv_init();
 	if (err) {
-		fprintf(stderr, "Failed to init PRUSSDRV driver: %s\n",
-			strerror(errno));
+		LOG(("Failed to init PRUSSDRV driver: %s\n", strerror(errno)));
 		return NULL;
 	}
 
 	err = prussdrv_open(PRU_EVTOUT_0);
 	if (err) {
-		fprintf(stderr, "Failed to open PRU0 interrupt: %s\n",
-			strerror(errno));
+		LOG(("Failed to open PRU0 interrupt: %s\n", strerror(errno)));
 		goto err_open_pru;
 	}
 
 	err = prussdrv_pruintc_init(&pruss_intc_initdata);
 	if (err) {
-		fprintf(stderr, "Failed init PRU0 interrupt: %s\n",
-			strerror(errno));
+		LOG(("Failed init PRU0 interrupt: %s\n", strerror(errno)));
 		goto err_open_pru;
 	}
 
@@ -248,21 +241,19 @@ void* pru_init(unsigned int threshold, unsigned int delay, unsigned int ema_pow)
 	                                (unsigned int*)&locals,
 	                                sizeof(locals));
 	if (err < 0) {
-		fprintf(stderr, "Failed write PRU0 memory: %s\n",
-			strerror(errno));
+		LOG(("Failed write PRU0 memory: %s\n", strerror(errno)));
 		goto err_open_pru;
 	}
 
 	err = prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, &ptr);
 	if (err < 0) {
-		fprintf(stderr, "Failed map PRU0 memory: %s\n",
-			strerror(errno));
+		LOG(("Failed map PRU0 memory: %s\n", strerror(errno)));
 		goto err_open_pru;
 	}
 
 	self = realpath("/proc/self/exe", NULL);
 	if (!self) {
-		fprintf(stderr, "Couldn't locate PRU firmware\n");
+		LOG(("Couldn't locate PRU firmware\n"));
 		goto err_open_pru;
 	}
 
@@ -272,8 +263,7 @@ void* pru_init(unsigned int threshold, unsigned int delay, unsigned int ema_pow)
 
 	err = prussdrv_exec_program(PRU0, firmware);
 	if (err < 0) {
-		fprintf(stderr, "Failed start PRU0 firmware: %s\n",
-			strerror(errno));
+		LOG(("Failed start PRU0 firmware: %s\n", strerror(errno)));
 		goto err_open_pru;
 	}
 
@@ -361,14 +351,14 @@ static usb_dev_handle* dmx_try_open(struct usb_device* dev) {
 	// we need to open the device in order to query strings
 	handle = usb_open(dev);
 	if (!handle) {
-		fprintf(stderr, "Warning: cannot open USB device: %s\n", usb_strerror());
+		LOG(("Warning: cannot open USB device: %s\n", usb_strerror()));
 		return NULL;
 	}
 
 	// now find out whether the device actually is obdev's Remote Sensor:
 	len = usbGetStringAscii(handle, dev->descriptor.iManufacturer, 0x0409, buf, sizeof(buf));
 	if (len < 0) {
-		fprintf(stderr, "Warning: cannot query manufacturer for device: %s\n", usb_strerror());
+		LOG(("Warning: cannot query manufacturer for device: %s\n", usb_strerror()));
 		goto skip_device;
 	}
 
@@ -377,7 +367,7 @@ static usb_dev_handle* dmx_try_open(struct usb_device* dev) {
 
 	len = usbGetStringAscii(handle, dev->descriptor.iProduct, 0x0409, buf, sizeof(buf));
 	if (len < 0) {
-		fprintf(stderr, "Warning: cannot query product for device: %s\n", usb_strerror());
+		LOG(("Warning: cannot query product for device: %s\n", usb_strerror()));
 		goto skip_device;
 	}
 
@@ -410,7 +400,7 @@ static usb_dev_handle* dmx_find_device(void)
 		}
 	}
 
-	fprintf(stderr, "Could not find USB device www.anyma.ch/uDMX\n");
+	LOG(("Could not find USB device www.anyma.ch/uDMX\n"));
 
 	return NULL;
 }
@@ -568,14 +558,12 @@ int open_i2c(const char* dev, int address) {
 
 	fd = open(dev, O_RDWR);
 	if (fd < 0) {
-		fprintf(stderr, "Failed to open %s: %s\n",
-			dev, strerror(errno));
+		LOG(("Failed to open %s: %s\n", dev, strerror(errno)));
 		return -1;
 	}
 
 	if (ioctl(fd, I2C_SLAVE, address) < 0) {
-		fprintf(stderr, "Failed to set I2C address 0x%x: %s\n",
-			address, strerror(errno));
+		LOG(("Failed to set I2C address 0x%x: %s\n", address, strerror(errno)));
 		close(fd);
 		return -1;
 	}
@@ -583,8 +571,7 @@ int open_i2c(const char* dev, int address) {
 	// Ensure the board is connected
 	ret = smbus_read_byte_data(fd, REG_MODE1);
 	if (ret == -1) {
-		fprintf(stderr, "Error opening PCA9685 @ 0x%x: %s\n",
-			address, strerror(errno));
+		LOG(("Error opening PCA9685 @ 0x%x: %s\n", address, strerror(errno)));
 		return -1;
 	}
 
@@ -608,8 +595,7 @@ int open_i2c(const char* dev, int address) {
 	prescale = smbus_read_byte_data(fd, REG_PRESCALE);
 	freq = 25000000 / (4096 * (prescale + 1));
 
-	LOG(("Opened PCA9685, Addr: 0x%x, Freq: %uHz (0x%x)\n",
-	     address, freq, prescale));
+	LOG(("Opened PCA9685, Addr: 0x%x, Freq: %uHz (0x%x)\n", address, freq, prescale));
 
 	return fd;
 }
@@ -623,7 +609,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned i
 	pal.p.panel_brightness = 8;
 
 	if (load_capes(capes)) {
-		perror("Failed to load the capes");
+		LOG(("Failed to load the capes: %s\n", strerror(errno)));
 		return NULL;
 	}
 

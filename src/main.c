@@ -78,20 +78,23 @@ int main(int argc, char** argv) {
 		rc = daemon(1, 0);
 		if (rc < 0) {
 			LOG(("daemon() failed: (%d) %s\n", errno, strerror(errno)));
-			return -1;
+			goto fail;
 		}
 	}
 
 	// enc_thresh, enc_delay, ema_pow
 	p = pal_init(1000, 1, 2);
-	if (!p)
-		return -1;
+	if (!p) {
+		LOG(("pal could not initialize\n"));
+		rc = -1;
+		goto fail;
+	}
 
 	eng = engine_init(p);
 	rc = web_init(eng, port);
 	if (rc < 0) {
 		LOG(("Web server failed to start: (%d) %s\n", rc, strerror(rc)));
-		return rc;
+		goto fail;
 	}
 
 	settings_load();
@@ -107,7 +110,8 @@ int main(int argc, char** argv) {
 
 	LOG(("Exited gracefully\n"));
 
+fail:
 	fclose(fout);
 
-	return 0;
+	return rc;
 }
