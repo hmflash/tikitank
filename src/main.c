@@ -12,32 +12,38 @@
 
 int verbosity = 0;
 
+FILE* fout = NULL;
+
 void debug_log(const char* fmt, ...) {
 	va_list arg;
 	struct timespec tv;
 
 	pal_clock_gettime(&tv);
 
-	printf("%ld.%3.3ld ", tv.tv_sec, tv.tv_nsec / 1000000);
+	fprintf(fout, "%ld.%3.3ld ", tv.tv_sec, tv.tv_nsec / 1000000);
 
 	va_start(arg, fmt);
-	vprintf(fmt, arg);
+	vfprintf(fout, fmt, arg);
 	va_end(arg);
+
+	fflush(fout);
 }
 
 static
 void usage(int rc) {
-	printf("usage: tikitank [-hv][-p PORT]\n");
+	printf("usage: tikitank [-hvd][-p PORT][-l LOGPATH]\n");
 	exit(rc);	
 }
 
 int main(int argc, char** argv) {
 	int rc;
+	int bg = 0;
 	const char* port = "80";
+	const char* logpath = NULL;
 	struct pal* p;
 	struct engine* eng;
 
-	while ((rc = getopt(argc, argv, "hvp:")) != -1) {
+	while ((rc = getopt(argc, argv, "hdvp:l:")) != -1) {
 		switch (rc) {
 		case 'p':
 			port = optarg;
@@ -48,9 +54,31 @@ int main(int argc, char** argv) {
 		case 'h':
 			usage(0);
 			break;
+		case 'd':
+			bg = 1;
+			break;
+		case 'l':
+			logpath = optarg;
+			break;
 		default:
 			usage(2);
 			break;
+		}
+	}
+
+	if (logpath) {
+		fout = fopen(logpath, "w");
+	}
+
+	if (!fout) {
+		fout = stdout;
+	}
+
+	if (bg) {
+		rc = daemon(1, 0);
+		if (rc < 0) {
+			LOG(("daemon() failed: (%d) %s\n", errno, strerror(errno)));
+			return -1;
 		}
 	}
 
@@ -61,7 +89,7 @@ int main(int argc, char** argv) {
 
 	eng = engine_init(p);
 	rc = web_init(eng, port);
-	if (rc) {
+	if (rc < 0) {
 		LOG(("Web server failed to start: (%d) %s\n", rc, strerror(rc)));
 		return rc;
 	}
@@ -78,6 +106,8 @@ int main(int argc, char** argv) {
 	pal_destroy();
 
 	LOG(("Exited gracefully\n"));
+
+	fclose(fout);
 
 	return 0;
 }
