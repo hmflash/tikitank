@@ -27,113 +27,104 @@
     </div>
     <div id="controlContainer">
       <div id="panelsTab">
-        <div id="effectsWrapper">
-          <svg class="effectsLeft">
-            <polygon data-id="0" class="panel" points="187, 125, 187, 250, 138, 199, 187, 125" />
-            <rect data-id="1" class="panel" x="199" y="250" width="50" height="100"/>
-            <polygon data-id="2" class="panel" points="249, 65, 249, 244, 199, 244, 199, 115, 249, 65" />
-            <polygon data-id="3" class="panel" points="19, 65, 239, 65, 189, 114, 68, 114, 19, 65" />
-            <polygon data-id="4" class="panel" points="79, 124, 178,124, 128, 199, 79, 124" />
-            <rect data-id="5" class="panel border" x="18" y="10" width="220" height="50"/>
-            <rect data-id="6" class="panel" x="9" y="249" width="50" height="100"/>
-            <rect data-id="7" class="panel" x="69" y="300" width="120" height="50"/>
-            <polygon data-id="8" class="panel" points="69, 125, 69, 249, 119, 200, 69, 125" />
-            <polygon data-id="9" class="panel" points="9, 65, 9, 244, 58, 244, 58, 114, 9, 65" />
-          </svg>
-          <div class="effectsRight">
-            <div class="effectDisplay">
-              current effect:
-              <div id="panelsActiveEffect" class="displayName">
-                CURRENT EFFECT
-              </div>
-            </div>
-            <div id="panelsEffectsList" class="effectsList">
-              <ul>
-                <li>No FX :(</li>
-              </ul>
+        <div class="left">
+          <div class="effectDisplay">
+            current effect:
+            <div id="panelsActiveEffect" class="displayName">
+              CURRENT EFFECT
             </div>
           </div>
+          <div id="panelsEffectsList" class="effectsList">
+            <ul>
+              <li>No FX :(</li>
+            </ul>
+          </div>
         </div>
+        <svg class="left">
+          <polygon data-id="0" class="panel" points="187, 125, 187, 250, 138, 199, 187, 125" />
+          <rect data-id="1" class="panel" x="199" y="250" width="50" height="100"/>
+          <polygon data-id="2" class="panel" points="249, 65, 249, 244, 199, 244, 199, 115, 249, 65" />
+          <polygon data-id="3" class="panel" points="19, 65, 239, 65, 189, 114, 68, 114, 19, 65" />
+          <polygon data-id="4" class="panel" points="79, 124, 178,124, 128, 199, 79, 124" />
+          <rect data-id="5" class="panel border" x="18" y="10" width="220" height="50"/>
+          <rect data-id="6" class="panel" x="9" y="249" width="50" height="100"/>
+          <rect data-id="7" class="panel" x="69" y="300" width="120" height="50"/>
+          <polygon data-id="8" class="panel" points="69, 125, 69, 249, 119, 200, 69, 125" />
+          <polygon data-id="9" class="panel" points="9, 65, 9, 244, 58, 244, 58, 114, 9, 65" />
+        </svg>
       </div>
 
       <div id="treadsTab">
-        <div id="effectsWrapper">
-          <div class="effectsLeft">
-            <div class="effectDisplay">
-              current effect:
-              <div id="treadsActiveEffect" class="displayName">
-                CURRENT EFFECT
-              </div>
-            </div>
-            <div id="treadsEffectsList" class="effectsList">
-              <ul>
-                <li>No FX :(</li>
-              </ul>
+        <div class="left">
+          <div class="effectDisplay">
+            current effect:
+            <div id="treadsActiveEffect" class="displayName">
+              CURRENT EFFECT
             </div>
           </div>
-          <div class="effectsRight">
-            <div class="effectDisplay">
-              <div id="treadsArgumentDescription">input:</div>
-              <input id="treadsArgumentValue" type="text">
+          <div id="treadsEffectsList" class="effectsList">
+            <ul>
+              <li>No FX :(</li>
+            </ul>
+          </div>
+        </div>
+        <div class="left">
+          <div class="effectDisplay">
+            <div id="treadsArgumentDescription"></div>
+            <input id="treadsArgumentValue" type="text">
+          </div>
+          <div class="effectControlWrapper">
+            <div class="button effect argument treads" data-channel="treads">
+              SET VALUE
             </div>
-            <div class="effectControlWrapper">
-              <div class="button effect argument treads" data-channel="treads">
-                SET VALUE
-              </div>
-              <div class="button effect color treads" data-channel="treads">
-                SET COLOR
-              </div>
-              <div class="button effect auto treads" data-channel="treads">
-                AUTOMATIC
-              </div>
-              <div class="button effect idle treads" data-channel="treads">
-                SCREEN SAVER
-              </div>
-              <div id="treadsPreviewButton" class="button effect">
-                PREVIEW
-              </div>
+            <div class="button effect color treads" data-channel="treads">
+              SET COLOR
+            </div>
+            <div class="button effect idle treads" data-channel="treads">
+              SCREEN SAVER
+            </div>
+            <div id="treadsPreviewButton" class="button effect">
+              PREVIEW
             </div>
           </div>
         </div>
       </div>
 
       <div id="barrelTab">
-        <div id="effectsWrapper">
-          <div class="effectsLeft">
-            <div class="effectDisplay">
-              current effect:
-              <div id="barrelActiveEffect" class="displayName">
-                CURRENT EFFECT
-              </div>
-            </div>
-            <div id="barrelEffectsList" class="effectsList">
-              <ul>
-                <li>No FX :(</li>
-              </ul>
+        <div class="left">
+          <div class="effectDisplay">
+            current effect:
+            <div id="barrelActiveEffect" class="displayName">
+              CURRENT EFFECT
             </div>
           </div>
-          <div class="effectsRight">
-            <div class="effectDisplay">
-              <div id="barrelArgumentDescription">input:</div>
-              <input id="barrelArgumentValue" type="text">
+          <div id="barrelEffectsList" class="effectsList">
+            <ul>
+              <li>No FX :(</li>
+            </ul>
+          </div>
+        </div>
+        <div class="left">
+          <div class="effectDisplay">
+            <div id="barrelArgumentDescription"></div>
+            <input id="barrelArgumentValue" type="text">
+          </div>
+          <div class="effectControlWrapper">
+            <div class="button effect argument barrel" data-channel="barrel">
+              SET VALUE
             </div>
-            <div class="effectControlWrapper">
-              <div class="button effect argument barrel" data-channel="barrel">
-                SET VALUE
-              </div>
-              <div class="button effect color barrel" data-channel="barrel">
-                SET COLOR
-              </div>
-              <div class="button effect idle barrel" data-channel="barrel">
-                SCREEN SAVER
-              </div>
+            <div class="button effect color barrel" data-channel="barrel">
+              SET COLOR
+            </div>
+            <div class="button effect idle barrel" data-channel="barrel">
+              SCREEN SAVER
             </div>
           </div>
         </div>
       </div>
 
       <div id="settingsTab">
-        <label>Brightness:</label>
+        <label>Brightness</label>
         <ul class="brightness">
           <li class="button">1</li>
           <li class="button">2</li>
@@ -145,34 +136,53 @@
           <li class="button">8</li>
         </ul>
         <hr>
-        <div class="settingsGroup">
-          <div class="left">
-            <label>Manual tick interval [ms]:</label>
-            <span>
-              <input id="manualTick" type="text">
-              <div class="button manualTick">
-                SET VALUE
-              </div>
-            </span>
-          </div>
-          <div class="right">
-            <label>Smoothing factor:</label>
-            <span>
-              <input id="alpha" type="text">
-              <div class="button alpha">
-                SET VALUE
-              </div>
-            </span>
-          </div>
-        </div>
+        <table>
+          <thead>
+            <th>Manual tick</th>
+            <th>Manual toggle</th>
+            <th>Smoothing factor</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input id="manualTick" type="text">
+                <div class="button manualTick">SET VALUE</div>
+              </td>
+              <td>
+                <div id="manualToggle" class="space"></div>
+                <div class="button manualToggle">TOGGLE</div>
+              </td>
+              <td>
+                <input id="alpha" type="text">
+                <div class="button alpha">SET VALUE</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <hr>
-        <div>
-          <label>Screensaver effect interval [mins]:</label>
-          <input id="idleInterval" type="text">
-          <div class="button idleInterval">
-            SET VALUE
-          </div>
-        </div>
+        <table>
+          <thead>
+            <th>Idle interval [mins]</th>
+            <th>Screensaver</th>
+            <th>Reset defaults</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input id="idleInterval" type="text">
+                <div class="button idleInterval">SET VALUE</div>
+              </td>
+              <td>
+                <div id="screenSaverToggle" class="space"></div>
+                <div class="button screenSaverToggle">TOGGLE</div>
+              </td>
+              <td>
+                <div class="space"></div>
+                <div class="button resetDefaults">RESET</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>			
   </div>

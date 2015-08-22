@@ -36,6 +36,8 @@ struct settings {
 	long                manual_tick;
 	long                idle_interval;
 	long                alpha;
+	long                manual_toggle;
+	long                screen_saver_toggle;
 };
 
 extern struct settings settings;

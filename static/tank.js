@@ -4,16 +4,15 @@
 
 var cw;
 var global = {
+	manualToggle: false,
+	screenSaverToggle: true,
 	treads: {
-		auto: false,
 		idle: false
 	},
 	barrel: {
-		auto: false,
 		idle: false
 	},
 	panels: {
-		auto: false,
 		idle: false
 	}
 };
@@ -94,8 +93,18 @@ $(document).ready(function () {
 		setSetting({ manualTick: $('#manualTick').val() });
 	});
 
+	$('.button.manualToggle').click(function() {
+		var value = !global.manualToggle;
+		setSetting({ manualToggle: value ? 1 : 0 });
+	});
+
 	$('.button.idleInterval').click(function() {
 		setSetting({ idleInterval: $('#idleInterval').val() });
+	});
+
+	$('.button.screenSaverToggle').click(function() {
+		var value = !global.screenSaverToggle;
+		setSetting({ screenSaverToggle: value ? 1 : 0 });
 	});
 
 	$('.button.alpha').click(function() {
@@ -113,16 +122,14 @@ $(document).ready(function () {
 		setEffect({ kind: channel, color: cw.color().hex.toString() });
 	});
 
-	$('.button.effect.auto').click(function() {
-		var channel = $(this).attr('data-channel');
-		var value = global[channel].auto;
-		setEffect({ kind: channel, sensor_driven: !value });
-	});
-
 	$('.button.effect.idle').click(function() {
 		var channel = $(this).attr('data-channel');
 		var value = global[channel].idle;
 		setEffect({ kind: channel, screen_saver: !value });
+	});
+
+	$('.button.resetDefaults').click(function() {
+		resetDefaults();
 	});
 
 	getEffects();
@@ -157,6 +164,18 @@ function intToRgb(raw) {
 	].join(',') + ')';
 }
 
+function displaySettings(data) {
+	$(".brightness .button").removeClass('active');
+	$(".brightness .button:nth-child(" + data.brightness + ")").addClass('active');
+	$("#manualTick").val(data.manualTick);
+	$("#idleInterval").val(data.idleInterval);
+	$("#alpha").val(data.alpha);
+	global.manualToggle = data.manualToggle == 1;
+	$("#manualToggle").text(data.manualToggle ? 'ON' : 'OFF');
+	global.screenSaverToggle = data.screenSaverToggle == 1;
+	$("#screenSaverToggle").text(data.screenSaverToggle ? 'ON' : 'OFF');
+}
+
 function displayActiveEffect(kind, data) {
 	if (data.arg_desc == null) {
 		data.arg_desc = "n/a"
@@ -165,14 +184,6 @@ function displayActiveEffect(kind, data) {
 	$("#" + kind + "ArgumentDescription").html(data.arg_desc);
 	$("#" + kind + "ArgumentValue").val(data.argument);
 	$("#" + kind + "ActiveEffect").text(data.name);
-
-	var autoButton = $(".button.effect.auto." + kind);
-	global[kind].auto = data.sensor_driven;
-	if (data.sensor_driven) {
-		autoButton.text("[X] AUTOMATIC");
-	} else {            
-		autoButton.text("[_] AUTOMATIC");
-	}
 
 	global[kind].idle = data.screen_saver;
 	var idleButton = $(".button.effect.idle." + kind);
@@ -193,11 +204,15 @@ function displayActiveEffect(kind, data) {
 	}
 }
 
+function displayEffects(data) {
+	displayEffect("panels", data.panels);
+	displayEffect("treads", data.treads);
+	displayEffect("barrel", data.barrel);
+}
+
 function getEffects() {
 	$.getJSON("/api/effects", function (data, status) {
-		displayEffect("panels", data.panels);
-		displayEffect("treads", data.treads);
-		displayEffect("barrel", data.barrel);
+		displayEffects(data);
 	});
 }
 
@@ -211,14 +226,6 @@ function selectEffect(api, idx) {
 	setEffect({ kind: api, active: idx });
 }
 
-function displaySettings(data) {
-	$(".brightness .button").removeClass('active');
-	$(".brightness .button:nth-child(" + data.brightness + ")").addClass('active');
-	$("#manualTick").val(data.manualTick);
-	$("#idleInterval").val(data.idleInterval);
-	$("#alpha").val(data.alpha);
-}
-
 function getSettings() {
 	$.getJSON("/api/settings", function (data, status) {
 		displaySettings(data);
@@ -228,5 +235,12 @@ function getSettings() {
 function setSetting(obj) {
 	$.post("/api/settings", obj, function (data, status) { 
 		displaySettings(data); 
+	});
+}
+
+function resetDefaults() {
+	$.post("/api/reset", null, function (data, status) { 
+		displaySettings(data); 
+		getEffects();
 	});
 }

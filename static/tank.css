@@ -103,28 +103,8 @@ body {
 	margin-bottom: 5px;
 }
 
-#effectsWrapper {
-	position: relative;
-	width: 605px;
-	z-index: 100;
-}
-
-.effectsLeft {
-	width: 355px;
-	height: 625px;
-	float: left;
-}
-
-#panelsTab .effectsLeft {
-	width: 300px;
-	height: 370px;
-	float: left;
-}
-
-#panelsTab .effectsRight{
-	width: 305px;
-	height: 625px;
-	float: left;
+#panelsTab .effectsRight {
+	padding: 20px 0px;
 }
 
 .effectDisplay > .displayName {
@@ -141,6 +121,14 @@ body {
 	padding: 10px;
 }
 
+.effectDisplay input {
+	width: 200px;
+	height: auto;
+	padding: 10px;
+	font-size: 1.6em;
+	border: none;
+}
+
 .effectsList {
 	position: relative;
 	top: 10px;
@@ -149,10 +137,6 @@ body {
 	height: 275px;
 	border: 2px solid #666666;
 	overflow: scroll;
-}
-
-#panelsTab .effectsList {
-	width: 280px;
 }
 
 .effectsList ul {
@@ -176,24 +160,14 @@ body {
 	background-color: #efefef;
 }
 
-.effectsRight{
+#panelsTab svg {
 	width: 250px;
-	height: 625px;
-	float: left;
+	height: 400px;
+	padding: 20px 0px;
 }
 
 .effectControlWrapper {
-	position: relative;
-	top: 10px;
-	left: 10px;
-	width: 230px;
-	height: 605px;
-}
-
-.effectsRight > .effectDisplay input {
-	width: 210px;
-	height: 35px;
-	font-size: 2em;
+	margin: 10px;
 }
 
 .button.effect {
@@ -203,20 +177,6 @@ body {
 	margin-bottom: 10px;
 }
 
-#panelsTab .effectDisplay {
-	font-family: Helvetica, Arial;
-	font-size: 1em;
-	padding: 10px;
-}
-
-#panelsTab .effectDisplay > .displayName {
-	width: 265px;
-	height: auto;
-	background-color: #efefef;
-	padding: 10px;
-	font-size: 1.2em;
-}
-
 #settingsTab {
 	margin-top: 5px;
 }
@@ -224,6 +184,14 @@ body {
 #settingsTab label {
 	font-family: Helvetica, Arial;
 	font-size: 1em;
+	line-height: 10px;
+	padding-left: 10px;
+}
+
+#settingsTab th {
+	font-family: Helvetica, Arial;
+	font-size: 1em;
+	font-weight: normal;
 	line-height: 10px;
 }
 
@@ -257,16 +225,35 @@ body {
 
 #settingsTab input {
 	display: block;	
-	width: 210px;
-	height: 35px;
+	width: 140px;
+	height: 25px;
 	font-family: Helvetica, Arial;
 	font-size: 2em;
-	margin: 10px 0px;
+	margin: 5px 0px;
+	padding: 10px;
+	border: none;
+	text-align: center;
 }
 
 #settingsTab div.button {
-	width: 195px;
+	width: 140px;
 	padding: 10px;
+}
+
+#settingsTab td {
+	padding: 0px 10px;
+}
+
+#settingsTab .space {
+	background-color: white;
+	width: 140px;
+	height: 25px;
+	line-height: 25px;
+	font-family: Helvetica, Arial;
+	font-size: 2em;
+	margin: 5px 0px;
+	padding: 10px;
+	text-align: center;
 }
 
 .magenta { background-color: #7F0A7F; }
@@ -287,10 +274,6 @@ body {
 	fill: black;
 	stroke: black;
 	cursor: pointer;
-}
-
-.settingsGroup {
-	height: 140px
 }
 
 .left {

@@ -97,7 +97,9 @@ void select_next_screen_saver(struct channel* c) {
 
 struct effect* get_effect(struct channel* c) {
 	int idle_interval = settings.idle_interval * FRAME_PER_SEC * SEC_PER_MIN;
-	if (c != &channel_panels && eng.idle_frames >= idle_interval) {
+	if (settings.screen_saver_toggle && 
+		c != &channel_panels && 
+		eng.idle_frames >= idle_interval) {
 		if (eng.idle_frames % idle_interval == 0) {
 			select_next_screen_saver(c);
 		}
@@ -127,7 +129,7 @@ int engine_run() {
 		char* treads_buf = eng.pal->treads_buf;
 
 		++framenum;
-		shift_inc = settings.manual_tick ? settings.manual_tick : dt * INC_PER_TICK;
+		shift_inc = settings.manual_toggle ? settings.manual_tick : dt * INC_PER_TICK;
 		shift_inc = alpha * shift_inc + (1.0 - alpha) * shift_last;
 		shift_last = shift_inc;
 		shift += shift_inc;

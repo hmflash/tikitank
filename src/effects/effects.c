@@ -22,80 +22,83 @@ void get_cycle(struct render_args* args, int i, int* j, int* cycle) {
 }
 
 struct effect effect_treads_off = {
-	.name       = "off",
-	.arg_desc   = "N/A",
-	.render     = off_treads,
+	.name          = "off",
+	.arg_desc      = "N/A",
+	.render        = off_treads,
 };
 
 struct effect effect_treads_simple = {
-	.name       = "simple",
-	.arg_desc   = "N/A",
-	.render     = simple_treads,
+	.name          = "simple",
+	.arg_desc      = "N/A",
+	.render        = simple_treads,
+	.sensor_driven = 1,
 };
 
 struct effect effect_treads_antialias = {
-	.name       = "antialias",
-	.arg_desc   = "N/A",
-	.render     = antialias_treads,
+	.name          = "antialias",
+	.arg_desc      = "N/A",
+	.render        = antialias_treads,
+	.sensor_driven = 1,
 };
 
 struct effect effect_treads_rolling_rainbow = {
-	.name       = "rolling rainbow",
-	.arg_desc   = "N/A",
-	.render     = rolling_rainbow_treads,
+	.name          = "rolling rainbow",
+	.arg_desc      = "N/A",
+	.render        = rolling_rainbow_treads,
+	.sensor_driven = 1,
 };
 
 struct effect effect_treads_rainbow = {
-	.name       = "rainbow",
-	.arg_desc   = "N/A",
-	.render     = rainbow_treads,
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_treads,
 };
 
 struct effect effect_barrel_off = {
-	.name       = "off",
-	.arg_desc   = "N/A",
-	.render     = off_barrel,
+	.name          = "off",
+	.arg_desc      = "N/A",
+	.render        = off_barrel,
 };
 
 struct effect effect_barrel_rainbow = {
-	.name       = "rainbow",
-	.arg_desc   = "N/A",
-	.render     = rainbow_barrel,
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_barrel,
 };
 
 struct effect effect_panels_off = {
-	.name       = "off",
-	.arg_desc   = "N/A",
-	.render     = off_panels,
+	.name          = "off",
+	.arg_desc      = "N/A",
+	.render        = off_panels,
 };
 
 struct effect effect_panels_simple = {
-	.name       = "simple",
-	.arg_desc   = "N/A",
-	.render     = simple_panels,
+	.name          = "simple",
+	.arg_desc      = "N/A",
+	.render        = simple_panels,
 };
 
 struct effect effect_panels_rainbow = {
-	.name       = "rainbow",
-	.arg_desc   = "N/A",
-	.render     = rainbow_panels,
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_panels,
 };
 
 struct effect* effects_treads[] = {
-	&effect_treads_off,
-	&effect_treads_simple,
+	// &effect_treads_off,
 	&effect_treads_antialias,
+	&effect_treads_simple,
 	&effect_treads_rolling_rainbow,
 	&effect_treads_rainbow,
 };
 
 struct effect* effects_barrel[] = {
-	&effect_barrel_off,
+	// &effect_barrel_off,
 	&effect_barrel_rainbow,
 };
 
 struct effect* effects_panels[] = {
-	&effect_panels_off,
+	// &effect_panels_off,
 	&effect_panels_simple,
 	&effect_panels_rainbow,
 };

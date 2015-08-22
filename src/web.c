@@ -25,11 +25,10 @@ struct web_context web;
 static
 struct mg_connection* ws_conn;
 
-static
-const char* API_SETTINGS = "/api/settings";
 
-static
-const char* API_EFFECTS  = "/api/effects";
+#define API_SETTINGS "/api/settings"
+#define API_EFFECTS  "/api/effects"
+#define API_RESET    "/api/reset"
 
 static
 char work_buf[64 * 1024];
@@ -51,6 +50,8 @@ const char* JSON_SETTINGS =
 	"\t\ts : i,\n"        // brightness: 0
 	"\t\ts : i,\n"        // manualTick: 0
 	"\t\ts : i,\n"        // idleInterval: 0
+	"\t\ts : i,\n"        // manualToggle: 0
+	"\t\ts : i,\n"        // screenSaverToggle: 0
 	"\t\ts : i\n"         // alpha: 0
 "\t}";
 
@@ -75,39 +76,42 @@ const char* JSON_EFFECT =
 	"\t\t\t\t\ts : i,\n"  // argument: 0
 	"\t\t\t\t\ts : s,\n"  // arg_desc: ""
 	"\t\t\t\t\ts : S,\n"  // color: 0|[0]
-	"\t\t\t\t\ts : i,\n"  // screen_saver 0|1
-	"\t\t\t\t\ts : i\n"   // sensor_driven: 0|1
+	"\t\t\t\t\ts : i\n"  // screen_saver 0|1
 "\t\t\t\t}";
 
 const char* JSON_PANELS_COLOR = "[i, i, i, i, i, i, i, i, i, i]";
 
-#define DEFAULT_BRIGHTNESS      100
-#define DEFAULT_MANUAL_TICK       0
-#define DEFAULT_IDLE_INTERVAL   120
+#define DEFAULT_BRIGHTNESS            8
+#define DEFAULT_MANUAL_TICK         100
+#define DEFAULT_IDLE_INTERVAL       120
+#define DEFAULT_MANUAL_TOGGLE         0
+#define DEFAULT_SCREEN_SAVER_TOGGLE   1
+#define DEFAULT_ALPHA                 5
 
-#define SETTINGS_FILE      "settings.json"
+#define SETTINGS_FILE       "settings.json"
+ 
+#define SETTINGS            "settings"
+#define BRIGHTNESS          "brightness"
+#define MANUAL_TICK         "manualTick"
+#define MANUAL_TOGGLE       "manualToggle"
+#define IDLE_INTERVAL       "idleInterval"
+#define SCREEN_SAVER_TOGGLE "screenSaverToggle"
+#define ARGUMENT            "argument"
+#define ARGUMENT_DESC       "arg_desc"
+#define COLOR               "color"
+#define IS_SSAVER           "screen_saver"
+#define NAME                "name"
+#define EFFECTS             "effects"
+#define TREADS              "treads"
+#define PANELS              "panels"
+#define BARREL              "barrel"
+#define ALL                 "all"
+#define ACTIVE              "active"
+#define KIND                "kind"
+#define ALPHA               "alpha"
 
-#define SETTINGS           "settings"
-#define BRIGHTNESS         "brightness"
-#define MANUAL_TICK        "manualTick"
-#define IDLE_INTERVAL      "idleInterval"
-#define ARGUMENT           "argument"
-#define ARGUMENT_DESC      "arg_desc"
-#define COLOR              "color"
-#define IS_SSAVER          "screen_saver"
-#define IS_SDRIVEN         "sensor_driven"
-#define NAME               "name"
-#define EFFECTS            "effects"
-#define TREADS             "treads"
-#define PANELS             "panels"
-#define BARREL             "barrel"
-#define ALL                "all"
-#define ACTIVE             "active"
-#define KIND               "kind"
-#define ALPHA              "alpha"
-
-#define CONTENT_TYPE       "Content-Type"
-#define CONTENT_TYPE_JSON  "application/json"
+#define CONTENT_TYPE        "Content-Type"
+#define CONTENT_TYPE_JSON   "application/json"
 
 static 
 long strntol(const char* buf, size_t size, int base) {
@@ -151,10 +155,7 @@ void channel_load(struct json_token* tokens, const char* kind, struct channel* c
 
 			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SSAVER, kind, i);
 			load_long(tokens, path, &channel->effects[i]->screen_saver);
-
-			snprintf(path, sizeof(path), EFFECTS ".%s." ALL "[%d]" IS_SDRIVEN, kind, i);
-			load_long(tokens, path, &channel->effects[i]->sensor_driven);
-			
+		
 			if (channel == &channel_panels) {
 				int j;
 
@@ -176,14 +177,46 @@ void channel_load(struct json_token* tokens, const char* kind, struct channel* c
 	}
 }
 
+static
+void channel_reset(struct channel* channel) {
+	int i;
+
+	channel->active = 0;
+	channel->idle   = 0;
+
+	for (i = 0; i < channel->num_effects; i++) {
+		int j;
+		struct effect* effect = channel->effects[i];
+
+		effect->argument = 0;
+		effect->screen_saver = effect->sensor_driven ? 0 : 1;
+
+		for (j = 0; j < NUM_PANELS/3; j++) {
+			effect->color_arg.colors[j].value = 0xffffffff;
+		}
+	}
+}
+
+static
+void settings_reset() {
+	settings.brightness          = DEFAULT_BRIGHTNESS;
+	settings.manual_tick         = DEFAULT_MANUAL_TICK;
+	settings.idle_interval       = DEFAULT_IDLE_INTERVAL;
+	settings.manual_toggle       = DEFAULT_MANUAL_TOGGLE;
+	settings.screen_saver_toggle = DEFAULT_SCREEN_SAVER_TOGGLE;
+	settings.alpha               = DEFAULT_ALPHA;
+
+	channel_reset(&channel_treads);
+	channel_reset(&channel_panels);
+	channel_reset(&channel_barrel);
+}
+
 int settings_load() {
 	FILE* fp;
 	size_t len;
 	int ret;
 
-	settings.brightness     = DEFAULT_BRIGHTNESS;
-	settings.manual_tick    = DEFAULT_MANUAL_TICK;
-	settings.idle_interval  = DEFAULT_IDLE_INTERVAL;
+	settings_reset();
 
 	fp = fopen(SETTINGS_FILE, "r");
 	if (!fp) {
@@ -204,10 +237,12 @@ int settings_load() {
 		return ret;
 	}
 
-	load_long(tokens, SETTINGS "." BRIGHTNESS,     &settings.brightness);
-	load_long(tokens, SETTINGS "." MANUAL_TICK,    &settings.manual_tick);
-	load_long(tokens, SETTINGS "." IDLE_INTERVAL,  &settings.idle_interval);
-	load_long(tokens, SETTINGS "." ALPHA,          &settings.alpha);
+	load_long(tokens, SETTINGS "." BRIGHTNESS,          &settings.brightness);
+	load_long(tokens, SETTINGS "." MANUAL_TICK,         &settings.manual_tick);
+	load_long(tokens, SETTINGS "." IDLE_INTERVAL,       &settings.idle_interval);
+	load_long(tokens, SETTINGS "." MANUAL_TOGGLE,       &settings.manual_toggle);
+	load_long(tokens, SETTINGS "." SCREEN_SAVER_TOGGLE, &settings.screen_saver_toggle);
+	load_long(tokens, SETTINGS "." ALPHA,               &settings.alpha);
 
 	channel_load(tokens, TREADS, &channel_treads);
 	channel_load(tokens, PANELS, &channel_panels);
@@ -219,10 +254,12 @@ int settings_load() {
 static
 int settings_json(char* buf, size_t len) {
 	return json_emit(buf, len, JSON_SETTINGS, 
-		BRIGHTNESS,     settings.brightness, 
-		MANUAL_TICK,    settings.manual_tick, 
-		IDLE_INTERVAL,  settings.idle_interval,
-		ALPHA,          settings.alpha
+		BRIGHTNESS,          settings.brightness, 
+		MANUAL_TICK,         settings.manual_tick, 
+		IDLE_INTERVAL,       settings.idle_interval,
+		MANUAL_TOGGLE,       settings.manual_toggle,
+		SCREEN_SAVER_TOGGLE, settings.screen_saver_toggle,
+		ALPHA,               settings.alpha
 	);
 }
 
@@ -272,8 +309,7 @@ int channel_json(char* buf, size_t len, struct channel* channel) {
 			ARGUMENT,      effect->argument,
 			ARGUMENT_DESC, effect->arg_desc ? effect->arg_desc : "",
 			COLOR,         color_buf,
-			IS_SSAVER,     effect->screen_saver,
-			IS_SDRIVEN,    effect->sensor_driven
+			IS_SSAVER,     effect->screen_saver
 		);
 
 		if (first) {
@@ -313,7 +349,7 @@ static
 int settings_save() {
 	FILE* fp;
 	size_t len;
-	char settings_buf[128];
+	char settings_buf[256];
 	char effects_buf[MAX_EFFECTS * 1024];
 
 	len = settings_json(settings_buf, sizeof(settings_buf));
@@ -372,6 +408,16 @@ void settings_post(struct mg_connection* conn) {
 	len = mg_get_var(conn, IDLE_INTERVAL, buf, sizeof(buf));
 	if (len > 0) {
 		settings.idle_interval = strtol(buf, NULL, 10);
+	}
+
+	len = mg_get_var(conn, MANUAL_TOGGLE, buf, sizeof(buf));
+	if (len > 0) {
+		settings.manual_toggle = strtol(buf, NULL, 10);
+	}
+
+	len = mg_get_var(conn, SCREEN_SAVER_TOGGLE, buf, sizeof(buf));
+	if (len > 0) {
+		settings.screen_saver_toggle = strtol(buf, NULL, 10);
 	}
 
 	len = mg_get_var(conn, ALPHA, buf, sizeof(buf));
@@ -485,18 +531,6 @@ void effects_post(struct mg_connection* conn) {
 		return;
 	}
 
-	len1 = mg_get_var(conn, IS_SDRIVEN, arg1, sizeof(arg1));
-	if (len1 > 0) {
-		LOG(("setEffectSensorDrive: %s\n", arg1));
-		if (!strncmp(arg1, "true", sizeof(arg1))) {
-			channel->effects[channel->active]->sensor_driven = 1;
-		} else {
-			channel->effects[channel->active]->sensor_driven = 0;
-		}
-		effects_post_reply(conn);
-		return;
-	}
-
 	len1 = mg_get_var(conn, COLOR, arg1, sizeof(arg1));
 	len2 = mg_get_var(conn, ARGUMENT, arg2, sizeof(arg2));
 
@@ -548,6 +582,29 @@ void on_effects(struct mg_connection* conn) {
 }
 
 static
+void on_reset(struct mg_connection* conn) {
+	int rc;
+	int len;
+
+	LOG(("reset: %s\n", conn->uri));
+
+	settings_reset();
+
+	rc = settings_save();
+	if (rc) {
+		mg_printf_data(conn, "Could not save " SETTINGS_FILE);
+		mg_send_status(conn, 500);
+		return;
+	}
+
+	len = settings_json(work_buf, sizeof(work_buf));
+
+	mg_send_header(conn, CONTENT_TYPE, CONTENT_TYPE_JSON);
+	mg_send_status(conn, 200);
+	mg_send_data(conn, work_buf, len);
+}
+
+static
 int on_request(struct mg_connection* conn) {
 	int ret = MG_FALSE;
 
@@ -560,6 +617,9 @@ int on_request(struct mg_connection* conn) {
 		ret = MG_TRUE;
 	} else if (!strncmp(conn->uri, API_EFFECTS, strlen(API_EFFECTS))) {
 		on_effects(conn);
+		ret = MG_TRUE;
+	} else if (!strncmp(conn->uri, API_RESET, strlen(API_RESET))) {
+		on_reset(conn);
 		ret = MG_TRUE;
 	}
 
