@@ -27,8 +27,6 @@
 #define    LED_PER_TICK   (LED_PER_METER * INCH_PER_TICK * METER_PER_INCH)
 #define    INC_PER_TICK   (INC_PER_LED * LED_PER_TICK)
 
-#define EWMA_ALPHA          0.01
-
 struct engine {
 	struct pal*        pal;
 	pthread_mutex_t    mutex;

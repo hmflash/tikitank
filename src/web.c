@@ -182,7 +182,6 @@ void channel_reset(struct channel* channel) {
 	int i;
 
 	channel->active = 0;
-	channel->idle   = 0;
 
 	for (i = 0; i < channel->num_effects; i++) {
 		int j;
