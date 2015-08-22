@@ -419,8 +419,10 @@ int dmx_write(int fd, const char* buf, size_t len) {
 	if (!pal.dmx)
 		return -1;
 
-	for (i = 0; i < NUM_PANELS; i++) {
-		ptr[i] = ptr[i] >> (MAX_BRIGHTNESS - settings.brightness);
+	if (settings.brightness < MAX_BRIGHTNESS) {
+		for (i = 0; i < NUM_PANELS; i++) {
+			ptr[i] /= (MAX_BRIGHTNESS - settings.brightness);
+		}
 	}
 
 	ret = usb_control_msg(pal.dmx,
