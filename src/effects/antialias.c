@@ -20,11 +20,11 @@ void antialias_treads(struct render_args* args) {
 		union color color = args->effect->color_arg.color;
 		get_cycle(args, i, &j, &cycle);
 
-		if (cycle == 9) {         // left edge
+		if (cycle == 9) {         // leading edge
 			pixel[0] = 0x80 | scale_color(color.rgb.green, args->shift_remainder);
 			pixel[1] = 0x80 | scale_color(color.rgb.red,   args->shift_remainder);
 			pixel[2] = 0x80 | scale_color(color.rgb.blue,  args->shift_remainder);
-		} else if (cycle == 14) { // right edge
+		} else if (cycle == 14) { // trailing edge
 			pixel[0] = 0x80 | scale_color(color.rgb.green, 0xff - args->shift_remainder);
 			pixel[1] = 0x80 | scale_color(color.rgb.red,   0xff - args->shift_remainder);
 			pixel[2] = 0x80 | scale_color(color.rgb.blue,  0xff - args->shift_remainder);

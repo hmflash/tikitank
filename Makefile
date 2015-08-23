@@ -21,7 +21,7 @@ BINDIR=bin
 PREFIX=/opt/tikitank
 
 LIBS_Linux=-lrt -l:libusb-0.1.so.4.4.4
-LIBS=-lpthread
+LIBS=-lpthread -lm
 
 COMMON_SRC := $(wildcard $(SRCDIR)/*.c)
 COMMON_INC := $(wildcard $(SRCDIR)/*.h)

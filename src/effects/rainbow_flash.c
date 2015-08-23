@@ -7,10 +7,10 @@ static
 int last_frame = -1;
 
 static
-void camera_flash(struct render_args* args) {
+void rainbow_flash(struct render_args* args) {
 	int i;
 	int j;
-	union color color = args->effect->color_arg.color;
+	int c = args->framenum / 8;
 	int num_pixels = args->framelen/3;
 	int delta = args->framenum - last_frame;
 	int flash_rate = args->effect->argument ? args->effect->argument : 1;
@@ -35,32 +35,32 @@ void camera_flash(struct render_args* args) {
 	for (j = 0; j < flash_quotient; j++) {
 		int p = random() % num_pixels;
 		char* pixel = &args->framebuf[p*3];
-		pixel[0] = 0x80 | color.rgb.green;
-		pixel[1] = 0x80 | color.rgb.red;
-		pixel[2] = 0x80 | color.rgb.blue;
+		pixel[0] = 0x80 | RAINBOW_G(c) >> 1;
+		pixel[1] = 0x80 | RAINBOW_R(c) >> 1;
+		pixel[2] = 0x80 | RAINBOW_B(c) >> 1;
 	}
 
 	if (flash_remainder && !(args->framenum % flash_remainder)) {
 		int p = random() % num_pixels;
 		char* pixel = &args->framebuf[p*3];
-		pixel[0] = 0x80 | color.rgb.green;
-		pixel[1] = 0x80 | color.rgb.red;
-		pixel[2] = 0x80 | color.rgb.blue;
+		pixel[0] = 0x80 | RAINBOW_G(c) >> 1;
+		pixel[1] = 0x80 | RAINBOW_R(c) >> 1;
+		pixel[2] = 0x80 | RAINBOW_B(c) >> 1;
 	}
 
 	last_frame = args->framenum;
 }
 
-struct effect effect_treads_camera_flash = {
-	.name          = "camera flash",
-	.arg_desc      = "flash rate",
+struct effect effect_treads_rainbow_sparkle = {
+	.name          = "rainbow sparkle",
+	.arg_desc      = "sparkle rate",
 	.arg_default   = 500,
-	.render        = camera_flash,
+	.render        = rainbow_flash,
 };
 
-struct effect effect_barrel_camera_flash = {
-	.name          = "camera flash",
-	.arg_desc      = "flash rate",
+struct effect effect_barrel_rainbow_sparkle = {
+	.name          = "rainbow sparkle",
+	.arg_desc      = "sparkle rate",
 	.arg_default   = 100,
-	.render        = camera_flash,
+	.render        = rainbow_flash,
 };

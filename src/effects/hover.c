@@ -74,7 +74,6 @@ void rainbow_hover(struct render_args* args) {
 	int upper = args->framelen + 85;
 	int lower = args->framelen + 85;
 	int keyframe = num_pixels/2;
-	int f = args->framenum;
 
 	memset(args->framebuf, 0x80, args->framelen);
 
