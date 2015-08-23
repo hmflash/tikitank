@@ -46,6 +46,18 @@ void rainbow_panels(struct render_args* args) {
 	}
 }
 
+static
+void rolling_rainbow_panels(struct render_args* args) {
+	int i;
+	int shift = RAINBOW_LENGTH / NUM_PANELS * 3;
+
+	for (i = 0; i < args->framelen; i += 3) {
+		args->framebuf[i+0] = CC_R(RAINBOW_R(args->framenum + i * shift));
+		args->framebuf[i+1] = CC_G(RAINBOW_G(args->framenum + i * shift));
+		args->framebuf[i+2] = CC_B(RAINBOW_B(args->framenum + i * shift));
+	}
+}
+
 struct effect effect_treads_rainbow = {
 	.name          = "rainbow",
 	.arg_desc      = "N/A",
@@ -62,4 +74,10 @@ struct effect effect_panels_rainbow = {
 	.name          = "rainbow",
 	.arg_desc      = "N/A",
 	.render        = rainbow_panels,
+};
+
+struct effect effect_panels_rolling_rainbow = {
+	.name          = "rolling rainbow",
+	.arg_desc      = "N/A",
+	.render        = rolling_rainbow_panels,
 };

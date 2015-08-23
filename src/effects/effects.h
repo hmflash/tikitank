@@ -16,7 +16,7 @@
 #define NUM_TREADS     (478*3)
 #define NUM_BARREL     (76*3)
 #define NUM_PANELS     (10*3)
-#define MAX_EFFECTS     20
+#define MAX_EFFECTS     50
 
 #define RAINBOW_LENGTH    768
 #define FRAME_PER_SEC     50

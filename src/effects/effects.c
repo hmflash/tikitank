@@ -30,6 +30,7 @@ struct effect effect_barrel_breather;
 struct effect effect_panels_off;
 struct effect effect_panels_simple;
 struct effect effect_panels_rainbow;
+struct effect effect_panels_rolling_rainbow;
 struct effect effect_panels_breather;
 
 struct effect* effects_treads[] = {
@@ -59,6 +60,7 @@ struct effect* effects_panels[] = {
 	// &effect_panels_off,
 	&effect_panels_simple,
 	&effect_panels_rainbow,
+	&effect_panels_rolling_rainbow,
 	&effect_panels_breather,
 };
 
