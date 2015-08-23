@@ -2,7 +2,7 @@
 
 case "$1" in
 	start)
-		cd /opt/tikitank && ./tikitank -d -l /tmp/tikitank.log
+		cd /opt/tikitank && ./tikitank -d -l /tmp/tikitank.log -p 8888
 		;;
 	stop)
 		pkill tikitank

@@ -85,7 +85,7 @@ clean:
 
 install: all
 	mkdir -p $(PREFIX)
-	cp $(BINDIR)/$(TARGET) $(PREFIX)
+	cp $(BINDIR)/$(TARGET) $(BINDIR)/firmware.bin $(PREFIX)
 	cp -a static $(PREFIX)
 	cp init /etc/init.d/tikitank
 	update-rc.d tikitank defaults

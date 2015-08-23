@@ -405,6 +405,18 @@ static usb_dev_handle* dmx_find_device(void)
 	return NULL;
 }
 
+static
+int brightness_scale[8] = {
+	64,
+ 	48,
+	32,
+	16,
+	8,
+	4,
+	2,
+	1,
+};
+
 static 
 int dmx_write(int fd, const char* buf, size_t len) {
 	int i;
@@ -419,10 +431,8 @@ int dmx_write(int fd, const char* buf, size_t len) {
 	if (!pal.dmx)
 		return -1;
 
-	if (settings.brightness < MAX_BRIGHTNESS) {
-		for (i = 0; i < NUM_PANELS; i++) {
-			ptr[i] /= (MAX_BRIGHTNESS - settings.brightness);
-		}
+	for (i = 0; i < NUM_PANELS; i++) {
+		ptr[i] /= brightness_scale[settings.brightness - 1];
 	}
 
 	ret = usb_control_msg(pal.dmx,

@@ -6,6 +6,8 @@
 static
 int last_frame = -1;
 
+#define MAX(x, y) (x >= y) ? (x) : (y)
+
 static
 void camera_flash(struct render_args* args) {
 	int i;
@@ -29,6 +31,7 @@ void camera_flash(struct render_args* args) {
 		uint8_t rp = args->framebuf[ri] & 0x7f;
 		if (!(args->framenum % old_mod)) {
 			mp = (lp + mp + rp) / 4;
+			// mp = MAX(MAX(lp, mp), rp) / 3;
 			args->framebuf[mi] = 0x80 | (mp & 0x7f);
 		} else {
 			double faded = mp * 0.99;
