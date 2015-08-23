@@ -15,6 +15,8 @@ struct effect effect_treads_rolling_rainbow;
 struct effect effect_treads_camera_flash;
 struct effect effect_treads_rainbow;
 struct effect effect_treads_cylon;
+struct effect effect_treads_hover;
+struct effect effect_treads_rainbow_hover;
 struct effect effect_treads_ruler;
 
 struct effect effect_barrel_off;
@@ -33,6 +35,8 @@ struct effect* effects_treads[] = {
 	&effect_treads_rainbow,
 	&effect_treads_camera_flash,
 	&effect_treads_cylon,
+	&effect_treads_hover,
+	&effect_treads_rainbow_hover,
 	&effect_treads_ruler,
 };
 
