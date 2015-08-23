@@ -37,7 +37,7 @@ struct effect* effects_treads[] = {
 	// &effect_treads_off,
 	// &effect_treads_ruler,
 	&effect_treads_antialias,
-	&effect_treads_simple,
+	// &effect_treads_simple,
 	&effect_treads_rolling_rainbow,
 	&effect_treads_rainbow,
 	&effect_treads_camera_flash,
