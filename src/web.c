@@ -287,7 +287,7 @@ int channel_json(char* buf, size_t len, struct channel* channel) {
 	int i;
 	int ret;
 	int first = 1;
-	char all_buf[MAX_EFFECTS * 1024];
+	char all_buf[MAX_EFFECTS * 512];
 	char* ptr = all_buf;
 
 	*ptr = 0;
@@ -329,9 +329,9 @@ int channel_json(char* buf, size_t len, struct channel* channel) {
 
 static
 int effects_json(char* buf, size_t len) {
-	char treads_buf[MAX_EFFECTS * 1024];
-	char panels_buf[MAX_EFFECTS * 1024];
-	char barrel_buf[MAX_EFFECTS * 1024];
+	char treads_buf[MAX_EFFECTS * 512];
+	char panels_buf[MAX_EFFECTS * 512];
+	char barrel_buf[MAX_EFFECTS * 512];
 
 	channel_json(treads_buf, sizeof(treads_buf), &channel_treads);
 	channel_json(panels_buf, sizeof(panels_buf), &channel_panels);
@@ -349,7 +349,7 @@ int settings_save() {
 	FILE* fp;
 	size_t len;
 	char settings_buf[256];
-	char effects_buf[MAX_EFFECTS * 1024];
+	char effects_buf[MAX_EFFECTS * 512];
 
 	len = settings_json(settings_buf, sizeof(settings_buf));
 	LOG(("settings_json: %zu bytes\n", len));
