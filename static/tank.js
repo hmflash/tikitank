@@ -181,7 +181,7 @@ function displayActiveEffect(kind, data) {
 		data.arg_desc = "n/a"
 	}
 
-	$("#" + kind + "ArgumentDescription").html(data.arg_desc);
+	$("#" + kind + "ArgumentDescription").html(data.arg_desc ? data.arg_desc : "N/A");
 	$("#" + kind + "ArgumentValue").val(data.argument);
 	$("#" + kind + "ActiveEffect").text(data.name);
 
