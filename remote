@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# ssh bbb date -s @`( date -u +"%s" )`
-
 if [ "$1" == "" ]; then
 	echo "Usage: $0 <host> [make options]"
 	exit 1
@@ -14,6 +12,10 @@ DIRNAME="`basename "$LOCAL"`"
 REMOTE="${SELF}/${DIRNAME// /\\ }"
 
 shift
+
+if [ "$HOST" == "bbb" ]; then
+	ssh $HOST date -s @`( date -u +"%s" )`
+fi
 
 ssh $HOST "mkdir -p ${REMOTE}"
 rsync -avz --delete --exclude=.git --exclude-from=.gitignore "${LOCAL}/" "${HOST}:${REMOTE}/"
