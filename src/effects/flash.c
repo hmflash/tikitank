@@ -11,12 +11,13 @@ int last_frame = -1;
 static
 void camera_flash(struct render_args* args) {
 	int i;
+	int j;
 	union color color = args->effect->color_arg.color;
 	int num_pixels = args->framelen/3;
 	int delta = args->framenum - last_frame;
 	int flash_rate = args->effect->argument ? args->effect->argument : 1;
-	int old_mod = 20;
-	int new_mod = (1000 / flash_rate) / (1000 / FRAME_PER_SEC);
+	int flash_quotient  = flash_rate / FRAME_PER_SEC;
+	int flash_remainder = flash_rate % FRAME_PER_SEC;
 
 	if (delta > 1) {
 		memset(args->framebuf, 0x80, args->framelen);
@@ -29,17 +30,19 @@ void camera_flash(struct render_args* args) {
 		uint8_t lp = args->framebuf[li] & 0x7f;
 		uint8_t mp = args->framebuf[mi] & 0x7f;
 		uint8_t rp = args->framebuf[ri] & 0x7f;
-		if (!(args->framenum % old_mod)) {
-			mp = (lp + mp + rp) / 4;
-			// mp = MAX(MAX(lp, mp), rp) / 3;
-			args->framebuf[mi] = 0x80 | (mp & 0x7f);
-		} else {
-			double faded = mp * 0.99;
-			args->framebuf[mi] = 0x80 | ((uint8_t)faded & 0x7f);
-		}
+		mp = (lp + mp + rp) / 4;
+		args->framebuf[mi] = 0x80 | (mp & 0x7f);
 	}
 
-	if (!(args->framenum % new_mod)) {
+	for (j = 0; j < flash_quotient; j++) {
+		int p = random() % num_pixels;
+		char* pixel = &args->framebuf[p*3];
+		pixel[0] = 0x80 | color.rgb.green;
+		pixel[1] = 0x80 | color.rgb.red;
+		pixel[2] = 0x80 | color.rgb.blue;
+	}
+
+	if (flash_remainder && !(args->framenum % flash_remainder)) {
 		int p = random() % num_pixels;
 		char* pixel = &args->framebuf[p*3];
 		pixel[0] = 0x80 | color.rgb.green;
