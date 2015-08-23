@@ -186,8 +186,8 @@ int open_spi(const char* dev) {
 		goto err_open_spi;
 	}
 
-	// Run LEDs at 4mhz
-	arg = 4000000;
+	// Run LEDs at 1.5mhz
+	arg = 1500000;
 	if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &arg) == -1) {
 		LOG(("Error setting %s speed: %s\n", dev, strerror(errno)));
 		goto err_open_spi;

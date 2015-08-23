@@ -6,8 +6,6 @@
 static
 int last_frame = -1;
 
-#define MAX(x, y) (x >= y) ? (x) : (y)
-
 static
 void camera_flash(struct render_args* args) {
 	int i;
