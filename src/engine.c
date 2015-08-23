@@ -21,7 +21,6 @@
 #define  METER_PER_INCH     0.0254
 #define    LED_PER_METER   32
 #define    INC_PER_LED    256
-#define  FRAME_PER_SEC     50
 #define    SEC_PER_MIN     60
 
 #define    LED_PER_TICK   (LED_PER_METER * INCH_PER_TICK * METER_PER_INCH)

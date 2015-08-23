@@ -187,7 +187,7 @@ void channel_reset(struct channel* channel) {
 		int j;
 		struct effect* effect = channel->effects[i];
 
-		effect->argument = 0;
+		effect->argument = effect->arg_default;
 		effect->screen_saver = effect->sensor_driven ? 0 : 1;
 
 		for (j = 0; j < NUM_PANELS/3; j++) {

@@ -18,7 +18,8 @@
 #define NUM_PANELS     (10*3)
 #define MAX_EFFECTS     20
 
-#define RAINBOW_LENGTH 768
+#define RAINBOW_LENGTH    768
+#define FRAME_PER_SEC     50
 
 extern char fastled_rainbow[RAINBOW_LENGTH][3];
 extern char linear_rainbow[RAINBOW_LENGTH][3];
@@ -56,6 +57,7 @@ struct render_args {
 struct effect {
 	const char*         name;
 	long                argument;
+	long                arg_default;
 	const char*         arg_desc;
 	union color_arg     color_arg;
 	long                screen_saver;

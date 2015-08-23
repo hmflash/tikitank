@@ -14,6 +14,7 @@ void rainbow_treads(struct render_args* args);
 void rainbow_barrel(struct render_args* args);
 void rainbow_panels(struct render_args* args);
 void rolling_rainbow_treads(struct render_args* args);
+void camera_flash(struct render_args* args);
 
 inline
 void get_cycle(struct render_args* args, int i, int* j, int* cycle) {
@@ -54,6 +55,8 @@ struct effect effect_treads_rainbow = {
 	.render        = rainbow_treads,
 };
 
+struct effect effect_treads_camera_flash;
+
 struct effect effect_barrel_off = {
 	.name          = "off",
 	.arg_desc      = "N/A",
@@ -90,6 +93,7 @@ struct effect* effects_treads[] = {
 	&effect_treads_simple,
 	&effect_treads_rolling_rainbow,
 	&effect_treads_rainbow,
+	&effect_treads_camera_flash,
 };
 
 struct effect* effects_barrel[] = {
