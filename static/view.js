@@ -40,10 +40,10 @@ function startPreview() {
 		var vertices = [
 			[   0,  0 ],
 			[   0, 10 ],  //  10 px
-			[  44, 35 ],  //  46 px
-			[ 208, 35 ],  // 164 px
-			[ 224, 22 ],  //  20 px
-			[ 224, 12 ],  //  10 px
+			[  44, 40 ],  //  46 px
+			[ 208, 40 ],  // 164 px
+			[ 225, 25 ],  //  20 px
+			[ 225, 15 ],  //  10 px
 			[ 208,  0 ],  //  20 px
 			[  80,  0 ]   // 128 px
 		];
@@ -57,6 +57,8 @@ function startPreview() {
 			);
 			prev = cur;
 		}
+	
+		// console.log('i: ', g.i/3, colors.length/3);
 
 		ctx.putImageData(img, 0, 0);
 	}
