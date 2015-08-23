@@ -10,6 +10,7 @@
 // new_max = framelen
 // new = (i / RAINBOW_LENGTH) * framelen
 
+static
 void rainbow_treads(struct render_args* args) {
 	int i;
 	int speed = 4 * args->framenum;
@@ -23,6 +24,7 @@ void rainbow_treads(struct render_args* args) {
 	}
 }
 
+static
 void rainbow_barrel(struct render_args* args) {
 	int i;
 
@@ -33,6 +35,7 @@ void rainbow_barrel(struct render_args* args) {
 	}
 }
 
+static
 void rainbow_panels(struct render_args* args) {
 	int i;
 
@@ -42,3 +45,21 @@ void rainbow_panels(struct render_args* args) {
 		args->framebuf[i+2] = CC_B(RAINBOW_B(args->framenum));
 	}
 }
+
+struct effect effect_treads_rainbow = {
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_treads,
+};
+
+struct effect effect_barrel_rainbow = {
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_barrel,
+};
+
+struct effect effect_panels_rainbow = {
+	.name          = "rainbow",
+	.arg_desc      = "N/A",
+	.render        = rainbow_panels,
+};

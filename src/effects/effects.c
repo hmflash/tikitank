@@ -2,90 +2,26 @@
 
 #include "effects.h"
 
-void off_treads(struct render_args* args);
-void off_barrel(struct render_args* args);
-void off_panels(struct render_args* args);
-
-void simple_treads(struct render_args* args);
-void simple_panels(struct render_args* args);
-void antialias_treads(struct render_args* args);
-
-void rainbow_treads(struct render_args* args);
-void rainbow_barrel(struct render_args* args);
-void rainbow_panels(struct render_args* args);
-void rolling_rainbow_treads(struct render_args* args);
-void camera_flash(struct render_args* args);
-
 inline
 void get_cycle(struct render_args* args, int i, int* j, int* cycle) {
 	*j = args->framelen + args->shift_quotient - i;
 	*cycle = *j % 15;
 }
 
-struct effect effect_treads_off = {
-	.name          = "off",
-	.arg_desc      = "N/A",
-	.render        = off_treads,
-};
-
-struct effect effect_treads_simple = {
-	.name          = "simple",
-	.arg_desc      = "N/A",
-	.render        = simple_treads,
-	.sensor_driven = 1,
-};
-
-struct effect effect_treads_antialias = {
-	.name          = "antialias",
-	.arg_desc      = "N/A",
-	.render        = antialias_treads,
-	.sensor_driven = 1,
-};
-
-struct effect effect_treads_rolling_rainbow = {
-	.name          = "rolling rainbow",
-	.arg_desc      = "N/A",
-	.render        = rolling_rainbow_treads,
-	.sensor_driven = 1,
-};
-
-struct effect effect_treads_rainbow = {
-	.name          = "rainbow",
-	.arg_desc      = "N/A",
-	.render        = rainbow_treads,
-};
-
+struct effect effect_treads_off;
+struct effect effect_treads_simple;
+struct effect effect_treads_antialias;
+struct effect effect_treads_rolling_rainbow;
 struct effect effect_treads_camera_flash;
+struct effect effect_treads_rainbow;
 
-struct effect effect_barrel_off = {
-	.name          = "off",
-	.arg_desc      = "N/A",
-	.render        = off_barrel,
-};
+struct effect effect_barrel_off;
+struct effect effect_barrel_camera_flash;
+struct effect effect_barrel_rainbow;
 
-struct effect effect_barrel_rainbow = {
-	.name          = "rainbow",
-	.arg_desc      = "N/A",
-	.render        = rainbow_barrel,
-};
-
-struct effect effect_panels_off = {
-	.name          = "off",
-	.arg_desc      = "N/A",
-	.render        = off_panels,
-};
-
-struct effect effect_panels_simple = {
-	.name          = "simple",
-	.arg_desc      = "N/A",
-	.render        = simple_panels,
-};
-
-struct effect effect_panels_rainbow = {
-	.name          = "rainbow",
-	.arg_desc      = "N/A",
-	.render        = rainbow_panels,
-};
+struct effect effect_panels_off;
+struct effect effect_panels_simple;
+struct effect effect_panels_rainbow;
 
 struct effect* effects_treads[] = {
 	// &effect_treads_off,
@@ -99,6 +35,7 @@ struct effect* effects_treads[] = {
 struct effect* effects_barrel[] = {
 	// &effect_barrel_off,
 	&effect_barrel_rainbow,
+	&effect_barrel_camera_flash,
 };
 
 struct effect* effects_panels[] = {

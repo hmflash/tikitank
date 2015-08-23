@@ -3,6 +3,7 @@
 
 #include "effects.h"
 
+static
 void simple_treads(struct render_args* args) {
 	int i;
 	int j;
@@ -25,6 +26,7 @@ void simple_treads(struct render_args* args) {
 	}
 }
 
+static
 void simple_panels(struct render_args* args) {
 	int i;
 	union color color;
@@ -37,3 +39,16 @@ void simple_panels(struct render_args* args) {
 		args->framebuf[i+2] = color.rgb.blue;
 	}
 }
+
+struct effect effect_treads_simple = {
+	.name          = "simple",
+	.arg_desc      = "N/A",
+	.render        = simple_treads,
+	.sensor_driven = 1,
+};
+
+struct effect effect_panels_simple = {
+	.name          = "simple",
+	.arg_desc      = "N/A",
+	.render        = simple_panels,
+};

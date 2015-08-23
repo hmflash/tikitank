@@ -8,6 +8,7 @@ uint8_t scale_color(uint8_t color, uint8_t scale) {
 	return ((int)color * (int)(scale)) >> 9;
 }
 
+static
 void antialias_treads(struct render_args* args) {
 	int i;
 	int j;
@@ -38,6 +39,7 @@ void antialias_treads(struct render_args* args) {
 	}
 }
 
+static
 void rolling_rainbow_treads(struct render_args* args) {
 	int i;
 	int j;
@@ -70,3 +72,17 @@ void rolling_rainbow_treads(struct render_args* args) {
 		}
 	}
 }
+
+struct effect effect_treads_antialias = {
+	.name          = "antialias",
+	.arg_desc      = "N/A",
+	.render        = antialias_treads,
+	.sensor_driven = 1,
+};
+
+struct effect effect_treads_rolling_rainbow = {
+	.name          = "rolling rainbow",
+	.arg_desc      = "N/A",
+	.render        = rolling_rainbow_treads,
+	.sensor_driven = 1,
+};

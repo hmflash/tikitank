@@ -53,3 +53,10 @@ struct effect effect_treads_camera_flash = {
 	.arg_default   = 8,
 	.render        = camera_flash,
 };
+
+struct effect effect_barrel_camera_flash = {
+	.name          = "camera flash",
+	.arg_desc      = "flash rate",
+	.arg_default   = 8,
+	.render        = camera_flash,
+};
