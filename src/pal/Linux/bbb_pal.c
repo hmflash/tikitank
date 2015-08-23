@@ -87,6 +87,11 @@ int load_cape(const char* path, const char* name, int* loaded) {
 		return 0;
 	}
 
+	if (!*loaded) {
+		LOG(("Waiting for system to boot...\n"));
+		sleep(5);
+	}
+
 	fp = fopen(path, "w");
 	if (!fp)
 		return -1;

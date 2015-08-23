@@ -115,6 +115,7 @@ void rainbow_hover(struct render_args* args) {
 
 struct effect effect_treads_rainbow_hover = {
 	.name          = "rainbow hover",
+	.arg_desc      = "N/A",
 	.render        = rainbow_hover,
 	.sensor_driven = 1,
 };

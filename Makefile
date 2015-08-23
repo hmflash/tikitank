@@ -88,4 +88,4 @@ install: all
 	cp $(BINDIR)/$(TARGET) $(BINDIR)/firmware.bin $(PREFIX)
 	cp -a static $(PREFIX)
 	cp init /etc/init.d/tikitank
-	update-rc.d tikitank defaults
+	update-rc.d tikitank defaults 99
