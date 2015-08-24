@@ -24,9 +24,9 @@
 extern char fastled_rainbow[RAINBOW_LENGTH][3];
 extern char linear_rainbow[RAINBOW_LENGTH][3];
 
-#define RAINBOW_R(idx) linear_rainbow[(idx) % RAINBOW_LENGTH][0]
-#define RAINBOW_G(idx) linear_rainbow[(idx) % RAINBOW_LENGTH][1]
-#define RAINBOW_B(idx) linear_rainbow[(idx) % RAINBOW_LENGTH][2]
+#define RAINBOW_R(idx) fastled_rainbow[(idx) % RAINBOW_LENGTH][0]
+#define RAINBOW_G(idx) fastled_rainbow[(idx) % RAINBOW_LENGTH][1]
+#define RAINBOW_B(idx) fastled_rainbow[(idx) % RAINBOW_LENGTH][2]
 
 union color {
 	struct {
