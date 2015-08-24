@@ -188,7 +188,11 @@ void channel_reset(struct channel* channel) {
 		struct effect* effect = channel->effects[i];
 
 		effect->argument = effect->arg_default;
-		effect->screen_saver = effect->sensor_driven ? 0 : 1;
+		if (channel == &channel_panels) {
+			effect->screen_saver = 0;
+		} else {
+			effect->screen_saver = effect->sensor_driven ? 0 : 1;
+		}
 
 		for (j = 0; j < NUM_PANELS/3; j++) {
 			effect->color_arg.colors[j].value = 0xffffffff;
