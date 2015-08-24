@@ -21,7 +21,7 @@ void camera_flash(struct render_args* args) {
 		memset(args->framebuf, 0x80, args->framelen);
 	}
 
-	for (i = 0; i < args->framelen; i++) {
+	for (i = args->framelen; i < args->framelen*2; i++) {
 		int li = (i-3) % args->framelen;
 		int mi = (i+0) % args->framelen;
 		int ri = (i+3) % args->framelen;
