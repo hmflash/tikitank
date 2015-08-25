@@ -55,14 +55,14 @@ void rolling_rainbow_panels(struct render_args* args) {
 
 struct effect effect_treads_rainbow = {
 	.name          = "rainbow",
-	.arg_desc      = "rotation rate",
+	.arg_desc      = "cycle rate",
 	.arg_default   = 10,
 	.render        = rainbow,
 };
 
 struct effect effect_barrel_rainbow = {
 	.name          = "rainbow",
-	.arg_desc      = "rotation rate",
+	.arg_desc      = "cycle rate",
 	.arg_default   = 20,
 	.render        = rainbow,
 };
