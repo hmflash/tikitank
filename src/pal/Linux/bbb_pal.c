@@ -63,6 +63,9 @@ struct bbb_pal {
 static
 struct bbb_pal pal;
 
+static
+int use_i2c = 0;
+
 static 
 int load_cape(const char* path, const char* name, int* loaded) {
 	FILE* fp;
@@ -618,6 +621,8 @@ int open_i2c(const char* dev, int address) {
 }
 
 struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned int ema_pow) {
+	int (*panel_fn)(int, const char*, size_t);
+
 	memset(&pal, 0, sizeof(pal));
 	pal.fd_treads = -1;
 	pal.fd_barrel = -1;
@@ -640,9 +645,15 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned i
 		return NULL;
 	}
 
-	pal.fd_panels[0] = open_i2c("/dev/i2c-1", 0x40);
-	pal.fd_panels[1] = open_i2c("/dev/i2c-1", 0x41);
-	pal.dmx = dmx_find_device();
+	if (use_i2c) {
+		pal.fd_panels[0] = open_i2c("/dev/i2c-1", 0x40);
+		pal.fd_panels[1] = open_i2c("/dev/i2c-1", 0x41);
+		panel_fn = write_i2c;
+	}
+	else {
+		pal.dmx = dmx_find_device();
+		panel_fn = dmx_write;
+	}
 
 	pal.pru = pru_init(enc_thresh, enc_delay, ema_pow);
 	if (pal.pru) {
@@ -665,8 +676,7 @@ struct pal* pal_init(unsigned int enc_thresh, unsigned int enc_delay, unsigned i
 	              pal.panels_buf1,
 	              pal.panels_buf2,
 	              NUM_PANELS,
-	              dmx_write,
-	              //write_i2c,
+	              panel_fn,
 	              &pal.p.panels_buf)) {
 		LOG(("Failed to start panel renderer thread: %s\n", strerror(errno)));
 	}
