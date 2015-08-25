@@ -52,9 +52,9 @@ void breather_panels(struct render_args* args) {
 		union color color = args->effect->color_arg.colors[i / 3];
 		union color scaled = {
 			.rgb = {
-				.red   = scale_color(CC_R(color.rgb.red),   c, 0),
-				.green = scale_color(CC_G(color.rgb.green), c, 0),
-				.blue  = scale_color(CC_B(color.rgb.blue),  c, 0),
+				.red   = scale_color(color.rgb.red,   c, 0),
+				.green = scale_color(color.rgb.green, c, 0),
+				.blue  = scale_color(color.rgb.blue,  c, 0),
 			}
 		};
 

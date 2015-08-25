@@ -32,9 +32,9 @@ void rainbow_panels(struct render_args* args) {
 	int i;
 
 	for (i = 0; i < args->framelen; i += 3) {
-		args->framebuf[i+0] = CC_R(RAINBOW_R(args->framenum));
-		args->framebuf[i+1] = CC_G(RAINBOW_G(args->framenum));
-		args->framebuf[i+2] = CC_B(RAINBOW_B(args->framenum));
+		args->framebuf[i+0] = RAINBOW_R(args->framenum);
+		args->framebuf[i+1] = RAINBOW_G(args->framenum);
+		args->framebuf[i+2] = RAINBOW_B(args->framenum);
 	}
 }
 
@@ -47,9 +47,9 @@ void rolling_rainbow_panels(struct render_args* args) {
 	for (i = 0, j = 0; i < args->framelen; i++, j += 3) {
 		char* pixel = &args->framebuf[j];
 		int c = args->framenum + i * scale;
-		pixel[0] = CC_R(RAINBOW_R(c));
-		pixel[1] = CC_G(RAINBOW_G(c));
-		pixel[2] = CC_B(RAINBOW_B(c));
+		pixel[0] = RAINBOW_R(c);
+		pixel[1] = RAINBOW_G(c);
+		pixel[2] = RAINBOW_B(c);
 	}
 }
 

@@ -430,6 +430,7 @@ int dmx_write(int fd, const char* buf, size_t len) {
 	int i;
 	int ret;
 	char* ptr = (char*)buf;
+	int scale = brightness_scale[settings.brightness - 1];
 
 	// Helper to make dmx look like spi writes
 	assert(NUM_PANELS == (10 * 3));
@@ -439,8 +440,10 @@ int dmx_write(int fd, const char* buf, size_t len) {
 	if (!pal.dmx)
 		return -1;
 
-	for (i = 0; i < NUM_PANELS; i++) {
-		ptr[i] /= brightness_scale[settings.brightness - 1];
+	for (i = 0; i < NUM_PANELS; i+=3) {
+		ptr[i+0] = CC_R((ptr[i+0] / scale));
+		ptr[i+1] = CC_G((ptr[i+1] / scale));
+		ptr[i+2] = CC_B((ptr[i+2] / scale));
 	}
 
 	ret = usb_control_msg(pal.dmx,
