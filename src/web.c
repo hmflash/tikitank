@@ -702,3 +702,9 @@ void web_treads_render(const char* buf, size_t len) {
 		mg_websocket_write(ws_conn, WEBSOCKET_OPCODE_BINARY, buf, len);
 	}
 }
+
+void web_barrel_render(const char* buf, size_t len) {
+	if (ws_conn) {
+		mg_websocket_write(ws_conn, WEBSOCKET_OPCODE_BINARY, buf, len);
+	}
+}
