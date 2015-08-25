@@ -27,6 +27,7 @@ struct effect effect_barrel_rainbow_sparkle;
 struct effect effect_barrel_rainbow;
 struct effect effect_barrel_breather;
 struct effect effect_barrel_discharge;
+struct effect effect_barrel_cylon;
 
 struct effect effect_panels_off;
 struct effect effect_panels_simple;
@@ -56,6 +57,7 @@ struct effect* effects_barrel[] = {
 	&effect_barrel_rainbow_sparkle,
 	&effect_barrel_breather,
 	&effect_barrel_discharge,
+	&effect_barrel_cylon,
 };
 
 struct effect* effects_panels[] = {

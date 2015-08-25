@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "effects.h"
 #include "common.h"
 
@@ -15,7 +16,7 @@
 #define KEYFRAME 227
 
 static
-void cylon(struct render_args* args) {
+void cylon_treads(struct render_args* args) {
 	union color color = args->effect->color_arg.color;
 	int num_pixels = args->framelen/3;
 	int upper_start  = args->framelen + 330;
@@ -56,7 +57,38 @@ void cylon(struct render_args* args) {
 	}
 }
 
+static
+void cylon_barrel(struct render_args* args) {
+	int i, j;
+	union color color = args->effect->color_arg.color;
+	int num_pixels = args->framelen/3;
+	int cycle = args->framenum % num_pixels;
+	double t = cos(2 * M_PI * (double)cycle / (double)num_pixels);
+	int x = num_pixels/2 * t + num_pixels/2;
+	int lx = x - 2;
+	int rx = x + 2;
+
+	for (i = 0, j = 0; i < num_pixels; i++, j += 3) {
+		char* pixel = &args->framebuf[j];
+		if (i >= lx && i <= rx) {
+			pixel[0] = 0x80 | color.rgb.green;
+			pixel[1] = 0x80 | color.rgb.red;
+			pixel[2] = 0x80 | color.rgb.blue;
+		} else {
+			pixel[0] = 0x80;
+			pixel[1] = 0x80;
+			pixel[2] = 0x80;
+		}
+	}
+}
+
 struct effect effect_treads_cylon = {
 	.name          = "cylon",
-	.render        = cylon,
+	.render        = cylon_treads,
 };
+
+struct effect effect_barrel_cylon = {
+	.name          = "cylon",
+	.render        = cylon_barrel,
+};
+
