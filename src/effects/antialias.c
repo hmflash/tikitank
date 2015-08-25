@@ -47,26 +47,24 @@ void rolling_rainbow_treads(struct render_args* args) {
 	int cycle;
 	int num_pixels = args->framelen/3;
 
-	for (i = 0; i < num_pixels; i++) {
+	for (i = 0, j = 0; i < num_pixels; i++, j += 3) {
 		int k;
-		char* pixel = &args->framebuf[i*3];
-
-		get_cycle(args, i, &j, &cycle);
-
-		k = j * args->framelen / RAINBOW_LENGTH;
+		char* pixel = &args->framebuf[j];
+		get_cycle(args, i, &k, &cycle);
+		int c = k * RAINBOW_LENGTH / num_pixels;
 
 		if (cycle == 9) {         // left edge
-			pixel[0] = 0x80 | scale_color(RAINBOW_G(k), args->shift_remainder);
-			pixel[1] = 0x80 | scale_color(RAINBOW_R(k), args->shift_remainder);
-			pixel[2] = 0x80 | scale_color(RAINBOW_B(k), args->shift_remainder);
+			pixel[0] = 0x80 | scale_color(RAINBOW_G(c), args->shift_remainder);
+			pixel[1] = 0x80 | scale_color(RAINBOW_R(c), args->shift_remainder);
+			pixel[2] = 0x80 | scale_color(RAINBOW_B(c), args->shift_remainder);
 		} else if (cycle == 14) { // right edge
-			pixel[0] = 0x80 | scale_color(RAINBOW_G(k), 0xff - args->shift_remainder);
-			pixel[1] = 0x80 | scale_color(RAINBOW_R(k), 0xff - args->shift_remainder);
-			pixel[2] = 0x80 | scale_color(RAINBOW_B(k), 0xff - args->shift_remainder);
+			pixel[0] = 0x80 | scale_color(RAINBOW_G(c), 0xff - args->shift_remainder);
+			pixel[1] = 0x80 | scale_color(RAINBOW_R(c), 0xff - args->shift_remainder);
+			pixel[2] = 0x80 | scale_color(RAINBOW_B(c), 0xff - args->shift_remainder);
 		} else if (cycle >= 10) { // middle
-			pixel[0] = 0x80 | RAINBOW_G(k) >> 1;
-			pixel[1] = 0x80 | RAINBOW_R(k) >> 1;
-			pixel[2] = 0x80 | RAINBOW_B(k) >> 1;
+			pixel[0] = 0x80 | RAINBOW_G(c) >> 1;
+			pixel[1] = 0x80 | RAINBOW_R(c) >> 1;
+			pixel[2] = 0x80 | RAINBOW_B(c) >> 1;
 		} else {
 			pixel[0] = 0x80;
 			pixel[1] = 0x80;
