@@ -22,7 +22,7 @@ void hover(struct render_args* args) {
 	union color color = args->effect->color_arg.color;
 	int num_pixels = args->framelen/3;
 	int midpoint = args->framelen + 85;
-	int keyframe = num_pixels/2;
+	int keyframe = num_pixels/2 + 1;
 
 	int k;
 	for (k = 0; k < keyframe; k++) {
@@ -77,7 +77,7 @@ static
 void rainbow_hover(struct render_args* args) {
 	int num_pixels = args->framelen/3;
 	int midpoint = args->framelen + 85;
-	int keyframe = num_pixels/2;
+	int keyframe = num_pixels/2 + 1;
 
 	int k;
 	for (k = 0; k < keyframe; k++) {

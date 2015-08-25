@@ -16,6 +16,7 @@ $(document).ready(function () {
 });
 
 function startPreview() {
+	var mode = true; // true = treads, false = barrel
 	var canvas = document.getElementById('canvas');
 	var width = 300;
 	var height = 50;
@@ -24,49 +25,71 @@ function startPreview() {
 
 	ws = new WebSocket('ws://' + location.host);
 	ws.binaryType = 'arraybuffer';
-	
-	ws.onmessage = function(event) {
-		var colors = new Uint8ClampedArray(event.data);
 
+	ws.onmessage = function(event) {
 		var g = {
+			offset: [20, 5],
 			img: img,
-			colors: colors,
+			colors: new Uint8ClampedArray(event.data),
 			i: 0
 		};
 
-		var origin = [80, 0];
-		var offset = [20, 5];
-
-		var vertices = [
-			[   0,  0 ],
-			[   0, 10 ],  //  10 px
-			[  44, 40 ],  //  46 px
-			[ 208, 40 ],  // 164 px
-			[ 225, 25 ],  //  20 px
-			[ 225, 15 ],  //  10 px
-			[ 208,  0 ],  //  20 px
-			[  80,  0 ]   // 128 px
-		];
-
-		var prev = origin;
-		for (var i = 0; i < vertices.length; i++) {
-			var cur = vertices[i];
-			line(g,
-				prev[0]+offset[0], prev[1]+offset[1], 
-				cur[0]+offset[0], cur[1]+offset[1]
-			);
-			prev = cur;
+		if (mode) {
+			renderTreads(g);
+		} else {
+			renderBarrel(g, 18);
+			renderBarrel(g, 20);
+			renderBarrel(g, 22);
+			ctx.putImageData(img, 0, 0);
 		}
-	
-		// console.log('i: ', g.i/3, colors.length/3);
 
-		ctx.putImageData(img, 0, 0);
+		mode = !mode;
 	}
 
 	ws.onclose = function(event) {
 		ctx.fillStyle = "black";
 		ctx.fillRect(0, 0, width, height);
 	}
+}
+
+function renderTreads(g) {
+	var vertices = [
+		[  80,  0 ],
+		[   0,  0 ],
+		[   0, 10 ],  //  10 px
+		[  44, 40 ],  //  46 px
+		[ 208, 40 ],  // 164 px
+		[ 225, 25 ],  //  20 px
+		[ 225, 15 ],  //  10 px
+		[ 208,  0 ],  //  20 px
+		[  80,  0 ]   // 128 px
+	];
+
+	renderPolygon(g, vertices);
+}
+
+function renderBarrel(g, y) {
+	var vertices = [
+		[ 156, y ],
+		[  80, y ]
+	];
+
+	g.i = 0;
+
+	renderPolygon(g, vertices);
+}
+
+function renderPolygon(g, vertices) {
+	var prev = vertices.shift();
+	for (var i = 0; i < vertices.length; i++) {
+		var cur = vertices[i];
+		line(g,
+			prev[0]+g.offset[0], prev[1]+g.offset[1], 
+			cur[0]+g.offset[0], cur[1]+g.offset[1]
+		);
+		prev = cur;
+	}
+	// console.log('i: ', g.i/3, colors.length/3);
 }
 
 function stopPreview() {

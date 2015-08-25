@@ -124,6 +124,7 @@ int engine_run() {
 		unsigned int sensor_ticks = *eng.pal->enc_ticks;
 		int dt = (int)sensor_ticks - (int)eng.last_tick;
 		char* treads_buf = eng.pal->treads_buf;
+		char* barrel_buf = eng.pal->barrel_buf;
 
 		++framenum;
 		shift_inc = settings.manual_toggle ? settings.manual_tick : dt * INC_PER_TICK;
@@ -151,7 +152,7 @@ int engine_run() {
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
 			.framenum        = framenum,
-			.framebuf        = eng.pal->barrel_buf,
+			.framebuf        = barrel_buf,
 			.framelen        = NUM_BARREL,
 		};
 
@@ -189,6 +190,7 @@ int engine_run() {
 		pal_panels_write();
 
 		web_treads_render(treads_buf, NUM_TREADS);
+		web_barrel_render(barrel_buf, NUM_BARREL);
 
 		tv.tv_nsec += 20000000; // advance by 20ms
 		tv.tv_sec += tv.tv_nsec / 1000000000;
