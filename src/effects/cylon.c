@@ -82,6 +82,51 @@ void cylon_barrel(struct render_args* args) {
 	}
 }
 
+static inline
+int scale_color(int c, double scale) {
+	if (scale == 1.0) {
+		return c;
+	}
+	int nonzeroscale = (scale != 0) ? 1 : 0;
+	return (c == 0) ? 0 : (c * scale) + nonzeroscale;
+}
+
+static inline
+void set_color(char* buf, int len, int i, union color color, double scale) {
+	if (i < len) {
+		int p = i*3;
+		buf[p+0] = 0x80 | scale_color(color.rgb.green, scale);
+		buf[p+1] = 0x80 | scale_color(color.rgb.red,   scale);
+		buf[p+2] = 0x80 | scale_color(color.rgb.blue,  scale);
+	}
+}
+
+static
+void kitt_barrel(struct render_args* args) {
+	union color color = args->effect->color_arg.color;
+	int num_pixels = args->framelen/3;
+	int x = args->framenum % (num_pixels * 2);
+
+	memset(args->framebuf, 0x80, args->framelen);
+
+	if (x < num_pixels) {
+		set_color(args->framebuf, num_pixels, x+1, color, 0.75);
+		set_color(args->framebuf, num_pixels, x+0, color, 1.00);
+		set_color(args->framebuf, num_pixels, x-1, color, 0.75);
+		set_color(args->framebuf, num_pixels, x-2, color, 0.50);
+		set_color(args->framebuf, num_pixels, x-3, color, 0.25);
+		set_color(args->framebuf, num_pixels, x-4, color, 0.10);
+	} else {
+		x = num_pixels*2 - x;
+		set_color(args->framebuf, num_pixels, x-1, color, 0.75);
+		set_color(args->framebuf, num_pixels, x+0, color, 1.00);
+		set_color(args->framebuf, num_pixels, x+1, color, 0.75);
+		set_color(args->framebuf, num_pixels, x+2, color, 0.50);
+		set_color(args->framebuf, num_pixels, x+3, color, 0.25);
+		set_color(args->framebuf, num_pixels, x+4, color, 0.10);
+	}
+}
+
 struct effect effect_treads_cylon = {
 	.name          = "cylon",
 	.render        = cylon_treads,
@@ -90,5 +135,10 @@ struct effect effect_treads_cylon = {
 struct effect effect_barrel_cylon = {
 	.name          = "cylon",
 	.render        = cylon_barrel,
+};
+
+struct effect effect_barrel_kitt = {
+	.name          = "kitt",
+	.render        = kitt_barrel,
 };
 

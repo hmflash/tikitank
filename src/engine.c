@@ -107,8 +107,8 @@ struct effect* get_effect(struct channel* c) {
 
 int engine_run() {
 	int ret;
-	int framenum = 0;
-	int shift = 0;
+	size_t framenum = 0;
+	int shift = -1000;
 	double shift_last = 0;
 	struct timespec tv;
 
@@ -142,7 +142,7 @@ int engine_run() {
 			.effect          = get_effect(&channel_treads),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
-			.framenum        = framenum,
+			.framenum        = framenum % 0x7fffffff,
 			.framebuf        = treads_buf,
 			.framelen        = NUM_TREADS,
 		};
@@ -151,7 +151,7 @@ int engine_run() {
 			.effect          = get_effect(&channel_barrel),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
-			.framenum        = framenum,
+			.framenum        = framenum % 0x7fffffff,
 			.framebuf        = barrel_buf,
 			.framelen        = NUM_BARREL,
 		};
@@ -160,7 +160,7 @@ int engine_run() {
 			.effect          = get_effect(&channel_panels),
 			.shift_quotient  = shift / 0xff,
 			.shift_remainder = shift % 0xff,
-			.framenum        = framenum,
+			.framenum        = framenum % 0x7fffffff,
 			.framebuf        = eng.pal->panels_buf,
 			.framelen        = NUM_PANELS,
 		};
@@ -174,7 +174,7 @@ int engine_run() {
 		           *eng.pal->enc_max,
 		           *eng.pal->enc_ticks,
 		           dt,
-			   *eng.pal->enc_speed));
+		           *eng.pal->enc_speed));
 
 		treads_args.effect->render(&treads_args);
 		barrel_args.effect->render(&barrel_args);
