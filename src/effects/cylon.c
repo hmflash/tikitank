@@ -93,7 +93,7 @@ int scale_color(int c, double scale) {
 
 static inline
 void set_color(char* buf, int len, int i, union color color, double scale) {
-	if (i < len) {
+	if (0 <= i && i < len) {
 		int p = i*3;
 		buf[p+0] = 0x80 | scale_color(color.rgb.green, scale);
 		buf[p+1] = 0x80 | scale_color(color.rgb.red,   scale);
