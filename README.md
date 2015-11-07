@@ -16,6 +16,11 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 # This disables lightdm run from "/etc/init.d/lightdm".
 optargs=text
 ```
+* Clone the repo on the Beaglebone
+
+* Install software with ```make install```
+
+* Reboot
 
 ### Wiring Diagram
 
