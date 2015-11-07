@@ -44,7 +44,7 @@ void rolling_rainbow_panels(struct render_args* args) {
 	int j;
 	int scale = RAINBOW_LENGTH / NUM_PANELS;
 
-	for (i = 0, j = 0; i < args->framelen; i++, j += 3) {
+	for (i = 0, j = 0; j < args->framelen; i++, j += 3) {
 		char* pixel = &args->framebuf[j];
 		int c = args->framenum + i * scale;
 		pixel[0] = RAINBOW_R(c);
