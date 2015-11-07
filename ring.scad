@@ -1,10 +1,10 @@
-diameter=3.04*25.4;  // Ring inner diameter
-height=0.5*25.4;     // Ring height
+diameter=3.03*25.4;  // Ring inner diameter
+height=1.0*25.4;     // Ring height
 thickness=5;         // Ring thickness
 mag_dia=6.10;        // Magnet diameter
 num_mags=16;         // Number of magnets
 detail=100;          // Circle detail
-teeth=2;             // Joint teeth count
+teeth=4;             // Joint teeth count
 
 difference(){
     difference() {
